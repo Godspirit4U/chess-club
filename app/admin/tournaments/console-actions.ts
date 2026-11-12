@@ -154,3 +154,42 @@ export async function publishRound(formData: FormData) {
   revalidatePath(`/tournaments/${slug}`);
   redirect(`/admin/tournaments/${slug}/console`);
 }
+
+export async function saveResult(formData: FormData) {
+  await requireAdmin();
+
+  const matchId = String(formData.get("match_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const result = String(formData.get("result") ?? "unplayed");
+  const pgn = String(formData.get("pgn") ?? "").trim();
+
+  const allowed = ["white", "black", "draw", "bye", "forfeit_white", "forfeit_black", "unplayed"];
+  if (!allowed.includes(result)) redirect(`/admin/tournaments/${slug}/console`);
+
+  const supabase = createClient();
+  await supabase
+    .from("matches")
+    .update({
+      result,
+      pgn: pgn || null,
+      ended_at: result === "unplayed" ? null : new Date().toISOString()
+    })
+    .eq("id", matchId);
+
+  revalidatePath(`/admin/tournaments/${slug}/console`);
+  revalidatePath(`/tournaments/${slug}`);
+  redirect(`/admin/tournaments/${slug}/console`);
+}
+
+export async function completeTournament(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("tournament_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+
+  const supabase = createClient();
+  await supabase.from("tournaments").update({ status: "completed" }).eq("id", id);
+
+  revalidatePath("/tournaments");
+  revalidatePath(`/tournaments/${slug}`);
+  redirect(`/tournaments/${slug}`);
+}

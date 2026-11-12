@@ -4,8 +4,10 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { computeStandings, generateSwiss, type MatchRow } from "@/lib/pairings";
 import {
+  completeTournament,
   generateRound,
   publishRound,
+  saveResult,
   startTournament,
   swapColours
 } from "@/app/admin/tournaments/console-actions";
@@ -46,7 +48,7 @@ export default async function ConsolePage({ params, searchParams }: Props) {
   const { data: matches } = roundIds.length
     ? await supabase
         .from("matches")
-        .select("id,round_id,board,white_id,black_id,result")
+        .select("id,round_id,board,white_id,black_id,result,pgn")
         .in("round_id", roundIds)
         .order("board", { ascending: true })
     : { data: [] as any[] };
@@ -195,26 +197,84 @@ export default async function ConsolePage({ params, searchParams }: Props) {
 
       {(rounds ?? []).some((r) => r.published_at) ? (
         <section style={{ marginTop: 28 }}>
-          <h2>Published rounds</h2>
+          <h2>Enter results</h2>
+          <p className="muted small">
+            One row per board. A PGN is optional; the result counts either way.
+          </p>
+
           {(rounds ?? [])
             .filter((r) => r.published_at)
             .map((r) => {
               const rows = (matches ?? []).filter((m) => m.round_id === r.id);
               return (
-                <div key={r.id} className="card" style={{ marginBottom: 12 }}>
+                <div key={r.id} className="card" style={{ marginBottom: 16 }}>
                   <h3>Round {r.number}</h3>
-                  <ul style={{ margin: 0, paddingLeft: 18 }}>
-                    {rows.map((m) => (
-                      <li key={m.id} className="small">
-                        {m.white_id ? nameOf.get(m.white_id) : "—"} vs{" "}
-                        {m.black_id ? nameOf.get(m.black_id) : "bye"}
-                      </li>
-                    ))}
-                  </ul>
+                  {rows.map((m) => {
+                    const isBye = !m.black_id;
+                    return (
+                      <form
+                        key={m.id}
+                        action={saveResult}
+                        style={{
+                          display: "grid",
+                          gap: 8,
+                          padding: "10px 0",
+                          borderTop: "1px solid var(--border)"
+                        }}
+                      >
+                        <input type="hidden" name="match_id" value={m.id} />
+                        <input type="hidden" name="slug" value={tournament.slug} />
+
+                        <div className="small">
+                          Board {m.board}: {m.white_id ? nameOf.get(m.white_id) : "—"} vs{" "}
+                          {isBye ? "bye" : m.black_id ? nameOf.get(m.black_id) : "—"}{" "}
+                          <span className="muted">· now: {m.result}</span>
+                        </div>
+
+                        {isBye ? (
+                          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                            <button className="btn secondary" name="result" value="bye" type="submit">
+                              Count as bye
+                            </button>
+                          </div>
+                        ) : (
+                          <>
+                            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                              <button className="btn" name="result" value="white" type="submit">
+                                White won
+                              </button>
+                              <button className="btn secondary" name="result" value="draw" type="submit">
+                                Draw
+                              </button>
+                              <button className="btn" name="result" value="black" type="submit">
+                                Black won
+                              </button>
+                            </div>
+                            <input
+                              name="pgn"
+                              placeholder="PGN, optional"
+                              defaultValue={m.pgn ?? ""}
+                              style={{ fontSize: 13 }}
+                            />
+                          </>
+                        )}
+                      </form>
+                    );
+                  })}
                 </div>
               );
             })}
         </section>
+      ) : null}
+
+      {tournament.status === "running" ? (
+        <form action={completeTournament} style={{ marginTop: 24 }}>
+          <input type="hidden" name="tournament_id" value={tournament.id} />
+          <input type="hidden" name="slug" value={tournament.slug} />
+          <button className="btn secondary" type="submit">
+            Mark the tournament complete
+          </button>
+        </form>
       ) : null}
     </>
   );

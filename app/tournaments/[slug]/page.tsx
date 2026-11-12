@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient, getCurrentProfile, isConfigured } from "@/lib/supabase/server";
+import { computeStandings, type MatchRow } from "@/lib/pairings";
 import { registerForTournament } from "@/app/admin/tournaments/actions";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +50,25 @@ export default async function TournamentPage({ params }: Props) {
         .from("tournament_players")
         .select("profile_id,withdrawn_at,profiles(full_name)")
         .eq("tournament_id", tournament.id)
+    : { data: [] as any[] };
+
+  const { data: rounds } = supabase
+    ? await supabase
+        .from("rounds")
+        .select("id,number,published_at")
+        .eq("tournament_id", tournament.id)
+        .not("published_at", "is", null)
+        .order("number", { ascending: true })
+    : { data: [] as any[] };
+
+  const publishedRoundIds = (rounds ?? []).map((r: any) => r.id);
+
+  const { data: allMatches } = supabase && publishedRoundIds.length
+    ? await supabase
+        .from("matches")
+        .select("id,round_id,board,white_id,black_id,result,pgn")
+        .in("round_id", publishedRoundIds)
+        .order("board", { ascending: true })
     : { data: [] as any[] };
 
   const active = (players ?? []).filter((p: any) => !p.withdrawn_at);
@@ -154,13 +174,96 @@ export default async function TournamentPage({ params }: Props) {
         </section>
       ) : null}
 
-      <section style={{ marginTop: 28 }}>
-        <h2>Pairings and table</h2>
-        <p className="empty">
-          Pairings appear here once the tournament starts. The points table follows the first
-          result.
-        </p>
-      </section>
+      {(allMatches ?? []).length > 0 ? (
+        <>
+          <section style={{ marginTop: 28 }}>
+            <h2>Points table</h2>
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Player</th>
+                  <th>P</th>
+                  <th>W</th>
+                  <th>D</th>
+                  <th>L</th>
+                  <th>Pts</th>
+                  <th>Form</th>
+                </tr>
+              </thead>
+              <tbody>
+                {computeStandings(
+                  active.map((p: any) => ({
+                    profileId: p.profile_id,
+                    name: p.profiles?.full_name ?? "Member"
+                  })),
+                  (allMatches as MatchRow[]) ?? [],
+                  { win: 1, draw: 0.5, loss: 0 }
+                ).map((row, i) => (
+                  <tr key={row.profileId}>
+                    <td>{i + 1}</td>
+                    <td>{row.name}</td>
+                    <td>{row.played}</td>
+                    <td>{row.wins}</td>
+                    <td>{row.draws}</td>
+                    <td>{row.losses}</td>
+                    <td>
+                      <strong>{row.points}</strong>
+                    </td>
+                    <td className="small muted">{row.form.slice(-5).join(" ")}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
+
+          <section style={{ marginTop: 28 }}>
+            <h2>Pairings</h2>
+            {(rounds ?? []).map((r: any) => {
+              const rows = (allMatches ?? []).filter((m: any) => m.round_id === r.id);
+              return (
+                <div key={r.id} className="card" style={{ marginBottom: 12 }}>
+                  <h3>Round {r.number}</h3>
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    {rows.map((m: any) => {
+                      const whiteName = active.find((p: any) => p.profile_id === m.white_id);
+                      const blackName = active.find((p: any) => p.profile_id === m.black_id);
+                      const score =
+                        m.result === "white" || m.result === "forfeit_black"
+                          ? "1-0"
+                          : m.result === "black" || m.result === "forfeit_white"
+                            ? "0-1"
+                            : m.result === "draw"
+                              ? "½-½"
+                              : m.result === "bye"
+                                ? "bye"
+                                : "";
+                      return (
+                        <li key={m.id} className="small">
+                          {whiteName?.profiles?.full_name ?? "—"} vs{" "}
+                          {blackName?.profiles?.full_name ?? "bye"}{" "}
+                          {score ? <strong>{score}</strong> : null}{" "}
+                          <Link href={`/tournaments/${tournament.slug}/matches/${m.id}`}>
+                            open
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              );
+            })}
+          </section>
+        </>
+      ) : (
+        <section style={{ marginTop: 28 }}>
+          <h2>Pairings and table</h2>
+          <p className="empty">
+            Pairings appear here once the tournament starts. The points table follows the first
+            result.
+          </p>
+        </section>
+      )}
     </>
   );
 }
