@@ -17,7 +17,7 @@ export default function LoginPage({ searchParams }: Props) {
       <h1>{isSignUp ? "Create your account" : "Sign in"}</h1>
       <p className="muted">
         {isSignUp
-          ? "Members should use their college email. Your account works immediately."
+          ? "Use your Sai University email, like name.batch@scds.saiuniversity.edu.in. Your account works immediately."
           : "The email address you signed up with."}
       </p>
 
