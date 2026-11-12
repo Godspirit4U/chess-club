@@ -17,8 +17,8 @@ export default function LoginPage({ searchParams }: Props) {
       <h1>{isSignUp ? "Create your account" : "Sign in"}</h1>
       <p className="muted">
         {isSignUp
-          ? "Use your college email. Your account works immediately."
-          : "Use the college email you signed up with."}
+          ? "Members should use their college email. Your account works immediately."
+          : "The email address you signed up with."}
       </p>
 
       {error ? (
@@ -45,7 +45,7 @@ export default function LoginPage({ searchParams }: Props) {
               <input id="full_name" name="full_name" autoComplete="name" required />
             </div>
             <div className="field">
-              <label htmlFor="email">College email</label>
+              <label htmlFor="email">Email address</label>
               <input id="email" name="email" type="email" autoComplete="email" required />
             </div>
             <div className="field">
@@ -66,7 +66,7 @@ export default function LoginPage({ searchParams }: Props) {
         ) : (
           <form action={signIn} className="stack">
             <div className="field">
-              <label htmlFor="email">College email</label>
+              <label htmlFor="email">Email address</label>
               <input id="email" name="email" type="email" autoComplete="email" required />
             </div>
             <div className="field">
