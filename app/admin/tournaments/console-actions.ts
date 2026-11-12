@@ -193,3 +193,27 @@ export async function completeTournament(formData: FormData) {
   revalidatePath(`/tournaments/${slug}`);
   redirect(`/tournaments/${slug}`);
 }
+
+export async function deleteTournament(formData: FormData) {
+  const profile = await getCurrentProfile();
+  if (!profile || profile.role === "member") redirect("/");
+
+  const id = String(formData.get("tournament_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const confirmed = formData.get("confirm") === "on";
+
+  if (!confirmed) {
+    redirect(
+      `/admin/tournaments/${slug}/console?error=${encodeURIComponent(
+        "Tick the box to confirm deleting this tournament."
+      )}`
+    );
+  }
+
+  const supabase = createClient();
+  await supabase.from("tournaments").delete().eq("id", id);
+
+  revalidatePath("/tournaments");
+  revalidatePath("/admin");
+  redirect("/tournaments");
+}

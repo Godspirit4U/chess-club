@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { computeStandings, generateSwiss, type MatchRow } from "@/lib/pairings";
 import {
   completeTournament,
+  deleteTournament,
   generateRound,
   publishRound,
   saveResult,
@@ -276,6 +277,33 @@ export default async function ConsolePage({ params, searchParams }: Props) {
           </button>
         </form>
       ) : null}
+      <section style={{ marginTop: 44, borderTop: "1px solid var(--border)", paddingTop: 20 }}>
+        <h2>Delete this tournament</h2>
+        <p className="muted small">
+          Removes the tournament, its registrations, pairings and results. This cannot be
+          undone.
+        </p>
+        <form action={deleteTournament} className="stack" style={{ maxWidth: 420 }}>
+          <input type="hidden" name="tournament_id" value={tournament.id} />
+          <input type="hidden" name="slug" value={tournament.slug} />
+          <label style={{ display: "flex", gap: 10, alignItems: "center", fontWeight: 400 }}>
+            <input
+              type="checkbox"
+              name="confirm"
+              style={{ width: 18, minHeight: 18 }}
+              required
+            />
+            I understand this deletes everything for this tournament
+          </label>
+          <button
+            className="btn secondary"
+            type="submit"
+            style={{ color: "var(--danger)", maxWidth: 220 }}
+          >
+            Delete tournament
+          </button>
+        </form>
+      </section>
     </>
   );
 }

@@ -12,7 +12,7 @@ type Props = { searchParams: { error?: string; done?: string } };
 
 export default async function PeoplePage({ searchParams }: Props) {
   const profile = await getCurrentProfile();
-  if (!profile || profile.role !== "super_admin") redirect("/admin");
+  if (!profile || profile.role === "member") redirect("/admin");
 
   const supabase = createClient();
   const { data: people } = await supabase
@@ -37,7 +37,7 @@ export default async function PeoplePage({ searchParams }: Props) {
         </p>
       ) : null}
 
-      <PeopleTable people={(people ?? []) as any} myId={profile.id} />
+      <PeopleTable people={(people ?? []) as any} myId={profile.id} myRole={profile.role} />
 
       <section style={{ marginTop: 36 }}>
         <h2>Add someone who could not register</h2>

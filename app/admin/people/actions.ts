@@ -5,24 +5,43 @@ import { revalidatePath } from "next/cache";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { createAdminClient, hasServiceRole } from "@/lib/supabase/admin";
 
-async function requireSuperAdmin() {
+async function requireAdmin() {
   const profile = await getCurrentProfile();
-  if (!profile || profile.role !== "super_admin") redirect("/admin");
+  if (!profile || profile.role === "member") redirect("/admin");
   return profile;
 }
 
 export async function changeRole(formData: FormData) {
-  const me = await requireSuperAdmin();
+  const me = await requireAdmin();
 
   const id = String(formData.get("id") ?? "");
   const role = String(formData.get("role") ?? "member");
 
   if (!["member", "admin", "super_admin"].includes(role)) redirect("/admin/people");
-  if (id === me.id && role !== "super_admin") {
-    redirect(`/admin/people?error=${encodeURIComponent("You cannot remove your own access.")}`);
+  if (id === me.id && role !== me.role) {
+    redirect(`/admin/people?error=${encodeURIComponent("You cannot change your own role.")}`);
   }
 
   const supabase = createClient();
+  const { data: target } = await supabase
+    .from("profiles")
+    .select("id,role")
+    .eq("id", id)
+    .single();
+
+  if (!target) redirect(`/admin/people?error=${encodeURIComponent("That person no longer exists.")}`);
+
+  if (me.role !== "super_admin") {
+    // Admins may promote a member to admin. Nothing else.
+    if (target!.role !== "member" || role !== "admin") {
+      redirect(
+        `/admin/people?error=${encodeURIComponent(
+          "Only a super admin can change the role of an admin or a super admin."
+        )}`
+      );
+    }
+  }
+
   await supabase.from("profiles").update({ role }).eq("id", id);
 
   revalidatePath("/admin/people");
@@ -30,12 +49,25 @@ export async function changeRole(formData: FormData) {
 }
 
 export async function removeMember(formData: FormData) {
-  const me = await requireSuperAdmin();
+  const me = await requireAdmin();
   const id = String(formData.get("id") ?? "");
   const email = String(formData.get("email") ?? "");
 
   if (id === me.id) {
     redirect(`/admin/people?error=${encodeURIComponent("You cannot remove your own account.")}`);
+  }
+
+  const supabaseCheck = createClient();
+  const { data: target } = await supabaseCheck
+    .from("profiles")
+    .select("role")
+    .eq("id", id)
+    .single();
+
+  if (me.role !== "super_admin" && target?.role !== "member") {
+    redirect(
+      `/admin/people?error=${encodeURIComponent("Only a super admin can remove an admin.")}`
+    );
   }
 
   if (!hasServiceRole) {
@@ -58,7 +90,7 @@ export async function removeMember(formData: FormData) {
 }
 
 export async function addMember(formData: FormData) {
-  await requireSuperAdmin();
+  await requireAdmin();
 
   const fullName = String(formData.get("full_name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();

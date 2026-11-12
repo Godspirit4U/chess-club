@@ -12,11 +12,14 @@ type Person = {
 
 export default function PeopleTable({
   people,
-  myId
+  myId,
+  myRole
 }: {
   people: Person[];
   myId: string;
+  myRole: "member" | "admin" | "super_admin";
 }) {
+  const isSuper = myRole === "super_admin";
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
@@ -67,25 +70,41 @@ export default function PeopleTable({
                 </td>
                 <td className="small muted">{p.email}</td>
                 <td>
-                  <form action={changeRole} style={{ display: "flex", gap: 6 }}>
-                    <input type="hidden" name="id" value={p.id} />
-                    <select
-                      name="role"
-                      defaultValue={p.role}
-                      style={{ minHeight: 36, fontSize: 14, minWidth: 130 }}
-                      aria-label={`Role for ${p.full_name}`}
-                    >
-                      <option value="member">Member</option>
-                      <option value="admin">Admin</option>
-                      <option value="super_admin">Super admin</option>
-                    </select>
-                    <button className="btn secondary" type="submit" style={{ minHeight: 36 }}>
-                      Save
-                    </button>
-                  </form>
+                  {p.id === myId ? (
+                    <span className="muted small">You</span>
+                  ) : isSuper ? (
+                    <form action={changeRole} style={{ display: "flex", gap: 6 }}>
+                      <input type="hidden" name="id" value={p.id} />
+                      <select
+                        name="role"
+                        defaultValue={p.role}
+                        style={{ minHeight: 36, fontSize: 14, minWidth: 130 }}
+                        aria-label={`Role for ${p.full_name}`}
+                      >
+                        <option value="member">Member</option>
+                        <option value="admin">Admin</option>
+                        <option value="super_admin">Super admin</option>
+                      </select>
+                      <button className="btn secondary" type="submit" style={{ minHeight: 36 }}>
+                        Save
+                      </button>
+                    </form>
+                  ) : p.role === "member" ? (
+                    <form action={changeRole}>
+                      <input type="hidden" name="id" value={p.id} />
+                      <input type="hidden" name="role" value="admin" />
+                      <button className="btn secondary" type="submit" style={{ minHeight: 36 }}>
+                        Make admin
+                      </button>
+                    </form>
+                  ) : (
+                    <span className="muted small">
+                      {p.role === "super_admin" ? "Super admin" : "Admin"}
+                    </span>
+                  )}
                 </td>
                 <td>
-                  {p.id !== myId ? (
+                  {p.id !== myId && (isSuper || p.role === "member") ? (
                     <form action={removeMember}>
                       <input type="hidden" name="id" value={p.id} />
                       <input type="hidden" name="email" value={p.email} />
