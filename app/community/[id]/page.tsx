@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import ChatRoom from "@/components/ChatRoom";
+import { sendRequest } from "../actions";
 
 export const metadata: Metadata = { title: "Message" };
 export const dynamic = "force-dynamic";
@@ -23,6 +24,32 @@ export default async function ConversationPage({ params }: Props) {
     .single();
 
   if (!other) notFound();
+
+  const { data: friends } = await supabase.rpc("are_friends", {
+    a: profile.id,
+    b: other.id
+  });
+
+  if (!friends) {
+    return (
+      <>
+        <p className="small">
+          <Link href="/community/people">Find people</Link>
+        </p>
+        <h2 style={{ marginTop: 0 }}>{other.full_name}</h2>
+        <p className="muted">
+          You can message each other once a connection is accepted. Send a request and wait
+          for them to accept.
+        </p>
+        <form action={sendRequest}>
+          <input type="hidden" name="addressee_id" value={other.id} />
+          <button className="btn" type="submit">
+            Send request
+          </button>
+        </form>
+      </>
+    );
+  }
 
   // Conversations are stored with the lower uuid first.
   const [a, b] = [profile.id, other.id].sort();
@@ -67,7 +94,7 @@ export default async function ConversationPage({ params }: Props) {
       <p className="small">
         <Link href="/community">Community</Link>
       </p>
-      <h1>{other.full_name}</h1>
+      <h2 style={{ marginTop: 0 }}>{other.full_name}</h2>
 
       <div style={{ marginTop: 16 }}>
         <ChatRoom
