@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient, getCurrentProfile, isConfigured } from "@/lib/supabase/server";
 import { computeStandings, type MatchRow } from "@/lib/pairings";
-import { registerForTournament } from "@/app/admin/tournaments/actions";
+import { registerForTournament, withdrawFromTournament } from "@/app/admin/tournaments/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -132,7 +132,20 @@ export default async function TournamentPage({ params }: Props) {
         {tournament.status === "completed" ? (
           <p className="muted small">This tournament has finished.</p>
         ) : registered ? (
-          <p className="muted small">You are registered. Pairings appear here each round.</p>
+          <div className="stack" style={{ maxWidth: 320 }}>
+            <p className="muted small" style={{ margin: 0 }}>
+              You are registered. Pairings appear here once the admin publishes them.
+            </p>
+            {registrationOpen ? (
+              <form action={withdrawFromTournament}>
+                <input type="hidden" name="tournament_id" value={tournament.id} />
+                <input type="hidden" name="slug" value={tournament.slug} />
+                <button className="btn secondary" type="submit">
+                  Withdraw my registration
+                </button>
+              </form>
+            ) : null}
+          </div>
         ) : registrationOpen ? (
           profile ? (
             <form action={registerForTournament}>
@@ -271,15 +284,7 @@ export default async function TournamentPage({ params }: Props) {
             })}
           </section>
         </>
-      ) : (
-        <section style={{ marginTop: 28 }}>
-          <h2>Pairings and table</h2>
-          <p className="empty">
-            Pairings appear here once the tournament starts. The points table follows the first
-            result.
-          </p>
-        </section>
-      )}
+      ) : null}
     </>
   );
 }

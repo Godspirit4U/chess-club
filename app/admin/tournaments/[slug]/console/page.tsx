@@ -125,7 +125,7 @@ export default async function ConsolePage({ params, searchParams }: Props) {
           <input type="hidden" name="tournament_id" value={tournament.id} />
           <input type="hidden" name="slug" value={tournament.slug} />
           <button className="btn" type="submit">
-            Generate round {(rounds?.length ?? 0) + 1}
+            Generate pairings for round {(rounds?.length ?? 0) + 1}
           </button>
         </form>
       ) : null}
@@ -134,8 +134,8 @@ export default async function ConsolePage({ params, searchParams }: Props) {
         <section style={{ marginTop: 28 }}>
           <h2>Round {draftRound.number}: draft pairings</h2>
           <p className="muted small">
-            Nothing here is public yet. Check the boards, swap colours where needed, then
-            publish.
+            Nothing here is public yet. Members see only the list of participants until
+            you publish.
           </p>
 
           <table style={{ marginTop: 12 }}>
@@ -189,7 +189,7 @@ export default async function ConsolePage({ params, searchParams }: Props) {
             <input type="hidden" name="round_id" value={draftRound.id} />
             <input type="hidden" name="slug" value={tournament.slug} />
             <button className="btn" type="submit">
-              Publish round {draftRound.number}
+              Publish pairings for round {draftRound.number}
             </button>
           </form>
         </section>

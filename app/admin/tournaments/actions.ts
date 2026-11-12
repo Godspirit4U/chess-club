@@ -79,3 +79,21 @@ export async function registerForTournament(formData: FormData) {
   revalidatePath(`/tournaments`);
   redirect(`/tournaments/${String(formData.get("slug") ?? "")}`);
 }
+
+export async function withdrawFromTournament(formData: FormData) {
+  const profile = await getCurrentProfile();
+  if (!profile) redirect("/login");
+
+  const tournamentId = String(formData.get("tournament_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+
+  const supabase = createClient();
+  await supabase
+    .from("tournament_players")
+    .update({ withdrawn_at: new Date().toISOString() })
+    .eq("tournament_id", tournamentId)
+    .eq("profile_id", profile.id);
+
+  revalidatePath(`/tournaments/${slug}`);
+  redirect(`/tournaments/${slug}`);
+}
