@@ -1,13 +1,56 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { createClient, isConfigured } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "Blog" };
+export const metadata: Metadata = {
+  title: "Blog",
+  description: "Announcements, recaps and tournament reports from the SaiU Chess Club."
+};
+export const dynamic = "force-dynamic";
 
-export default function Page() {
+export default async function BlogPage() {
+  let posts: { slug: string; title: string; excerpt: string | null; published_at: string | null }[] = [];
+
+  if (isConfigured) {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from("posts")
+      .select("slug,title,excerpt,published_at")
+      .not("published_at", "is", null)
+      .order("published_at", { ascending: false });
+    posts = data ?? [];
+  }
+
   return (
     <>
       <h1>Blog</h1>
-      <p className="muted">Announcements, recaps and reports from the club.</p>
-      <p className="empty">This page is being built. The layout and the copy are settled; the data lands next.</p>
+      <p className="muted">Announcements, recaps and reports, written by the committee.</p>
+
+      {posts.length === 0 ? (
+        <p className="empty">
+          Nothing published yet. Announcements and tournament recaps will appear here.
+        </p>
+      ) : (
+        <div className="stack" style={{ marginTop: 20 }}>
+          {posts.map((p) => (
+            <article key={p.slug} className="card">
+              <p className="muted small" style={{ margin: 0 }}>
+                {p.published_at
+                  ? new Date(p.published_at).toLocaleDateString("en-IN", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric"
+                    })
+                  : ""}
+              </p>
+              <h2 style={{ margin: "4px 0 6px" }}>
+                <Link href={`/blog/${p.slug}`}>{p.title}</Link>
+              </h2>
+              {p.excerpt ? <p className="muted" style={{ margin: 0 }}>{p.excerpt}</p> : null}
+            </article>
+          ))}
+        </div>
+      )}
     </>
   );
 }
