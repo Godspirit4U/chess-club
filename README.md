@@ -75,7 +75,6 @@ components/             shared UI
 lib/supabase/           browser and server clients
 supabase/
   schema.sql            tables, policies, triggers
-  backup-workflow.yml   scheduled dump, runs in the backups repository
 ```
 
 ## Scripts
@@ -91,7 +90,9 @@ supabase/
 Vercel builds from `main` on every push. Set the two public environment variables in the
 Vercel project settings before the first deploy.
 
-## Further documentation
+## Related repositories and documents
 
-- `HANDOVER.md` — accounts, access and the handover checklist between committees
-- `supabase/schema.sql` — the data model, readable as the specification
+- `Godspirit4U/chess-club-backups` — weekly database dumps, private. Contains the scheduled
+  workflow at `.github/workflows/backup.yml`.
+- `HANDOVER.md` — accounts, access and the transfer checklist between committees.
+- `supabase/schema.sql` — the data model, readable as the specification.
