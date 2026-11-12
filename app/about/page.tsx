@@ -3,15 +3,10 @@ import { club } from "@/lib/club";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Who the SaiU Chess Club is, when it meets, and how it is run."
+  description: "Who the SaiU Chess Club is, and how the club is run."
 };
 
 export default function AboutPage() {
-  const rows = [
-    { label: "Meets", value: [club.meetingDay, club.meetingTime].filter(Boolean).join(", ") },
-    { label: "Venue", value: club.venue }
-  ].filter((r) => r.value);
-
   return (
     <>
       <h1>About {club.name}</h1>
@@ -21,24 +16,19 @@ export default function AboutPage() {
         that carries across the year.
       </p>
 
-      {rows.length > 0 ? (
-        <table style={{ marginTop: 20, maxWidth: 480 }}>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.label}>
-                <th scope="row">{r.label}</th>
-                <td>{r.value}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : null}
-
       <h2 style={{ marginTop: 28 }}>How the club is run</h2>
       <p>
         The committee is the president, the vice president, the secretary and the media
-        partner. They create tournaments, post announcements, and run the site. Any member
-        can register for a tournament, follow the pairings and see the table.
+        partner. They create tournaments, post announcements, and run the site. Any member can
+        register for a tournament, follow the pairings and see the table.
+      </p>
+
+      <h2 style={{ marginTop: 28 }}>What happens at a tournament</h2>
+      <p>
+        Members register before the deadline. When the tournament starts, the committee
+        publishes the pairings for each round. Results go in after every round, and the points
+        table moves with them. Finished games can be replayed move by move, and opened in a
+        full engine on Lichess.
       </p>
 
       <h2 style={{ marginTop: 28 }}>Who can join</h2>
