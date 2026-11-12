@@ -305,3 +305,41 @@ main { padding: 28px 0 56px; }
     top: 16px;
   }
 }
+
+/* Admin: sidebar and main pane */
+.admin-layout {
+  display: grid;
+  gap: 24px;
+  align-items: start;
+}
+
+.admin-side {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.admin-side a {
+  color: var(--ink);
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+}
+
+.admin-side a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+@media (min-width: 900px) {
+  .admin-layout {
+    grid-template-columns: 210px 1fr;
+  }
+
+  .admin-side {
+    border-right: 1px solid var(--border);
+    padding-right: 20px;
+    position: sticky;
+    top: 16px;
+  }
+}
