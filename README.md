@@ -1,45 +1,97 @@
-# Chess club website
+# Chess Club Website
 
-Tournaments, pairings, puzzles, blog and a members-only community for a student chess club.
+Web platform for the university chess club. Tournaments with Swiss, round-robin, knockout
+and group-stage pairings; live points tables; match pages with PGN replay; daily puzzles; a
+blog; and a members-only community with realtime chat.
 
 ## Stack
 
-- **Next.js** (App Router, TypeScript), deployed on Vercel
-- **Supabase** for database, authentication, file storage and realtime chat
-- Plain CSS with design tokens in `app/globals.css`. No CSS framework, no component library.
+| Layer | Choice |
+|---|---|
+| Framework | Next.js 14, App Router, TypeScript |
+| Database | Supabase Postgres |
+| Authentication | Supabase Auth, email and password |
+| File storage | Supabase Storage |
+| Realtime | Supabase Realtime, used for chat |
+| Hosting | Vercel |
 
-## Setup
+## Getting started
 
-1. Create a Supabase project, then run `supabase/schema.sql` in the SQL editor.
-2. Copy `.env.example` to `.env.local` and fill in the URL and anon key.
-3. `npm install && npm run dev`
+Requirements: Node 20 or later, and a Supabase project.
 
-## First admin
+```bash
+git clone https://github.com/Godspirit4U/chess-club.git
+cd chess-club
+npm install
+cp .env.example .env.local
+npm run dev
+```
 
-Sign up through the site with your own email, then run this once in the SQL editor:
+The site runs at `http://localhost:3000`.
+
+## Environment variables
+
+| Name | Where it comes from | Exposed to the browser |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase, Project settings, API | Yes |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase, Project settings, API | Yes |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase, Project settings, API | **No. Server only** |
+| `NEXT_PUBLIC_SITE_URL` | The deployed URL | Yes |
+
+The service role key bypasses row level security. It must never appear in client code or
+in the repository.
+
+## Database
+
+Run `supabase/schema.sql` once in the Supabase SQL editor. It creates eleven tables, the
+row level security policies, the profile trigger, and enables realtime on `messages`.
+
+## First administrator
+
+1. Sign up through the site with your own email.
+2. Run this once in the SQL editor:
 
 ```sql
 update profiles set role = 'super_admin' where email = 'your-email@example.com';
 ```
 
-Everyone else is promoted from `/admin/people` by typing their college email.
+Further administrators are promoted from `/admin/people` by email.
 
-## Structure
+## Project structure
 
 ```
-app/                  pages (App Router)
-  admin/              admin area, behind login
-  tournaments/        list, single tournament, match pages
-  blog/ puzzles/ events/ community/ about/ contact/ profile/
-components/           shared UI
-lib/supabase/         browser and server clients
-supabase/schema.sql   tables, row level security, triggers
+app/
+  page.tsx              home
+  tournaments/          list, single tournament, match pages
+  blog/                 post list and single post
+  puzzles/              daily puzzle and archive
+  events/               all club events
+  community/            directory, general room, direct messages
+  profile/              the signed-in member
+  admin/                admin area, behind login
+  layout.tsx            shell, metadata
+  globals.css           design tokens and base styles
+components/             shared UI
+lib/supabase/           browser and server clients
+supabase/
+  schema.sql            tables, policies, triggers
+  backup-workflow.yml   scheduled dump, runs in the backups repository
 ```
 
-## Rules this project holds itself to
+## Scripts
 
-- No lorem ipsum. A section without real copy does not ship.
-- No gradients, glass cards, glowing orbs, dot grids or hover animations.
-- One accent colour. Status is carried by a label, never by colour alone.
-- Phone first: every page is designed at 375px wide before desktop.
-- Images: 1600px longest edge for blog and hero, 512px square for avatars, WebP, quality 80.
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm start` | Serve the production build |
+
+## Deployment
+
+Vercel builds from `main` on every push. Set the two public environment variables in the
+Vercel project settings before the first deploy.
+
+## Further documentation
+
+- `HANDOVER.md` — accounts, access and the handover checklist between committees
+- `supabase/schema.sql` — the data model, readable as the specification
