@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
-import { setRole } from "./actions";
+import { hasServiceRole } from "@/lib/supabase/admin";
+import PeopleTable from "@/components/PeopleTable";
+import { addMember } from "./actions";
 
 export const metadata: Metadata = { title: "People" };
 export const dynamic = "force-dynamic";
 
-type Props = { searchParams: { error?: string } };
+type Props = { searchParams: { error?: string; done?: string } };
 
 export default async function PeoplePage({ searchParams }: Props) {
   const profile = await getCurrentProfile();
@@ -16,15 +18,12 @@ export default async function PeoplePage({ searchParams }: Props) {
   const { data: people } = await supabase
     .from("profiles")
     .select("id,full_name,email,role")
-    .order("role", { ascending: true })
     .order("full_name", { ascending: true });
 
   return (
     <>
       <h1>People</h1>
-      <p className="muted">
-        Promote someone by their email address. They must have signed up already.
-      </p>
+      <p className="muted">Search for anyone in the club, change their role, or remove them.</p>
 
       {searchParams.error ? (
         <p role="alert" style={{ color: "var(--danger)", fontSize: 14 }}>
@@ -32,44 +31,46 @@ export default async function PeoplePage({ searchParams }: Props) {
         </p>
       ) : null}
 
-      <form action={setRole} className="card stack" style={{ marginTop: 16, maxWidth: 520 }}>
-        <div className="field">
-          <label htmlFor="email">Email address</label>
-          <input id="email" name="email" type="email" required placeholder="name@scds.saiuniversity.edu.in" />
-        </div>
-        <div className="field">
-          <label htmlFor="role">Role</label>
-          <select id="role" name="role" defaultValue="admin">
-            <option value="admin">Admin</option>
-            <option value="super_admin">Super admin</option>
-            <option value="member">Member</option>
-          </select>
-        </div>
-        <button className="btn" type="submit">
-          Save role
-        </button>
-      </form>
+      {searchParams.done ? (
+        <p role="status" style={{ color: "var(--accent)", fontSize: 14 }}>
+          {searchParams.done}.
+        </p>
+      ) : null}
 
-      <section style={{ marginTop: 28 }}>
-        <h2>Everyone ({(people ?? []).length})</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(people ?? []).map((p) => (
-              <tr key={p.id}>
-                <td>{p.full_name}</td>
-                <td className="small muted">{p.email}</td>
-                <td className="small">{p.role.replace("_", " ")}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <PeopleTable people={(people ?? []) as any} myId={profile.id} />
+
+      <section style={{ marginTop: 36 }}>
+        <h2>Add someone who could not register</h2>
+        <p className="muted small">
+          Creates an account with a password you choose. Tell them the password; they can
+          change it once password settings are added.
+        </p>
+
+        {hasServiceRole ? (
+          <form action={addMember} className="card stack" style={{ maxWidth: 480 }}>
+            <div className="field">
+              <label htmlFor="full_name">Full name</label>
+              <input id="full_name" name="full_name" required />
+            </div>
+            <div className="field">
+              <label htmlFor="email">College email</label>
+              <input id="email" name="email" type="email" required />
+            </div>
+            <div className="field">
+              <label htmlFor="password">Temporary password</label>
+              <input id="password" name="password" type="text" minLength={8} required />
+            </div>
+            <button className="btn" type="submit">
+              Add member
+            </button>
+          </form>
+        ) : (
+          <p className="empty">
+            Adding or removing members needs the service role key. Add
+            SUPABASE_SERVICE_ROLE_KEY to the Vercel environment variables and redeploy, and
+            this form appears.
+          </p>
+        )}
       </section>
     </>
   );
