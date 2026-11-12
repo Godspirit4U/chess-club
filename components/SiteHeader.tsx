@@ -13,8 +13,21 @@ const links = [
   { href: "/contact", label: "Contact" }
 ];
 
-export default function SiteHeader() {
+export default function SiteHeader({
+  signedIn,
+  isAdmin,
+  name
+}: {
+  signedIn: boolean;
+  isAdmin: boolean;
+  name?: string;
+}) {
   const [open, setOpen] = useState(false);
+
+  const all = [
+    ...links,
+    ...(signedIn ? [{ href: "/profile", label: name ? name.split(" ")[0] : "Profile" }] : [])
+  ];
 
   return (
     <header className="site-header">
@@ -30,7 +43,18 @@ export default function SiteHeader() {
                 {l.label}
               </Link>
             ))}
-            <Link href="/profile">Profile</Link>
+
+            {isAdmin ? (
+              <Link href="/admin" style={{ fontWeight: 600 }}>
+                Admin
+              </Link>
+            ) : null}
+
+            {signedIn ? (
+              <Link href="/profile">{name ? name.split(" ")[0] : "Profile"}</Link>
+            ) : (
+              <Link href="/login">Sign in</Link>
+            )}
           </nav>
 
           <button
@@ -46,14 +70,21 @@ export default function SiteHeader() {
 
         {open && (
           <nav id="mobile-nav" className="mobile-nav" aria-label="Main">
-            {links.map((l) => (
+            {all.map((l) => (
               <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
                 {l.label}
               </Link>
             ))}
-            <Link href="/profile" onClick={() => setOpen(false)}>
-              Profile
-            </Link>
+            {isAdmin ? (
+              <Link href="/admin" onClick={() => setOpen(false)}>
+                Admin
+              </Link>
+            ) : null}
+            {!signedIn ? (
+              <Link href="/login" onClick={() => setOpen(false)}>
+                Sign in
+              </Link>
+            ) : null}
           </nav>
         )}
       </div>

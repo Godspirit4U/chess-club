@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import { getCurrentProfile } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: {
@@ -13,11 +14,16 @@ export const metadata: Metadata = {
   icons: { icon: "/favicon.ico" }
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const profile = await getCurrentProfile();
   return (
     <html lang="en">
       <body>
-        <SiteHeader />
+        <SiteHeader
+          signedIn={Boolean(profile)}
+          isAdmin={Boolean(profile && profile.role !== "member")}
+          name={profile?.full_name}
+        />
         <main>
           <div className="container">{children}</div>
         </main>
