@@ -33,6 +33,18 @@ export async function signUp(formData: FormData) {
   }
 
   const supabase = createClient();
+
+  // The database enforces this too; this check exists so the message is readable.
+  const { data: allowed } = await supabase.rpc("is_email_allowed", { p_email: email });
+
+  if (allowed === false) {
+    redirect(
+      `/login?mode=signup&error=${encodeURIComponent(
+        "Use your college email address. Only club members can create an account."
+      )}`
+    );
+  }
+
   const { error } = await supabase.auth.signUp({
     email,
     password,
@@ -40,7 +52,10 @@ export async function signUp(formData: FormData) {
   });
 
   if (error) {
-    redirect(`/login?mode=signup&error=${encodeURIComponent(error.message)}`);
+    const message = /college email/i.test(error.message)
+      ? "Use your college email address. Only club members can create an account."
+      : error.message;
+    redirect(`/login?mode=signup&error=${encodeURIComponent(message)}`);
   }
 
   redirect("/profile");
