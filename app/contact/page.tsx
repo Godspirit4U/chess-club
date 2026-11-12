@@ -71,10 +71,10 @@ export default function ContactPage({ searchParams }: Props) {
       ) : null}
 
       <section style={{ marginTop: 28 }}>
-        <h2>Send a message</h2>
+        <h2>Report a problem or send feedback</h2>
         <p className="muted small">
-          A wrong result, a bug on the site, or anything else the committee should know. Goes
-          straight to the admins.
+          A wrong result, something broken on the site, or an idea for the club. Goes straight
+          to the committee.
         </p>
 
         {searchParams.sent ? (
@@ -89,7 +89,7 @@ export default function ContactPage({ searchParams }: Props) {
               fontSize: 14
             }}
           >
-            Message sent. The committee will get back to you.
+            Sent. The committee will see it.
           </p>
         ) : null}
 
@@ -100,6 +100,15 @@ export default function ContactPage({ searchParams }: Props) {
         ) : null}
 
         <form action={sendMessage} className="card stack" style={{ maxWidth: 520 }}>
+          <div className="field">
+            <label htmlFor="kind">What is this about</label>
+            <select id="kind" name="kind" defaultValue="feedback">
+              <option value="problem">A problem with a result or a tournament</option>
+              <option value="bug">Something broken on the site</option>
+              <option value="feedback">Feedback or an idea</option>
+              <option value="other">Something else</option>
+            </select>
+          </div>
           <div className="field">
             <label htmlFor="name">Your name</label>
             <input id="name" name="name" required />
