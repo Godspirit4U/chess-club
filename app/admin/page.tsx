@@ -11,11 +11,19 @@ export default async function AdminPage() {
   let drafts = 0;
   let open = 0;
   let running = 0;
+  let list: { slug: string; name: string; status: string }[] = [];
 
   if (isConfigured) {
     const supabase = createClient();
-    const { data } = await supabase.from("tournaments").select("status");
-    for (const row of data ?? []) {
+    const { data } = await supabase
+      .from("tournaments")
+      .select("slug,name,status")
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    list = (data as { slug: string; name: string; status: string }[]) ?? [];
+
+    for (const row of list) {
       if (row.status === "draft") drafts++;
       if (row.status === "open") open++;
       if (row.status === "running") running++;
@@ -47,6 +55,32 @@ export default async function AdminPage() {
           Create a tournament
         </Link>
       </p>
+
+      {list.length > 0 ? (
+        <section style={{ marginTop: 28 }}>
+          <h2>Your tournaments</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((t) => (
+                <tr key={t.slug}>
+                  <td>{t.name}</td>
+                  <td className="muted">{t.status}</td>
+                  <td>
+                    <Link href={`/admin/tournaments/${t.slug}/console`}>Console</Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </section>
+      ) : null}
     </>
   );
 }
