@@ -11,7 +11,7 @@ export default function SiteFooter() {
           <Link href="/privacy">Privacy</Link> · <Link href="/terms">Terms</Link>
         </p>
         <p className="small">
-          Chess Club, {year}. Built and run by students.
+          SaiU Chess Club, {year}. Built and run by students.
         </p>
       </div>
     </footer>

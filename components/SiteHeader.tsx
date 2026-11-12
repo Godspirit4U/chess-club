@@ -21,7 +21,7 @@ export default function SiteHeader() {
       <div className="container">
         <div className="bar">
           <Link href="/" className="brand">
-            Chess Club
+            SaiU Chess Club
           </Link>
 
           <nav className="nav-links" aria-label="Main">

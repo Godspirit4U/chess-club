@@ -5,11 +5,11 @@ import SiteFooter from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: {
-    default: "Chess Club",
-    template: "%s | Chess Club"
+    default: "SaiU Chess Club",
+    template: "%s | SaiU Chess Club"
   },
   description:
-    "Tournaments, pairings, puzzles and results for the university chess club.",
+    "Tournaments, pairings, puzzles and results for the SaiU Chess Club.",
   icons: { icon: "/favicon.ico" }
 };
 
