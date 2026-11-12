@@ -92,9 +92,25 @@ export default async function TournamentPage({ params }: Props) {
 
   return (
     <>
-      <p className="small">
-        <Link href="/tournaments">Tournaments</Link>
-      </p>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap"
+        }}
+      >
+        <p className="small" style={{ margin: 0 }}>
+          <Link href="/tournaments">Tournaments</Link>
+        </p>
+        {profile && profile.role !== "member" ? (
+          <p className="small" style={{ margin: 0, display: "flex", gap: 12 }}>
+            <Link href={`/admin/tournaments/${tournament.slug}/console`}>Open console</Link>
+            <Link href="/admin/tournaments/new">Create a tournament</Link>
+          </p>
+        ) : null}
+      </div>
 
       <h1>{tournament.name}</h1>
       <p className="muted">

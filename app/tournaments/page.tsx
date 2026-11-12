@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient, isConfigured } from "@/lib/supabase/server";
+import { createClient, getCurrentProfile, isConfigured } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Tournaments",
@@ -41,6 +41,9 @@ function Card({ t }: { t: Row }) {
 }
 
 export default async function TournamentsPage() {
+  const profile = await getCurrentProfile();
+  const isAdmin = Boolean(profile && profile.role !== "member");
+
   let rows: Row[] = [];
 
   if (isConfigured) {
@@ -59,7 +62,22 @@ export default async function TournamentsPage() {
 
   return (
     <>
-      <h1>Tournaments</h1>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap"
+        }}
+      >
+        <h1 style={{ margin: 0 }}>Tournaments</h1>
+        {isAdmin ? (
+          <Link className="btn" href="/admin/tournaments/new">
+            Create a tournament
+          </Link>
+        ) : null}
+      </div>
 
       {rows.length === 0 ? (
         <p className="empty">
