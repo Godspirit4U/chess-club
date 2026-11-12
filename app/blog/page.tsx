@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { createClient, isConfigured } from "@/lib/supabase/server";
+import { createClient, getCurrentProfile, isConfigured } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -9,6 +9,9 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function BlogPage() {
+  const profile = await getCurrentProfile();
+  const isAdmin = Boolean(profile && profile.role !== "member");
+
   let posts: { slug: string; title: string; excerpt: string | null; published_at: string | null }[] = [];
 
   if (isConfigured) {
@@ -23,7 +26,22 @@ export default async function BlogPage() {
 
   return (
     <>
-      <h1>Blog</h1>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap"
+        }}
+      >
+        <h1 style={{ margin: 0 }}>Blog</h1>
+        {isAdmin ? (
+          <Link className="btn" href="/admin/blog">
+            Write a post
+          </Link>
+        ) : null}
+      </div>
       <p className="muted">Announcements, recaps and reports, written by the committee.</p>
 
       {posts.length === 0 ? (

@@ -40,7 +40,22 @@ export default async function CommunityPage() {
 
   return (
     <>
-      <h1>Community</h1>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap"
+        }}
+      >
+        <h1 style={{ margin: 0 }}>Community</h1>
+        {profile.role === "super_admin" ? (
+          <Link className="btn secondary" href="/admin/people">
+            Manage people
+          </Link>
+        ) : null}
+      </div>
       <p className="muted">Members of the club, and the room everyone shares.</p>
 
       <section style={{ marginTop: 20 }}>

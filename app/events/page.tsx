@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { createClient, isConfigured } from "@/lib/supabase/server";
+import Link from "next/link";
+import { createClient, getCurrentProfile, isConfigured } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "Events",
@@ -24,6 +25,9 @@ const kindLabel: Record<string, string> = {
 };
 
 export default async function EventsPage() {
+  const profile = await getCurrentProfile();
+  const isAdmin = Boolean(profile && profile.role !== "member");
+
   let events: Event[] = [];
 
   if (isConfigured) {
@@ -61,7 +65,22 @@ export default async function EventsPage() {
 
   return (
     <>
-      <h1>Events</h1>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap"
+        }}
+      >
+        <h1 style={{ margin: 0 }}>Events</h1>
+        {isAdmin ? (
+          <Link className="btn" href="/admin/events">
+            Add an event
+          </Link>
+        ) : null}
+      </div>
       <p className="muted">Everything the club is doing: tournaments, training and casual meets.</p>
 
       {events.length === 0 ? (

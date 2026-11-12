@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PuzzlesPage() {
   const profile = await getCurrentProfile();
+  const isAdmin = Boolean(profile && profile.role !== "member");
   let puzzles: { id: string; puzzle_date: string; note: string | null }[] = [];
   let solvedCount = 0;
 
@@ -36,7 +37,22 @@ export default async function PuzzlesPage() {
 
   return (
     <>
-      <h1>Puzzles</h1>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          justifyContent: "space-between",
+          gap: 12,
+          flexWrap: "wrap"
+        }}
+      >
+        <h1 style={{ margin: 0 }}>Puzzles</h1>
+        {isAdmin ? (
+          <Link className="btn" href="/admin/puzzles">
+            Add a puzzle
+          </Link>
+        ) : null}
+      </div>
       <p className="muted">One position a day. Solve it on the board and your count goes up.</p>
 
       {profile ? (
