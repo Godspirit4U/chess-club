@@ -89,14 +89,6 @@ export default function PeopleTable({
                         Save
                       </button>
                     </form>
-                  ) : p.role === "member" ? (
-                    <form action={changeRole}>
-                      <input type="hidden" name="id" value={p.id} />
-                      <input type="hidden" name="role" value="admin" />
-                      <button className="btn secondary" type="submit" style={{ minHeight: 36 }}>
-                        Make admin
-                      </button>
-                    </form>
                   ) : (
                     <span className="muted small">
                       {p.role === "super_admin" ? "Super admin" : "Admin"}

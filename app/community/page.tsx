@@ -22,6 +22,7 @@ export default async function GeneralChatPage() {
       <h2 style={{ marginTop: 0 }}>General chat</h2>
       <p className="muted small">Everyone in the club. Anything club-related goes here.</p>
       <ChatRoom
+        canModerate={profile!.role !== "member"}
         room="general"
         currentUserId={profile!.id}
         title="General chat"

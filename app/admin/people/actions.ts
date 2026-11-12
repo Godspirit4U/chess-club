@@ -32,14 +32,11 @@ export async function changeRole(formData: FormData) {
   if (!target) redirect(`/admin/people?error=${encodeURIComponent("That person no longer exists.")}`);
 
   if (me.role !== "super_admin") {
-    // Admins may promote a member to admin. Nothing else.
-    if (target!.role !== "member" || role !== "admin") {
-      redirect(
-        `/admin/people?error=${encodeURIComponent(
-          "Only a super admin can change the role of an admin or a super admin."
-        )}`
-      );
-    }
+    redirect(
+      `/admin/people?error=${encodeURIComponent(
+        "Only a super admin can change anyone's role."
+      )}`
+    );
   }
 
   await supabase.from("profiles").update({ role }).eq("id", id);

@@ -18,13 +18,15 @@ export default function ChatRoom({
   conversationId,
   currentUserId,
   initialMessages,
-  title
+  title,
+  canModerate = false
 }: {
   room: "general" | "admin" | "dm";
   conversationId?: string;
   currentUserId: string;
   initialMessages: Message[];
   title: string;
+  canModerate?: boolean;
 }) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [draft, setDraft] = useState("");
@@ -63,6 +65,14 @@ export default function ChatRoom({
           );
         }
       )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "messages" },
+        (payload) => {
+          const gone = (payload.old as { id?: string })?.id;
+          if (gone) setMessages((prev) => prev.filter((m) => m.id !== gone));
+        }
+      )
       .subscribe();
 
     return () => {
@@ -91,6 +101,12 @@ export default function ChatRoom({
     setSending(false);
   }
 
+  async function remove(id: string) {
+    const supabase = createClient();
+    await supabase.from("messages").delete().eq("id", id);
+    setMessages((prev) => prev.filter((m) => m.id !== id));
+  }
+
   return (
     <div className="card" style={{ padding: 0 }}>
       <div style={{ padding: "12px 16px", borderBottom: "1px solid var(--border)" }}>
@@ -110,7 +126,27 @@ export default function ChatRoom({
                   minute: "2-digit"
                 })}
               </div>
-              <div style={{ whiteSpace: "pre-wrap" }}>{m.body}</div>
+              <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                <div style={{ whiteSpace: "pre-wrap", flex: 1 }}>{m.body}</div>
+                {m.sender_id === currentUserId || canModerate ? (
+                  <button
+                    type="button"
+                    onClick={() => remove(m.id)}
+                    className="small"
+                    style={{
+                      background: "none",
+                      border: 0,
+                      color: "var(--muted)",
+                      cursor: "pointer",
+                      padding: 0,
+                      textDecoration: "underline"
+                    }}
+                    aria-label="Delete message"
+                  >
+                    Delete
+                  </button>
+                ) : null}
+              </div>
             </div>
           ))
         )}
