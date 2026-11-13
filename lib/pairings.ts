@@ -10,6 +10,8 @@ export type Standing = {
   blacks: number;
   hadBye: boolean;
   form: ("W" | "D" | "L")[];
+  /** Colours played, in round order. Used for the FIDE colour rules. */
+  colours: ("w" | "b")[];
 };
 
 export type Board = {
@@ -28,6 +30,8 @@ export type MatchRow = {
   white_id: string | null;
   black_id: string | null;
   result: "white" | "black" | "draw" | "bye" | "forfeit_white" | "forfeit_black" | "unplayed";
+  /** Round number, so colour history is built in the right order. */
+  round?: number;
 };
 
 /** Points, records and colour counts for every player in the tournament. */
@@ -50,11 +54,14 @@ export function computeStandings(
       whites: 0,
       blacks: 0,
       hadBye: false,
-      form: []
+      form: [],
+      colours: []
     });
   }
 
-  for (const m of matches) {
+  const ordered = [...matches].sort((a, b) => (a.round ?? 0) - (b.round ?? 0));
+
+  for (const m of ordered) {
     if (m.result === "unplayed") continue;
 
     if (m.result === "bye") {
@@ -76,6 +83,8 @@ export function computeStandings(
     black.played++;
     white.whites++;
     black.blacks++;
+    white.colours.push("w");
+    black.colours.push("b");
 
     if (m.result === "draw") {
       white.points += points.draw;
@@ -107,6 +116,32 @@ export function computeStandings(
       b.wins - a.wins ||
       a.name.localeCompare(b.name)
   );
+}
+
+/** The colour a player should get next, per FIDE C.04.1 rules 8. */
+function colourPreference(s: Standing): "w" | "b" | null {
+  const diff = s.whites - s.blacks;
+  if (diff > 0) return "b";
+  if (diff < 0) return "w";
+
+  const last = s.colours[s.colours.length - 1];
+  if (!last) return null;
+  return last === "w" ? "b" : "w";
+}
+
+/** Would giving this player this colour break rule 6 or rule 7? */
+function colourViolates(s: Standing, colour: "w" | "b"): boolean {
+  const whites = s.whites + (colour === "w" ? 1 : 0);
+  const blacks = s.blacks + (colour === "b" ? 1 : 0);
+
+  if (Math.abs(whites - blacks) > 2) return true;
+
+  const c = s.colours;
+  if (c.length >= 2 && c[c.length - 1] === colour && c[c.length - 2] === colour) {
+    return true;
+  }
+
+  return false;
 }
 
 /** True when these two have already met in any earlier round. */
@@ -175,19 +210,55 @@ export function generateSwiss(standings: Standing[], previous: MatchRow[]): Draf
       warnings.push("These two have already played");
     }
 
-    // The player with fewer whites takes white; ties alternate by score order.
-    let whiteFirst = player.whites < player.blacks;
-    if (player.whites === player.blacks && opponent.whites === opponent.blacks) {
-      whiteFirst = true;
-    } else if (player.whites === player.blacks) {
-      whiteFirst = opponent.whites > opponent.blacks;
+    // FIDE C.04.1: a player should get the colour they have played less, and
+    // when balanced, the one alternating from their last game.
+    const prefA = colourPreference(player);
+    const prefB = colourPreference(opponent);
+
+    let whiteIsA: boolean;
+
+    if (prefA && prefB && prefA !== prefB) {
+      whiteIsA = prefA === "w";
+    } else if (prefA && !prefB) {
+      whiteIsA = prefA === "w";
+    } else if (!prefA && prefB) {
+      whiteIsA = prefB !== "w";
+    } else if (prefA && prefB && prefA === prefB) {
+      // Both want the same colour: the larger imbalance wins, else the higher scorer.
+      const imbalanceA = Math.abs(player.whites - player.blacks);
+      const imbalanceB = Math.abs(opponent.whites - opponent.blacks);
+      if (imbalanceA === imbalanceB) {
+        whiteIsA = prefA === "w";
+      } else {
+        whiteIsA = imbalanceA > imbalanceB ? prefA === "w" : prefB !== "w";
+      }
+    } else {
+      // Neither has a preference: the higher-ranked player takes white.
+      whiteIsA = true;
     }
 
-    const white = whiteFirst ? player : opponent;
-    const black = whiteFirst ? opponent : player;
+    let white = whiteIsA ? player : opponent;
+    let black = whiteIsA ? opponent : player;
 
-    if (white.whites >= 3 && white.whites > white.blacks + 1) {
-      warnings.push(`${white.name} would have white again`);
+    // Hard rules: never more than two apart, never three of the same colour.
+    const whiteOk = !colourViolates(white, "w");
+    const blackOk = !colourViolates(black, "b");
+
+    if (!(whiteOk && blackOk)) {
+      const swappedOk =
+        !colourViolates(opponent, "w") && !colourViolates(player, "b");
+
+      if (swappedOk) {
+        white = opponent;
+        black = player;
+        warnings.push("Colours swapped to stay within FIDE limits");
+      } else {
+        warnings.push("Colour rule cannot be met for this board");
+      }
+    }
+
+    if (colourViolates(white, "w")) {
+      warnings.push(`${white.name} would exceed the colour limits`);
     }
 
     boards.push({

@@ -64,7 +64,11 @@ export default async function ConsolePage({ params, searchParams }: Props) {
     ? (matches ?? []).filter((m) => m.round_id === draftRound.id)
     : [];
 
-  const previous = (matches ?? []).filter((m) => m.round_id !== draftRound?.id) as MatchRow[];
+  const roundNumber = new Map((rounds ?? []).map((r) => [r.id, r.number]));
+
+  const previous = ((matches ?? []) as any[])
+    .filter((m) => m.round_id !== draftRound?.id)
+    .map((m) => ({ ...m, round: roundNumber.get(m.round_id) ?? 0 })) as MatchRow[];
   const standings = computeStandings(
     (players ?? []).map((p: any) => ({
       profileId: p.profile_id,

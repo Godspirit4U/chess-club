@@ -58,19 +58,28 @@ export async function generateRound(formData: FormData) {
   }
 
   const roundIds = (rounds ?? []).map((r) => r.id);
-  const { data: previous } = roundIds.length
+  const roundNumber = new Map((rounds ?? []).map((r) => [r.id, r.number]));
+
+  const { data: rawPrevious } = roundIds.length
     ? await supabase
         .from("matches")
-        .select("white_id,black_id,result")
+        .select("white_id,black_id,result,round_id")
         .in("round_id", roundIds)
-    : { data: [] as MatchRow[] };
+    : { data: [] as any[] };
+
+  const previous = ((rawPrevious ?? []) as any[]).map((m) => ({
+    white_id: m.white_id,
+    black_id: m.black_id,
+    result: m.result,
+    round: roundNumber.get(m.round_id) ?? 0
+  })) as MatchRow[];
 
   const standings = computeStandings(
     (players ?? []).map((p: any) => ({
       profileId: p.profile_id,
       name: p.profiles?.full_name ?? "Member"
     })),
-    (previous as MatchRow[]) ?? [],
+    previous,
     {
       win: Number(tournament.points_win),
       draw: Number(tournament.points_draw),
@@ -82,7 +91,7 @@ export async function generateRound(formData: FormData) {
     redirect(`/admin/tournaments/${slug}/console?error=${encodeURIComponent("At least two players are needed.")}`);
   }
 
-  const draft = generateSwiss(standings, (previous as MatchRow[]) ?? []);
+  const draft = generateSwiss(standings, previous);
 
   const { data: round, error } = await supabase
     .from("rounds")
