@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SiteHeader from "@/components/SiteHeader";
+import PageLoader from "@/components/PageLoader";
 import SiteFooter from "@/components/SiteFooter";
 import { getCurrentProfile } from "@/lib/supabase/server";
 
@@ -34,6 +35,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           name={profile?.full_name}
         />
         <main id="main">
+          <PageLoader />
           <div className="container">{children}</div>
         </main>
         <SiteFooter />
