@@ -57,6 +57,7 @@ export default async function AdminBlogPage({ searchParams }: Props) {
               <tr>
                 <th>Title</th>
                 <th>Status</th>
+                <th>Edit</th>
                 <th />
               </tr>
             </thead>
@@ -67,6 +68,9 @@ export default async function AdminBlogPage({ searchParams }: Props) {
                     <Link href={`/blog/${p.slug}`}>{p.title}</Link>
                   </td>
                   <td className="muted small">{p.published_at ? "published" : "draft"}</td>
+                  <td>
+                    <Link href={`/admin/blog/${p.id}`}>Edit</Link>
+                  </td>
                   <td>
                     <form action={deletePost}>
                       <input type="hidden" name="id" value={p.id} />

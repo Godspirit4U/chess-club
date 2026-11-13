@@ -49,3 +49,15 @@ export async function recordSolve(formData: FormData) {
   revalidatePath("/puzzles");
   redirect(`/puzzles/${String(formData.get("date") ?? "")}`);
 }
+
+export async function deletePuzzle(formData: FormData) {
+  const profile = await getCurrentProfile();
+  if (!profile || profile.role === "member") redirect("/");
+
+  const id = String(formData.get("id") ?? "");
+  const supabase = createClient();
+  await supabase.from("puzzles").delete().eq("id", id);
+
+  revalidatePath("/puzzles");
+  redirect("/admin/puzzles");
+}

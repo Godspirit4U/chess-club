@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { createPuzzle } from "./actions";
+import { createPuzzle, deletePuzzle } from "./actions";
 
 export const metadata: Metadata = { title: "Puzzles" };
 export const dynamic = "force-dynamic";
@@ -57,6 +57,7 @@ export default async function AdminPuzzlesPage({ searchParams }: Props) {
               <tr>
                 <th>Date</th>
                 <th>Note</th>
+                <th />
               </tr>
             </thead>
             <tbody>
@@ -64,6 +65,20 @@ export default async function AdminPuzzlesPage({ searchParams }: Props) {
                 <tr key={p.id}>
                   <td>{p.puzzle_date}</td>
                   <td className="muted small">{p.note ?? "—"}</td>
+                  <td>
+                    <form
+                      action={deletePuzzle}
+                      onSubmit={(ev) => {
+                        if (!window.confirm("Delete this puzzle and every solve recorded for it?"))
+                          ev.preventDefault();
+                      }}
+                    >
+                      <input type="hidden" name="id" value={p.id} />
+                      <button className="btn secondary" type="submit" style={{ minHeight: 32, color: "var(--danger)" }}>
+                        Delete
+                      </button>
+                    </form>
+                  </td>
                 </tr>
               ))}
             </tbody>

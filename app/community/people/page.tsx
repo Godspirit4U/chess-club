@@ -124,9 +124,23 @@ export default async function PeoplePage() {
                         </form>
                       </span>
                     ) : link.status === "pending" ? (
-                      <span className="muted small">
-                        {link.incoming ? "Wants to connect" : "Request sent"}
-                      </span>
+                      link.incoming ? (
+                        <span className="muted small">Wants to connect</span>
+                      ) : (
+                        <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                          <span className="muted small">Request sent</span>
+                          <form action={removeConnection}>
+                            <input type="hidden" name="id" value={link.id} />
+                            <button
+                              className="btn secondary"
+                              type="submit"
+                              style={{ minHeight: 32, fontSize: 13 }}
+                            >
+                              Cancel
+                            </button>
+                          </form>
+                        </span>
+                      )
                     ) : (
                       <span className="muted small">Declined</span>
                     )}

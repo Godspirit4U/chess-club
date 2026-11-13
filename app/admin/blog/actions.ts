@@ -57,3 +57,31 @@ export async function deletePost(formData: FormData) {
   revalidatePath("/");
   redirect("/admin/blog");
 }
+
+export async function updatePost(formData: FormData) {
+  const profile = await getCurrentProfile();
+  if (!profile || profile.role === "member") redirect("/");
+
+  const id = String(formData.get("id") ?? "");
+  const title = String(formData.get("title") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+
+  if (!title || !body) {
+    redirect(`/admin/blog/${id}?error=${encodeURIComponent("A title and some text are needed.")}`);
+  }
+
+  const supabase = createClient();
+  await supabase
+    .from("posts")
+    .update({
+      title,
+      body,
+      excerpt: String(formData.get("excerpt") ?? "").trim() || body.slice(0, 160),
+      published_at: formData.get("publish") === "on" ? new Date().toISOString() : null
+    })
+    .eq("id", id);
+
+  revalidatePath("/blog");
+  revalidatePath("/");
+  redirect("/admin/blog");
+}

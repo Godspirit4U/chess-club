@@ -40,3 +40,15 @@ export async function createEvent(formData: FormData) {
   revalidatePath("/events");
   redirect("/admin/events");
 }
+
+export async function deleteEvent(formData: FormData) {
+  const profile = await getCurrentProfile();
+  if (!profile || profile.role === "member") redirect("/");
+
+  const id = String(formData.get("id") ?? "");
+  const supabase = createClient();
+  await supabase.from("events").delete().eq("id", id);
+
+  revalidatePath("/events");
+  redirect("/admin/events");
+}

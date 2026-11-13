@@ -11,6 +11,7 @@ const groups: { label: string; links: { href: string; label: string }[] }[] = [
   {
     label: "Tournaments",
     links: [
+      { href: "/admin/tournaments", label: "All tournaments" },
       { href: "/admin/tournaments/new", label: "Create a tournament" },
       { href: "/tournaments", label: "View public list" }
     ]

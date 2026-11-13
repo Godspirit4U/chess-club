@@ -11,6 +11,15 @@ async function requireAdmin() {
   return profile;
 }
 
+
+async function countSuperAdmins(supabase: ReturnType<typeof createClient>) {
+  const { count } = await supabase
+    .from("profiles")
+    .select("id", { count: "exact", head: true })
+    .eq("role", "super_admin");
+  return count ?? 0;
+}
+
 export async function changeRole(formData: FormData) {
   const me = await requireAdmin();
 
@@ -39,6 +48,17 @@ export async function changeRole(formData: FormData) {
     );
   }
 
+  if (target!.role === "super_admin" && role !== "super_admin") {
+    const supers = await countSuperAdmins(supabase);
+    if (supers <= 1) {
+      redirect(
+        `/admin/people?error=${encodeURIComponent(
+          "This is the last super admin. Promote someone else first."
+        )}`
+      );
+    }
+  }
+
   await supabase.from("profiles").update({ role }).eq("id", id);
 
   revalidatePath("/admin/people");
@@ -60,6 +80,17 @@ export async function removeMember(formData: FormData) {
     .select("role")
     .eq("id", id)
     .single();
+
+  if (target?.role === "super_admin") {
+    const supers = await countSuperAdmins(supabaseCheck);
+    if (supers <= 1) {
+      redirect(
+        `/admin/people?error=${encodeURIComponent(
+          "This is the last super admin. Promote someone else first."
+        )}`
+      );
+    }
+  }
 
   if (me.role !== "super_admin" && target?.role !== "member") {
     redirect(

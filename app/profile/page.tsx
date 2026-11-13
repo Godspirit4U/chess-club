@@ -42,6 +42,10 @@ export default async function ProfilePage() {
         </div>
       </div>
 
+      <p style={{ marginTop: 20 }}>
+        <Link href="/profile/edit">Edit profile</Link>
+      </p>
+
       <form action={signOut} style={{ marginTop: 24 }}>
         <button className="btn secondary" type="submit">
           Sign out

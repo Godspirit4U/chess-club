@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { createEvent } from "./actions";
+import { createEvent, deleteEvent } from "./actions";
 
 export const metadata: Metadata = { title: "Events" };
 export const dynamic = "force-dynamic";
@@ -67,6 +67,7 @@ export default async function AdminEventsPage({ searchParams }: Props) {
                 <th>Title</th>
                 <th>Kind</th>
                 <th>When</th>
+                <th />
               </tr>
             </thead>
             <tbody>
@@ -79,6 +80,19 @@ export default async function AdminEventsPage({ searchParams }: Props) {
                       dateStyle: "medium",
                       timeStyle: "short"
                     })}
+                  </td>
+                  <td>
+                    <form
+                      action={deleteEvent}
+                      onSubmit={(ev) => {
+                        if (!window.confirm("Delete this event?")) ev.preventDefault();
+                      }}
+                    >
+                      <input type="hidden" name="id" value={e.id} />
+                      <button className="btn secondary" type="submit" style={{ minHeight: 32, color: "var(--danger)" }}>
+                        Delete
+                      </button>
+                    </form>
                   </td>
                 </tr>
               ))}

@@ -19,12 +19,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body>
+        <a className="skip-link" href="#main">
+          Skip to content
+        </a>
         <SiteHeader
           signedIn={Boolean(profile)}
           isAdmin={Boolean(profile && profile.role !== "member")}
           name={profile?.full_name}
         />
-        <main>
+        <main id="main">
           <div className="container">{children}</div>
         </main>
         <SiteFooter />

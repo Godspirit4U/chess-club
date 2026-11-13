@@ -97,7 +97,15 @@ export default function PeopleTable({
                 </td>
                 <td>
                   {p.id !== myId && (isSuper || p.role === "member") ? (
-                    <form action={removeMember}>
+                    <form
+                      action={removeMember}
+                      onSubmit={(e) => {
+                        const ok = window.confirm(
+                          `Remove ${p.full_name} from the club? This deletes their account, registrations and messages, and cannot be undone.`
+                        );
+                        if (!ok) e.preventDefault();
+                      }}
+                    >
                       <input type="hidden" name="id" value={p.id} />
                       <input type="hidden" name="email" value={p.email} />
                       <button
