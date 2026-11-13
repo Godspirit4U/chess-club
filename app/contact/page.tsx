@@ -39,6 +39,53 @@ export default function ContactPage({ searchParams }: Props) {
       </section>
 
       <section style={{ marginTop: 28 }}>
+        <h2>Find us</h2>
+
+        <div className="grid two" style={{ marginTop: 12 }}>
+          {club.whatsapp ? (
+            <div className="card">
+              <h3 style={{ marginTop: 0, fontSize: 16 }}>WhatsApp group</h3>
+              <p className="muted small">
+                Announcements, session timings and match-day chatter.
+              </p>
+              <a className="btn" href={club.whatsapp} target="_blank" rel="noreferrer">
+                Join the group
+              </a>
+              <img
+                src="/qr-whatsapp.png"
+                alt="QR code for the club WhatsApp group"
+                width={180}
+                height={180}
+                style={{ display: "block", marginTop: 14, borderRadius: 6, width: 180, height: "auto" }}
+              />
+            </div>
+          ) : null}
+
+          {club.instagram ? (
+            <div className="card">
+              <h3 style={{ marginTop: 0, fontSize: 16 }}>Instagram</h3>
+              <p className="muted small">Photos, results and the odd puzzle.</p>
+              <a
+                className="btn secondary"
+                href={`https://instagram.com/${club.instagram}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                @{club.instagram}
+              </a>
+              <img
+                src="/qr-instagram.png"
+                alt="QR code for the club Instagram account"
+                width={180}
+                height={180}
+                style={{ display: "block", marginTop: 14, borderRadius: 6, width: 180, height: "auto" }}
+              />
+            </div>
+          ) : null}
+        </div>
+      </section>
+
+      <section style={{ marginTop: 28 }}>
         <h2>Report a problem or send feedback</h2>
 
         {searchParams.sent ? (
