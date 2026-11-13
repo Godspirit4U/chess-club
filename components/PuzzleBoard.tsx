@@ -28,6 +28,19 @@ export default function PuzzleBoard({
   onSolved: () => void;
   alreadySolved: boolean;
 }) {
+  const moves = useMemo(
+    () =>
+      solution
+        .join(" ")
+        .replace(/\d+\.(\.\.)?/g, " ")
+        .replace(/\b(1-0|0-1|1\/2-1\/2|\*)\b/g, " ")
+        .replace(/[?!]+/g, "")
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean),
+    [solution]
+  );
+
   const game = useMemo(() => {
     const g = new Chess();
     try {
@@ -66,16 +79,34 @@ export default function PuzzleBoard({
         return;
       }
 
-      const expected = solution[step];
+      const expected = moves[step];
       if (move.san === expected) {
         setPosition(attempt);
         setStep((s) => s + 1);
         setSelected(null);
         setMessage(null);
 
-        if (step + 1 >= solution.length) {
+        if (step + 1 >= moves.length) {
           setDone(true);
           onSolved();
+          return;
+        }
+
+        // Play the opponent's reply so the solver only has to find their own moves.
+        const reply = moves[step + 1];
+        if (reply) {
+          try {
+            const after = new Chess(attempt.fen());
+            after.move(reply);
+            setPosition(after);
+            setStep((s2) => s2 + 2);
+            if (step + 2 >= moves.length) {
+              setDone(true);
+              onSolved();
+            }
+          } catch {
+            setStep((s2) => s2 + 1);
+          }
         }
       } else {
         setSelected(null);
