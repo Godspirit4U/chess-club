@@ -40,11 +40,15 @@ export async function recordSolve(formData: FormData) {
   if (!profile) redirect("/login");
 
   const puzzleId = String(formData.get("puzzle_id") ?? "");
+  const seconds = Number(formData.get("seconds") ?? 0) || null;
   const supabase = createClient();
 
   await supabase
     .from("puzzle_solves")
-    .upsert({ puzzle_id: puzzleId, profile_id: profile.id }, { onConflict: "puzzle_id,profile_id", ignoreDuplicates: true });
+    .upsert(
+      { puzzle_id: puzzleId, profile_id: profile.id, seconds },
+      { onConflict: "puzzle_id,profile_id", ignoreDuplicates: true }
+    );
 
   revalidatePath("/puzzles");
   redirect(`/puzzles/${String(formData.get("date") ?? "")}`);

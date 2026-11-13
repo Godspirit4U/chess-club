@@ -1,7 +1,7 @@
 "use client";
 
 import { Chess } from "chess.js";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Chessboard } from "react-chessboard";
 import { recordSolve } from "@/app/admin/puzzles/actions";
 
@@ -41,12 +41,16 @@ export default function PuzzleBoard({
   const [step, setStep] = useState(0);
   const [done, setDone] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [waiting, setWaiting] = useState(false);
+  const startedAt = useRef<number | null>(null);
 
   function submitSolve() {
     if (alreadySolved) return;
     const data = new FormData();
     data.set("puzzle_id", puzzleId);
     data.set("date", date);
+    const elapsed = startedAt.current ? Math.round((Date.now() - startedAt.current) / 1000) : 0;
+    data.set("seconds", String(elapsed));
     void recordSolve(data);
   }
 
@@ -67,27 +71,41 @@ export default function PuzzleBoard({
       return false;
     }
 
+    if (!startedAt.current) startedAt.current = Date.now();
+
     setMessage(null);
 
-    // Play the opponent's reply straight away.
     const reply = moves[step + 1];
-    if (reply) {
+
+    if (!reply) {
+      setPosition(game.fen());
+      setStep(step + 1);
+      if (step + 1 >= moves.length) {
+        setDone(true);
+        submitSolve();
+      }
+      return true;
+    }
+
+    // Show the player's move first, then let the reply slide in.
+    setPosition(game.fen());
+    setWaiting(true);
+
+    window.setTimeout(() => {
       try {
         game.move(reply);
       } catch {
         /* ignore a malformed reply */
       }
-    }
+      setPosition(game.fen());
+      setStep(step + 2);
+      setWaiting(false);
 
-    setPosition(game.fen());
-
-    const next = step + (reply ? 2 : 1);
-    setStep(next);
-
-    if (next >= moves.length) {
-      setDone(true);
-      submitSolve();
-    }
+      if (step + 2 >= moves.length) {
+        setDone(true);
+        submitSolve();
+      }
+    }, 520);
 
     return true;
   }
@@ -99,7 +117,7 @@ export default function PuzzleBoard({
           position={position}
           onPieceDrop={onDrop}
           boardWidth={380}
-          arePiecesDraggable={!done}
+          arePiecesDraggable={!done && !waiting}
           customBoardStyle={{ borderRadius: 6, boxShadow: "0 1px 3px rgba(20,32,26,0.15)" }}
           customDarkSquareStyle={{ backgroundColor: "#7d6f52" }}
           customLightSquareStyle={{ backgroundColor: "#f6f1e3" }}
@@ -113,7 +131,10 @@ export default function PuzzleBoard({
           </p>
         ) : (
           <p className="small muted" style={{ margin: 0 }}>
-            {message ?? `Move ${Math.floor(step / 2) + 1} of ${Math.ceil(moves.length / 2)}`}
+            {message ??
+              (waiting
+                ? "Replying…"
+                : `Move ${Math.floor(step / 2) + 1} of ${Math.ceil(moves.length / 2)}`)}
           </p>
         )}
 

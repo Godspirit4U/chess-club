@@ -34,6 +34,11 @@ export default async function PuzzlePage({ params }: Props) {
     alreadySolved = Boolean(solve);
   }
 
+  const { count: solverCount } = await supabase
+    .from("puzzle_solves")
+    .select("id", { count: "exact", head: true })
+    .eq("puzzle_id", puzzle.id);
+
   const solution = puzzle.solution.trim().split(/\s+/);
 
   return (
@@ -50,7 +55,13 @@ export default async function PuzzlePage({ params }: Props) {
       </h1>
       <p className="muted">{puzzle.note ?? "Find the best move for the side to play."}</p>
 
-      <div style={{ marginTop: 20 }}>
+      <p className="small" style={{ marginTop: 12 }}>
+        {solverCount ?? 0} {(solverCount ?? 0) === 1 ? "member has" : "members have"} solved this
+        {" · "}
+        <Link href={`/puzzles/${puzzle.puzzle_date}/solvers`}>See who solved this puzzle</Link>
+      </p>
+
+      <div style={{ marginTop: 12 }}>
         <PuzzleBoard
           fen={puzzle.fen}
           solution={solution}
