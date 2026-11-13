@@ -34,8 +34,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           isAdmin={Boolean(profile && profile.role !== "member")}
           name={profile?.full_name}
         />
+        <PageLoader />
         <main id="main">
-          <PageLoader />
           <div className="container">{children}</div>
         </main>
         <SiteFooter />
