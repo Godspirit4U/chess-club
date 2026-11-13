@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { createPuzzle, deletePuzzle } from "./actions";
+import ConfirmButton from "@/components/ConfirmButton";
 
 export const metadata: Metadata = { title: "Puzzles" };
 export const dynamic = "force-dynamic";
@@ -64,17 +65,9 @@ export default async function AdminPuzzlesPage({ searchParams }: Props) {
                   <td>{p.puzzle_date}</td>
                   <td className="muted small">{p.note ?? "—"}</td>
                   <td>
-                    <form
-                      action={deletePuzzle}
-                      onSubmit={(ev) => {
-                        if (!window.confirm("Delete this puzzle and every solve recorded for it?"))
-                          ev.preventDefault();
-                      }}
-                    >
+                    <form action={deletePuzzle}>
                       <input type="hidden" name="id" value={p.id} />
-                      <button className="btn secondary" type="submit" style={{ minHeight: 32, color: "var(--danger)" }}>
-                        Delete
-                      </button>
+                      <ConfirmButton message="Delete this puzzle and every solve recorded for it?" style={{ minHeight: 32, color: "var(--danger)" }}>Delete</ConfirmButton>
                     </form>
                   </td>
                 </tr>

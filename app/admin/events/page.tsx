@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { createEvent, deleteEvent } from "./actions";
+import ConfirmButton from "@/components/ConfirmButton";
 
 export const metadata: Metadata = { title: "Events" };
 export const dynamic = "force-dynamic";
@@ -80,16 +81,9 @@ export default async function AdminEventsPage({ searchParams }: Props) {
                     })}
                   </td>
                   <td>
-                    <form
-                      action={deleteEvent}
-                      onSubmit={(ev) => {
-                        if (!window.confirm("Delete this event?")) ev.preventDefault();
-                      }}
-                    >
+                    <form action={deleteEvent}>
                       <input type="hidden" name="id" value={e.id} />
-                      <button className="btn secondary" type="submit" style={{ minHeight: 32, color: "var(--danger)" }}>
-                        Delete
-                      </button>
+                      <ConfirmButton message="Delete this event?" style={{ minHeight: 32, color: "var(--danger)" }}>Delete</ConfirmButton>
                     </form>
                   </td>
                 </tr>
