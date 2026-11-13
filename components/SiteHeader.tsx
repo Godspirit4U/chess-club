@@ -34,7 +34,14 @@ export default function SiteHeader({
       <div className="container">
         <div className="bar">
           <Link href="/" className="brand">
-            SaiU Chess Club
+            <img
+              src="/logo-64.png"
+              alt=""
+              width={32}
+              height={32}
+              style={{ borderRadius: "50%", display: "block" }}
+            />
+            <span>SaiU Chess Club</span>
           </Link>
 
           <nav className="nav-links" aria-label="Main">

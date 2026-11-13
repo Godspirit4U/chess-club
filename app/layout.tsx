@@ -11,7 +11,13 @@ export const metadata: Metadata = {
   },
   description:
     "Tournaments, pairings, puzzles and results for the SaiU Chess Club.",
-  icons: { icon: "/favicon.ico" }
+  openGraph: {
+    title: "SaiU Chess Club",
+    description: "Tournaments, pairings, the points table and a puzzle a day.",
+    siteName: "SaiU Chess Club",
+    type: "website"
+  },
+  twitter: { card: "summary_large_image" }
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
