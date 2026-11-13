@@ -184,7 +184,9 @@ export default async function TournamentPage({ params }: Props) {
         {active.length === 0 ? null : (
           <ul style={{ paddingLeft: 18, margin: 0 }}>
             {active.map((p: any) => (
-              <li key={p.profile_id}>{p.profiles?.full_name ?? "Member"}</li>
+              <li key={p.profile_id}>
+                <Link href={`/members/${p.profile_id}`}>{p.profiles?.full_name ?? "Member"}</Link>
+              </li>
             ))}
           </ul>
         )}

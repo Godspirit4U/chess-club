@@ -41,7 +41,7 @@ export async function getCurrentProfile() {
 
   const { data } = await supabase
     .from("profiles")
-    .select("id,email,full_name,role,avatar_path,chess_username,chess_platform,lichess_username,chesscom_username")
+    .select("id,email,full_name,role,avatar_path,phone,chess_username,chess_platform,lichess_username,chesscom_username")
     .eq("id", user.id)
     .single();
 

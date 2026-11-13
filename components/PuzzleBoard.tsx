@@ -105,7 +105,7 @@ export default function PuzzleBoard({
         setDone(true);
         submitSolve();
       }
-    }, 520);
+    }, 300);
 
     return true;
   }

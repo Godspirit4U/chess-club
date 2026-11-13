@@ -68,6 +68,14 @@ export async function registerForTournament(formData: FormData) {
 
   if (!profile) redirect("/login");
 
+  if (!profile.phone) {
+    redirect(
+      `/profile/edit?error=${encodeURIComponent(
+        "Add your mobile number before registering, so your opponent can reach you."
+      )}`
+    );
+  }
+
   const supabase = createClient();
   await supabase
     .from("tournament_players")

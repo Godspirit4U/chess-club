@@ -20,7 +20,7 @@ export default async function PuzzlesPage() {
       .from("puzzles")
       .select("id,puzzle_date,note")
       .order("puzzle_date", { ascending: false })
-      .limit(30);
+      .limit(200);
     puzzles = data ?? [];
 
     if (profile) {
