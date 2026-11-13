@@ -140,8 +140,9 @@ export default async function ProfilePage() {
         </p>
       </div>
 
-      <p style={{ marginTop: 20, display: "flex", gap: 16, alignItems: "center" }}>
+      <p style={{ marginTop: 20, display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
         <Link href="/profile/edit">Edit profile</Link>
+        <Link href="/profile/password">Change password</Link>
       </p>
 
       <form action={signOut} style={{ marginTop: 12 }}>

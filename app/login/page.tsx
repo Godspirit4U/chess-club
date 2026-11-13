@@ -1,24 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { signIn, signUp } from "@/app/auth/actions";
+import { requestReset, signIn, signUp } from "@/app/auth/actions";
 
 export const metadata: Metadata = { title: "Sign in" };
 
 type Props = {
-  searchParams: { mode?: string; error?: string };
+  searchParams: { mode?: string; error?: string; sent?: string };
 };
 
 export default function LoginPage({ searchParams }: Props) {
   const isSignUp = searchParams.mode === "signup";
+  const isForgot = searchParams.mode === "forgot";
   const error = searchParams.error;
+  const sent = searchParams.sent;
 
   return (
     <div style={{ maxWidth: 420 }}>
-      <h1>{isSignUp ? "Create your account" : "Sign in"}</h1>
+      <h1>{isSignUp ? "Create your account" : isForgot ? "Reset your password" : "Sign in"}</h1>
       <p className="muted">
         {isSignUp
           ? "Use your Sai University email, like name.batch@scds.saiuniversity.edu.in. Your account works immediately."
-          : "The email address you signed up with."}
+          : isForgot
+            ? "We will email you a link to set a new password."
+            : "The email address you signed up with."}
       </p>
 
       {error ? (
@@ -37,8 +41,34 @@ export default function LoginPage({ searchParams }: Props) {
         </p>
       ) : null}
 
+      {sent ? (
+        <p
+          role="status"
+          style={{
+            border: "1px solid #cfe0d3",
+            background: "var(--tint)",
+            color: "var(--accent-dark)",
+            borderRadius: 6,
+            padding: "10px 12px",
+            fontSize: 14
+          }}
+        >
+          If that address has an account, a reset link is on its way.
+        </p>
+      ) : null}
+
       <div className="card">
-        {isSignUp ? (
+        {isForgot ? (
+          <form action={requestReset} className="stack">
+            <div className="field">
+              <label htmlFor="email">Email address</label>
+              <input id="email" name="email" type="email" autoComplete="email" required />
+            </div>
+            <button className="btn" type="submit">
+              Send reset link
+            </button>
+          </form>
+        ) : isSignUp ? (
           <form action={signUp} className="stack">
             <div className="field">
               <label htmlFor="full_name">Full name</label>
@@ -91,9 +121,15 @@ export default function LoginPage({ searchParams }: Props) {
           <>
             Already have an account? <Link href="/login">Sign in</Link>
           </>
+        ) : isForgot ? (
+          <>
+            Remembered it? <Link href="/login">Sign in</Link>
+          </>
         ) : (
           <>
             New to the club? <Link href="/login?mode=signup">Create an account</Link>
+            <br />
+            <Link href="/login?mode=forgot">Forgot your password?</Link>
           </>
         )}
       </p>

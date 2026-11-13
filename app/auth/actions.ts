@@ -66,3 +66,24 @@ export async function signOut() {
   await supabase.auth.signOut();
   redirect("/");
 }
+
+export async function requestReset(formData: FormData) {
+  const email = String(formData.get("email") ?? "").trim();
+
+  if (!email) {
+    redirect(`/login?mode=forgot&error=${encodeURIComponent("Enter your email address.")}`);
+  }
+
+  const site = process.env.NEXT_PUBLIC_SITE_URL ?? "https://saiu-chess-club.vercel.app";
+  const supabase = createClient();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${site}/auth/confirm`
+  });
+
+  if (error) {
+    redirect(`/login?mode=forgot&error=${encodeURIComponent(error.message)}`);
+  }
+
+  redirect("/login?mode=forgot&sent=1");
+}
