@@ -2,6 +2,7 @@
 
 import { Chess, type Square } from "chess.js";
 import { useMemo, useState } from "react";
+import { recordSolve } from "@/app/admin/puzzles/actions";
 
 const GLYPHS: Record<string, string> = {
   wp: "♙", wn: "♘", wb: "♗", wr: "♖", wq: "♕", wk: "♔",
@@ -20,13 +21,15 @@ function gridFrom(game: Chess) {
 export default function PuzzleBoard({
   fen,
   solution,
-  onSolved,
-  alreadySolved
+  alreadySolved,
+  puzzleId,
+  date
 }: {
   fen: string;
   solution: string[];
-  onSolved: () => void;
   alreadySolved: boolean;
+  puzzleId: string;
+  date: string;
 }) {
   const moves = useMemo(
     () =>
@@ -88,7 +91,7 @@ export default function PuzzleBoard({
 
         if (step + 1 >= moves.length) {
           setDone(true);
-          onSolved();
+          submitSolve();
           return;
         }
 
@@ -102,7 +105,7 @@ export default function PuzzleBoard({
             setStep((s2) => s2 + 2);
             if (step + 2 >= moves.length) {
               setDone(true);
-              onSolved();
+              submitSolve();
             }
           } catch {
             setStep((s2) => s2 + 1);
@@ -115,6 +118,14 @@ export default function PuzzleBoard({
     } catch {
       setSelected(null);
     }
+  }
+
+  function submitSolve() {
+    if (alreadySolved) return;
+    const data = new FormData();
+    data.set("puzzle_id", puzzleId);
+    data.set("date", date);
+    void recordSolve(data);
   }
 
   return (

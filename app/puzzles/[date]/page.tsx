@@ -55,7 +55,8 @@ export default async function PuzzlePage({ params }: Props) {
           fen={puzzle.fen}
           solution={solution}
           alreadySolved={alreadySolved}
-          onSolved={() => {}}
+          puzzleId={puzzle.id}
+          date={puzzle.puzzle_date}
         />
       </div>
 
