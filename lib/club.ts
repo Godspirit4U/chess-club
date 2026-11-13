@@ -6,7 +6,7 @@ export const club = {
   name: "Sai University Chess Club",
   shortName: "SaiU Chess Club",
   university: "Sai University",
-  email: "chessclub@saiuniversity.edu.in",
+  email: "sivaharsha.s-29@saiuniversity.edu.in",
   instagram: "saiuchessclub",
   whatsapp: "https://chat.whatsapp.com/EgUqiLPhitgL1TGOF3gUBc",
   founded: "15 August 2023",
