@@ -3,29 +3,28 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const groups: { label: string; links: { href: string; label: string }[] }[] = [
+const groups: { label: string; links: { href: string; label: string; exact?: boolean }[] }[] = [
   {
     label: "Overview",
-    links: [{ href: "/admin", label: "Dashboard" }]
+    links: [{ href: "/admin", label: "Dashboard", exact: true }]
   },
   {
     label: "Tournaments",
     links: [
-      { href: "/admin/tournaments", label: "All tournaments" },
-      { href: "/admin/tournaments/new", label: "Create a tournament" },
-      { href: "/tournaments", label: "View public list" }
+      { href: "/admin/tournaments", label: "All tournaments", exact: true },
+      { href: "/admin/tournaments/new", label: "Create one" }
     ]
   },
   {
-    label: "Content",
+    label: "Add to the site",
     links: [
-      { href: "/admin/blog", label: "Blog" },
-      { href: "/admin/puzzles", label: "Puzzles" },
-      { href: "/admin/events", label: "Events" }
+      { href: "/admin/blog", label: "Write a post" },
+      { href: "/admin/puzzles", label: "Add a puzzle" },
+      { href: "/admin/events", label: "Add an event" }
     ]
   },
   {
-    label: "Club",
+    label: "The club",
     links: [
       { href: "/admin/people", label: "People" },
       { href: "/admin/feedback", label: "Feedback" }
@@ -39,7 +38,7 @@ export default function AdminSidebar({ name }: { name: string }) {
   return (
     <aside className="admin-side">
       <div className="side-block">
-        <p className="side-label">Admin</p>
+        <p className="side-label">Signed in</p>
         <p style={{ margin: 0, fontWeight: 600 }}>{name}</p>
       </div>
 
@@ -47,10 +46,9 @@ export default function AdminSidebar({ name }: { name: string }) {
         <nav key={group.label} className="side-block" aria-label={group.label}>
           <p className="side-label">{group.label}</p>
           {group.links.map((link) => {
-            const active =
-              link.href === "/admin"
-                ? pathname === "/admin"
-                : pathname.startsWith(link.href);
+            const active = link.exact
+              ? pathname === link.href
+              : pathname === link.href || pathname.startsWith(link.href + "/");
             return (
               <Link
                 key={link.href}
@@ -67,11 +65,6 @@ export default function AdminSidebar({ name }: { name: string }) {
           })}
         </nav>
       ))}
-
-      <div className="side-block">
-        <p className="side-label">Leave</p>
-        <Link href="/">Back to the site</Link>
-      </div>
     </aside>
   );
 }

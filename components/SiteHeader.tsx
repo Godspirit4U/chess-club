@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/tournaments", label: "Tournaments" },
@@ -23,6 +24,8 @@ export default function SiteHeader({
   name?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const inAdmin = Boolean(pathname?.startsWith("/admin"));
 
   const all = [
     ...links,
@@ -45,22 +48,34 @@ export default function SiteHeader({
           </Link>
 
           <nav className="nav-links" aria-label="Main">
-            {links.map((l) => (
-              <Link key={l.href} href={l.href}>
-                {l.label}
-              </Link>
-            ))}
-
-            {isAdmin ? (
-              <Link href="/admin" style={{ fontWeight: 600 }}>
-                Admin
-              </Link>
-            ) : null}
-
-            {signedIn ? (
-              <Link href="/profile">Profile</Link>
+            {inAdmin ? (
+              <>
+                <Link href="/admin" style={{ fontWeight: 600 }}>
+                  Admin
+                </Link>
+                <Link href="/">Back to the site</Link>
+                <Link href="/profile">Profile</Link>
+              </>
             ) : (
-              <Link href="/login">Sign in</Link>
+              <>
+                {links.map((l) => (
+                  <Link key={l.href} href={l.href}>
+                    {l.label}
+                  </Link>
+                ))}
+
+                {isAdmin ? (
+                  <Link href="/admin" style={{ fontWeight: 600 }}>
+                    Admin
+                  </Link>
+                ) : null}
+
+                {signedIn ? (
+                  <Link href="/profile">Profile</Link>
+                ) : (
+                  <Link href="/login">Sign in</Link>
+                )}
+              </>
             )}
           </nav>
 
@@ -77,21 +92,37 @@ export default function SiteHeader({
 
         {open && (
           <nav id="mobile-nav" className="mobile-nav" aria-label="Main">
-            {all.map((l) => (
-              <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
-                {l.label}
-              </Link>
-            ))}
-            {isAdmin ? (
-              <Link href="/admin" onClick={() => setOpen(false)}>
-                Admin
-              </Link>
-            ) : null}
-            {!signedIn ? (
-              <Link href="/login" onClick={() => setOpen(false)}>
-                Sign in
-              </Link>
-            ) : null}
+            {inAdmin ? (
+              <>
+                <Link href="/admin" onClick={() => setOpen(false)}>
+                  Admin
+                </Link>
+                <Link href="/" onClick={() => setOpen(false)}>
+                  Back to the site
+                </Link>
+                <Link href="/profile" onClick={() => setOpen(false)}>
+                  Profile
+                </Link>
+              </>
+            ) : (
+              <>
+                {all.map((l) => (
+                  <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
+                    {l.label}
+                  </Link>
+                ))}
+                {isAdmin ? (
+                  <Link href="/admin" onClick={() => setOpen(false)}>
+                    Admin
+                  </Link>
+                ) : null}
+                {!signedIn ? (
+                  <Link href="/login" onClick={() => setOpen(false)}>
+                    Sign in
+                  </Link>
+                ) : null}
+              </>
+            )}
           </nav>
         )}
       </div>
