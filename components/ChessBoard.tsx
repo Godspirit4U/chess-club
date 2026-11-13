@@ -79,7 +79,7 @@ export default function ChessBoard({ pgn }: { pgn: string }) {
               <div
                 key={`${r}-${c}`}
                 style={{
-                  background: light ? "#f0eadd" : "#8a7f6d",
+                  background: light ? "#f6f1e3" : "#7d6f52",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",

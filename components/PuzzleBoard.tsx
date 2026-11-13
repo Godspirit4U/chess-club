@@ -109,7 +109,7 @@ export default function PuzzleBoard({
                 type="button"
                 onClick={() => tap(square)}
                 style={{
-                  background: isSelected ? "#c9d8c2" : light ? "#f0eadd" : "#8a7f6d",
+                  background: isSelected ? "#bfe6cf" : light ? "#f6f1e3" : "#7d6f52",
                   border: 0,
                   padding: 0,
                   display: "flex",

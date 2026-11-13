@@ -1,14 +1,25 @@
 :root {
-  --paper: #f7f5ef;
-  --surface: #ffffff;
-  --ink: #14201a;
-  --muted: #5b6660;
-  --accent: #1d5c3a;
-  --accent-dark: #14432a;
-  --tint: #e4efe7;
-  --amber: #96550f;
-  --danger: #a32b2b;
-  --border: #dfdbd0;
+  /* Surfaces */
+  --paper: #fbf9f3;      /* page */
+  --surface: #ffffff;    /* cards, tables, inputs */
+  --hover: #f1eee3;      /* row or card under the cursor */
+  --border: #e0dac8;     /* hairlines */
+
+  /* Text */
+  --ink: #0f1f14;        /* body and headings */
+  --muted: #5a6659;      /* captions, dates */
+  --disabled: #8c9288;   /* fields that cannot be edited */
+
+  /* Action */
+  --accent: #0f7d52;     /* every link and primary button */
+  --accent-dark: #0b6342;
+  --tint: #dff3e7;       /* badges, selected row */
+
+  /* Status */
+  --amber: #c2560f;      /* live, in progress, warnings */
+  --danger: #a32b2b;     /* delete, errors */
+
+  /* Layout */
   --radius: 6px;
   --maxw: 1080px;
 }
@@ -142,7 +153,7 @@ th {
 }
 
 .badge.live {
-  background: #f6ece0;
+  background: #fbeee2;
   color: var(--amber);
 }
 
@@ -370,4 +381,46 @@ textarea:focus-visible,
 .skip-link:focus {
   left: 8px;
   top: 8px;
+}
+
+
+/* Table rows respond to the pointer */
+tbody tr:hover {
+  background: var(--hover);
+}
+
+/* A field that cannot be edited */
+input:disabled,
+textarea:disabled,
+select:disabled {
+  background: var(--paper);
+  color: var(--disabled);
+  cursor: not-allowed;
+}
+
+/* Cards lift very slightly on hover, colour only */
+.card {
+  transition: border-color 120ms ease;
+}
+
+a.card:hover,
+.card:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+/* Headings get the accent underline on section titles */
+h2 {
+  letter-spacing: -0.01em;
+}
+
+/* Primary button uses the brighter accent, pressed state darkens */
+.btn {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
 }
