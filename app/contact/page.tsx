@@ -121,7 +121,7 @@ export default function ContactPage({ searchParams }: Props) {
             <label htmlFor="body">Message</label>
             <textarea id="body" name="body" rows={5} maxLength={4000} required />
           </div>
-          <SubmitButton pendingLabel="Sending…">Send</SubmitButton>
+          <SubmitButton>Send</SubmitButton>
         </form>
       </section>
     </>

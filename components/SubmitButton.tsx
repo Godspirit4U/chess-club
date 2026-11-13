@@ -5,14 +5,12 @@ import { useFormStatus } from "react-dom";
 export default function SubmitButton({
   children,
   className = "btn",
-  pendingLabel = "Working…",
   name,
   value,
   style
 }: {
   children: React.ReactNode;
   className?: string;
-  pendingLabel?: string;
   name?: string;
   value?: string;
   style?: React.CSSProperties;
@@ -27,9 +25,17 @@ export default function SubmitButton({
       value={value}
       disabled={pending}
       aria-busy={pending}
-      style={{ opacity: pending ? 0.7 : 1, cursor: pending ? "progress" : "pointer", ...style }}
+      style={{ cursor: pending ? "progress" : "pointer", ...style }}
     >
-      {pending ? pendingLabel : children}
+      {pending ? (
+        <span className="dots" aria-label="Working">
+          <span />
+          <span />
+          <span />
+        </span>
+      ) : (
+        children
+      )}
     </button>
   );
 }

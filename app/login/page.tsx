@@ -65,7 +65,7 @@ export default function LoginPage({ searchParams }: Props) {
               <label htmlFor="email">Email address</label>
               <input id="email" name="email" type="email" autoComplete="email" required />
             </div>
-            <SubmitButton pendingLabel="Sending…">Send reset link</SubmitButton>
+            <SubmitButton>Send reset link</SubmitButton>
           </form>
         ) : isSignUp ? (
           <form action={signUp} className="stack">
@@ -88,7 +88,7 @@ export default function LoginPage({ searchParams }: Props) {
                 required
               />
             </div>
-            <SubmitButton pendingLabel="Creating…">Create account</SubmitButton>
+            <SubmitButton>Create account</SubmitButton>
           </form>
         ) : (
           <form action={signIn} className="stack">
@@ -106,7 +106,7 @@ export default function LoginPage({ searchParams }: Props) {
                 required
               />
             </div>
-            <SubmitButton pendingLabel="Signing in…">Sign in</SubmitButton>
+            <SubmitButton>Sign in</SubmitButton>
           </form>
         )}
       </div>

@@ -141,7 +141,7 @@ export default async function TournamentPage({ params }: Props) {
               <form action={withdrawFromTournament}>
                 <input type="hidden" name="tournament_id" value={tournament.id} />
                 <input type="hidden" name="slug" value={tournament.slug} />
-                <SubmitButton className="btn secondary" pendingLabel="Withdrawing…">
+                <SubmitButton className="btn secondary">
                   Withdraw my registration
                 </SubmitButton>
               </form>
@@ -152,7 +152,7 @@ export default async function TournamentPage({ params }: Props) {
             <form action={registerForTournament}>
               <input type="hidden" name="tournament_id" value={tournament.id} />
               <input type="hidden" name="slug" value={tournament.slug} />
-              <SubmitButton pendingLabel="Registering…">Register</SubmitButton>
+              <SubmitButton>Register</SubmitButton>
             </form>
           ) : (
             <p>

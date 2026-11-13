@@ -58,14 +58,14 @@ export default async function PeoplePage() {
                   <form action={respondRequest}>
                     <input type="hidden" name="id" value={c.id} />
                     <input type="hidden" name="decision" value="accepted" />
-                    <SubmitButton pendingLabel="…" style={{ minHeight: 36 }}>
+                    <SubmitButton style={{ minHeight: 36 }}>
                       Accept
                     </SubmitButton>
                   </form>
                   <form action={respondRequest}>
                     <input type="hidden" name="id" value={c.id} />
                     <input type="hidden" name="decision" value="declined" />
-                    <SubmitButton className="btn secondary" pendingLabel="…" style={{ minHeight: 36 }}>
+                    <SubmitButton className="btn secondary" style={{ minHeight: 36 }}>
                       Decline
                     </SubmitButton>
                   </form>
@@ -99,7 +99,7 @@ export default async function PeoplePage() {
                 {m.id === profile!.id ? null : !link ? (
                   <form action={sendRequest}>
                     <input type="hidden" name="addressee_id" value={m.id} />
-                    <SubmitButton className="btn secondary" pendingLabel="Sending…" style={{ minHeight: 36 }}>
+                    <SubmitButton className="btn secondary" style={{ minHeight: 36 }}>
                       Connect
                     </SubmitButton>
                   </form>
@@ -110,7 +110,6 @@ export default async function PeoplePage() {
                       <input type="hidden" name="id" value={link.id} />
                       <SubmitButton
                         className="btn secondary"
-                        pendingLabel="…"
                         style={{ minHeight: 32, fontSize: 13 }}
                       >
                         Remove
@@ -127,7 +126,6 @@ export default async function PeoplePage() {
                         <input type="hidden" name="id" value={link.id} />
                         <SubmitButton
                           className="btn secondary"
-                          pendingLabel="…"
                           style={{ minHeight: 32, fontSize: 13 }}
                         >
                           Cancel
