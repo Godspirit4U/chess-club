@@ -55,6 +55,7 @@ export default async function EventPage({ params }: Props) {
             <Link href={`/admin/events/${event.id}`}>Edit</Link>
             <form action={deleteEvent}>
               <input type="hidden" name="id" value={event.id} />
+              <input type="hidden" name="return_to" value="/events" />
               <ConfirmButton message="Delete this event?" style={{ minHeight: 28, color: "var(--danger)", fontSize: 13 }}>
                 Delete
               </ConfirmButton>

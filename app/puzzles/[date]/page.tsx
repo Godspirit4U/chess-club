@@ -35,6 +35,13 @@ export default async function PuzzlePage({ params }: Props) {
     alreadySolved = Boolean(solve);
   }
 
+  const { data: solvers } = await supabase
+    .from("puzzle_solves")
+    .select("solved_at,seconds,profiles(full_name,id)")
+    .eq("puzzle_id", puzzle.id)
+    .order("solved_at", { ascending: true })
+    .limit(20);
+
   const { count: solverCount } = await supabase
     .from("puzzle_solves")
     .select("id", { count: "exact", head: true })
@@ -69,13 +76,7 @@ export default async function PuzzlePage({ params }: Props) {
       </h1>
       <p className="muted">{puzzle.note ?? "Find the best move for the side to play."}</p>
 
-      <p className="small" style={{ marginTop: 12 }}>
-        {solverCount ?? 0} {(solverCount ?? 0) === 1 ? "member has" : "members have"} solved this
-        {" · "}
-        <Link href={`/puzzles/${puzzle.puzzle_date}/solvers`}>See who solved this puzzle</Link>
-      </p>
-
-      <div style={{ marginTop: 12 }}>
+      <div className="grid two" style={{ marginTop: 12, alignItems: "start" }}>
         <PuzzleBoard
           fen={puzzle.fen}
           solution={solution}
@@ -83,6 +84,48 @@ export default async function PuzzlePage({ params }: Props) {
           puzzleId={puzzle.id}
           date={puzzle.puzzle_date}
         />
+
+        <div className="card">
+          <h2 style={{ fontSize: 16, marginTop: 0 }}>
+            {solverCount ?? 0} {(solverCount ?? 0) === 1 ? "solver" : "solvers"}
+          </h2>
+
+          {(solvers ?? []).length === 0 ? (
+            <p className="muted small" style={{ margin: 0 }}>
+              Nobody yet. Be the first.
+            </p>
+          ) : (
+            (solvers ?? []).map((row: any, index) => (
+              <div
+                key={index}
+                className="person-row"
+                style={{ padding: "7px 0" }}
+              >
+                <span className="small muted" style={{ width: 18 }}>
+                  {index + 1}
+                </span>
+                <span style={{ minWidth: 0, flex: 1 }}>
+                  {row.profiles?.id ? (
+                    <Link href={`/members/${row.profiles.id}`} className="person-name">
+                      {row.profiles.full_name}
+                    </Link>
+                  ) : (
+                    <span className="person-name">Member</span>
+                  )}
+                </span>
+                <span className="small muted">
+                  {row.seconds === null || row.seconds === undefined
+                    ? "—"
+                    : row.seconds <= 0
+                      ? "<1s"
+                      : row.seconds >= 60
+                        ? `${Math.floor(row.seconds / 60)}m ${row.seconds % 60}s`
+                        : `${row.seconds}s`}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       {!profile ? (

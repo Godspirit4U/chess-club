@@ -46,6 +46,7 @@ export default async function PostPage({ params }: Props) {
             <Link href={`/admin/blog/${post.id}`}>Edit</Link>
             <form action={deletePost}>
               <input type="hidden" name="id" value={post.id} />
+              <input type="hidden" name="return_to" value="/blog" />
               <ConfirmButton
                 message="Delete this post?"
                 style={{ minHeight: 28, color: "var(--danger)", fontSize: 13 }}

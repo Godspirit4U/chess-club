@@ -48,11 +48,13 @@ export async function deleteEvent(formData: FormData) {
   if (!profile || profile.role === "member") redirect("/");
 
   const id = String(formData.get("id") ?? "");
+  const back = String(formData.get("return_to") ?? "/admin/events");
   const supabase = createClient();
   await supabase.from("events").delete().eq("id", id);
 
   revalidatePath("/events");
-  redirect("/admin/events");
+  revalidatePath("/admin/events");
+  redirect(back);
 }
 
 export async function updateEvent(formData: FormData) {

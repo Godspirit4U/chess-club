@@ -119,7 +119,13 @@ export default async function EditProfilePage({ searchParams }: Props) {
 
             <div className="field" style={{ marginTop: 8 }}>
               <label htmlFor="full_name">Full name</label>
-              <input id="full_name" name="full_name" defaultValue={profile.full_name} required />
+              <input
+                id="full_name"
+                name="full_name"
+                autoComplete="name"
+                defaultValue={profile.full_name}
+                required
+              />
             </div>
 
             <ChessAccounts

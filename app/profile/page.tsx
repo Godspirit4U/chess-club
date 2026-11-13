@@ -169,6 +169,31 @@ export default async function ProfilePage() {
         </p>
       </div>
 
+      <div className="card" style={{ marginTop: 16 }}>
+        <h2 style={{ fontSize: 16 }}>Contact</h2>
+        <p className="muted small" style={{ marginTop: 0 }}>
+          Your opponent sees this on your match page, so they can reach you.
+        </p>
+
+        {profile.phone ? (
+          <p style={{ margin: 0 }}>
+            <a
+              className="btn secondary"
+              href={`https://wa.me/91${String(profile.phone).replace(/[^0-9]/g, "").slice(-10)}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              WhatsApp {profile.phone}
+            </a>
+          </p>
+        ) : (
+          <p className="small" style={{ margin: 0 }}>
+            No mobile number yet. <Link href="/profile/edit">Add one</Link> so your opponent can
+            reach you.
+          </p>
+        )}
+      </div>
+
       <p style={{ marginTop: 20, display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
         <Link href="/profile/edit">Edit profile</Link>
         <Link href="/profile/password">Change password</Link>

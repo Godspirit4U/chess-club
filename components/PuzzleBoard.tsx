@@ -213,7 +213,7 @@ export default function PuzzleBoard({
           <button
             type="button"
             className="btn secondary"
-            style={{ minHeight: 32, fontSize: 13 }}
+            style={{ minHeight: 32, fontSize: 13, marginLeft: "auto" }}
             onClick={() => setShowSolution((v) => !v)}
           >
             {showSolution ? "Hide solution" : "Show the solution"}

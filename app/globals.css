@@ -649,3 +649,35 @@ h2::after {
 }
 
 
+
+/* Page hero band, used at the top of section pages */
+.page-hero {
+  background: var(--accent);
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 26px 22px;
+  margin-top: 8px;
+  margin-bottom: 20px;
+}
+
+.page-hero h1 {
+  color: #ffffff;
+  margin: 0;
+  font-size: 28px;
+}
+
+.page-hero p {
+  color: rgba(255, 255, 255, 0.9);
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+@media (max-width: 640px) {
+  .page-hero {
+    padding: 20px 16px;
+  }
+
+  .page-hero h1 {
+    font-size: 23px;
+  }
+}

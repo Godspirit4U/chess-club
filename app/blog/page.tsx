@@ -35,7 +35,10 @@ export default async function BlogPage() {
           flexWrap: "wrap"
         }}
       >
-        <h1 style={{ margin: 0 }}>Blog</h1>
+        <div className="page-hero">
+        <h1>Blog</h1>
+        <p>Announcements, recaps and reports from the committee.</p>
+      </div>
         {isAdmin ? (
           <Link className="btn" href="/blog/new">
             Write a post

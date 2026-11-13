@@ -71,7 +71,10 @@ export default async function TournamentsPage() {
           flexWrap: "wrap"
         }}
       >
-        <h1 style={{ margin: 0 }}>Tournaments</h1>
+        <div className="page-hero">
+        <h1>Tournaments</h1>
+        <p>Every tournament, from registration to final standings.</p>
+      </div>
         {isAdmin ? (
           <Link className="btn" href="/tournaments/new">
             Create a tournament

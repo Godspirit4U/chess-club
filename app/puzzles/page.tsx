@@ -46,7 +46,10 @@ export default async function PuzzlesPage() {
           flexWrap: "wrap"
         }}
       >
-        <h1 style={{ margin: 0 }}>Puzzles</h1>
+        <div className="page-hero">
+        <h1>Puzzles</h1>
+        <p>One position at a time. Solve it on the board.</p>
+      </div>
         {isAdmin ? (
           <Link className="btn" href="/puzzles/new">
             Add a puzzle

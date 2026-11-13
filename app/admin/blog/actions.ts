@@ -55,7 +55,7 @@ export async function deletePost(formData: FormData) {
 
   revalidatePath("/blog");
   revalidatePath("/");
-  redirect("/admin/blog");
+  redirect(String(formData.get("return_to") ?? "/admin/blog"));
 }
 
 export async function updatePost(formData: FormData) {

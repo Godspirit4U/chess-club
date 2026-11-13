@@ -85,6 +85,7 @@ export default function LoginPage({ searchParams }: Props) {
                 name="phone"
                 type="tel"
                 inputMode="numeric"
+                autoComplete="tel-national"
                 pattern="[0-9]{10}"
                 placeholder="10 digits"
                 required
@@ -93,7 +94,12 @@ export default function LoginPage({ searchParams }: Props) {
 
             <div className="field">
               <label htmlFor="chesscom_username">Chess.com username</label>
-              <input id="chesscom_username" name="chesscom_username" required />
+              <input
+                id="chesscom_username"
+                name="chesscom_username"
+                autoComplete="off"
+                required
+              />
             </div>
             <div className="field">
               <label htmlFor="password">Password</label>

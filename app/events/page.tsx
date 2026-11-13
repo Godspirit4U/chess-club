@@ -94,6 +94,7 @@ export default async function EventsPage() {
                 <a href={`/admin/events/${e.id}`}>Edit</a>
                 <form action={deleteEvent}>
                   <input type="hidden" name="id" value={e.id} />
+                  <input type="hidden" name="return_to" value="/events" />
                   <ConfirmButton
                     message="Delete this event?"
                     style={{ minHeight: 26, fontSize: 12, color: "var(--danger)" }}
@@ -119,7 +120,10 @@ export default async function EventsPage() {
           flexWrap: "wrap"
         }}
       >
-        <h1 style={{ margin: 0 }}>Events</h1>
+        <div className="page-hero">
+        <h1>Events</h1>
+        <p>Tournaments, training sessions and casual meets.</p>
+      </div>
         {isAdmin ? (
           <Link className="btn" href="/events/new">
             Add an event
