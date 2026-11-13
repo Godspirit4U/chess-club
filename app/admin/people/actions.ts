@@ -110,8 +110,11 @@ export async function removeMember(formData: FormData) {
   const { error } = await admin.auth.admin.deleteUser(id);
 
   if (error) {
-    redirect(`/admin/people?error=${encodeURIComponent(error.message)}`);
+    redirect(`/admin/people?error=${encodeURIComponent(`Could not remove: ${error.message}`)}`);
   }
+
+  // The profile row normally disappears with the auth user; make sure it has.
+  await admin.from("profiles").delete().eq("id", id);
 
   revalidatePath("/admin/people");
   redirect(`/admin/people?done=${encodeURIComponent(`${email} removed`)}`);
