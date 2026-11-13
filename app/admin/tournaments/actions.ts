@@ -68,10 +68,10 @@ export async function registerForTournament(formData: FormData) {
 
   if (!profile) redirect("/login");
 
-  if (!profile.phone) {
+  if (!profile.phone || !profile.chesscom_username) {
     redirect(
       `/profile/edit?error=${encodeURIComponent(
-        "Add your mobile number before registering, so your opponent can reach you."
+        "Add your mobile number and Chess.com username before registering."
       )}`
     );
   }
