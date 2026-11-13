@@ -63,7 +63,7 @@ export const committee: { role: string; name: string; email: string }[] = [
     email: "sivaharsha.s-29@scds.saiuniversity.edu.in"
   },
   {
-    role: "Social media",
+    role: "Social media handler",
     name: "Chagam Riteeswar Reddy",
     email: "riteeswar.c-29@scds.saiuniversity.edu.in"
   }

@@ -30,12 +30,17 @@ export default async function EditProfilePage({ searchParams }: Props) {
     if (!me) redirect("/login");
 
     const fullName = String(formData.get("full_name") ?? "").trim();
+    const phone = String(formData.get("phone") ?? "").replace(/[^0-9]/g, "");
     const platform = String(formData.get("chess_platform") ?? "none");
     const lichess = String(formData.get("lichess_username") ?? "").trim();
     const chesscom = String(formData.get("chesscom_username") ?? "").trim();
 
     if (!fullName) {
       redirect(`/profile/edit?error=${encodeURIComponent("A name is required.")}`);
+    }
+
+    if (phone && phone.length < 10) {
+      redirect(`/profile/edit?error=${encodeURIComponent("Enter a 10-digit mobile number.")}`);
     }
 
     if (platform === "lichess" && !lichess) {
@@ -55,6 +60,7 @@ export default async function EditProfilePage({ searchParams }: Props) {
       .from("profiles")
       .update({
         full_name: fullName,
+        phone: phone || null,
         chess_platform: platform === "none" ? null : platform,
         lichess_username: platform === "lichess" || platform === "both" ? lichess : null,
         chesscom_username: platform === "chesscom" || platform === "both" ? chesscom : null

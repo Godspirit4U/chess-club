@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import PuzzleBoard from "@/components/PuzzleBoard";
-import { recordSolve } from "@/app/admin/puzzles/actions";
+import { deletePuzzle, recordSolve } from "@/app/admin/puzzles/actions";
+import ConfirmButton from "@/components/ConfirmButton";
 
 export const dynamic = "force-dynamic";
 
@@ -43,9 +44,22 @@ export default async function PuzzlePage({ params }: Props) {
 
   return (
     <>
-      <p className="small">
-        <Link href="/puzzles">Puzzles</Link>
-      </p>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <p className="small" style={{ margin: 0 }}>
+          <Link href="/puzzles">Puzzles</Link>
+        </p>
+        {profile && profile.role !== "member" ? (
+          <form action={deletePuzzle}>
+            <input type="hidden" name="id" value={puzzle.id} />
+            <ConfirmButton
+              message="Delete this puzzle and every solve recorded for it?"
+              style={{ minHeight: 28, color: "var(--danger)", fontSize: 13 }}
+            >
+              Delete puzzle
+            </ConfirmButton>
+          </form>
+        ) : null}
+      </div>
       <h1>
         {new Date(puzzle.puzzle_date).toLocaleDateString("en-IN", {
           day: "numeric",

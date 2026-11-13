@@ -50,6 +50,16 @@ export async function recordSolve(formData: FormData) {
       { onConflict: "puzzle_id,profile_id", ignoreDuplicates: true }
     );
 
+  // Fill in a time for a solve that was recorded before times existed.
+  if (seconds) {
+    await supabase
+      .from("puzzle_solves")
+      .update({ seconds })
+      .eq("puzzle_id", puzzleId)
+      .eq("profile_id", profile.id)
+      .is("seconds", null);
+  }
+
   revalidatePath("/puzzles");
   redirect(`/puzzles/${String(formData.get("date") ?? "")}`);
 }

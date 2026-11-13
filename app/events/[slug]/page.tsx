@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import ConfirmButton from "@/components/ConfirmButton";
+import { deleteEvent } from "@/app/admin/events/actions";
 import { notFound } from "next/navigation";
-import { createClient, isConfigured } from "@/lib/supabase/server";
+import { createClient, getCurrentProfile, isConfigured } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -35,15 +37,31 @@ export default async function EventPage({ params }: Props) {
   const event = await load(params.slug);
   if (!event) notFound();
 
+  const me = await getCurrentProfile();
+  const isAdmin = Boolean(me && me.role !== "member");
+
   const cover = event.cover_path
     ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/covers/${event.cover_path}`
     : null;
 
   return (
     <article style={{ maxWidth: 720 }}>
-      <p className="small">
-        <Link href="/events">Events</Link>
-      </p>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <p className="small" style={{ margin: 0 }}>
+          <Link href="/events">Events</Link>
+        </p>
+        {isAdmin ? (
+          <p className="small" style={{ margin: 0, display: "flex", gap: 12, alignItems: "center" }}>
+            <Link href={`/admin/events/${event.id}`}>Edit</Link>
+            <form action={deleteEvent}>
+              <input type="hidden" name="id" value={event.id} />
+              <ConfirmButton message="Delete this event?" style={{ minHeight: 28, color: "var(--danger)", fontSize: 13 }}>
+                Delete
+              </ConfirmButton>
+            </form>
+          </p>
+        ) : null}
+      </div>
 
       <h1>{event.title}</h1>
       <p className="muted small">

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient, isConfigured } from "@/lib/supabase/server";
+import { createClient, getCurrentProfile, isConfigured } from "@/lib/supabase/server";
+import ConfirmButton from "@/components/ConfirmButton";
+import { deletePost } from "@/app/admin/blog/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +14,7 @@ async function loadPost(slug: string) {
   const supabase = createClient();
   const { data } = await supabase
     .from("posts")
-    .select("slug,title,excerpt,body,published_at,profiles(full_name)")
+    .select("id,slug,title,excerpt,body,published_at,profiles(full_name)")
     .eq("slug", slug)
     .not("published_at", "is", null)
     .single();
@@ -28,13 +30,32 @@ export default async function PostPage({ params }: Props) {
   const post = await loadPost(params.slug);
   if (!post) notFound();
 
+  const me = await getCurrentProfile();
+  const isAdmin = Boolean(me && me.role !== "member");
+
   const author = (post as any).profiles?.full_name;
 
   return (
     <article style={{ maxWidth: 680 }}>
-      <p className="small">
-        <Link href="/blog">Blog</Link>
-      </p>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+        <p className="small" style={{ margin: 0 }}>
+          <Link href="/blog">Blog</Link>
+        </p>
+        {isAdmin && post?.id ? (
+          <p className="small" style={{ margin: 0, display: "flex", gap: 12, alignItems: "center" }}>
+            <Link href={`/admin/blog/${post.id}`}>Edit</Link>
+            <form action={deletePost}>
+              <input type="hidden" name="id" value={post.id} />
+              <ConfirmButton
+                message="Delete this post?"
+                style={{ minHeight: 28, color: "var(--danger)", fontSize: 13 }}
+              >
+                Delete
+              </ConfirmButton>
+            </form>
+          </p>
+        ) : null}
+      </div>
       <h1>{post.title}</h1>
       <p className="muted small">
         {post.published_at

@@ -162,8 +162,9 @@ export default async function MatchPage({ params }: Props) {
           <div style={{ marginTop: 20 }}>
             <ChessBoard pgn={match.pgn} />
           </div>
-          <p className="small" style={{ marginTop: 12 }}>
+          <p style={{ marginTop: 12 }}>
             <a
+              className="btn secondary"
               href={`https://lichess.org/analysis/pgn/${encodeURIComponent(
                 match.pgn
                   .replace(/\[[^\]]*\]/g, " ")

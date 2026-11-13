@@ -10,7 +10,8 @@ export const dynamic = "force-dynamic";
 type Props = { params: { date: string } };
 
 function clock(seconds: number | null) {
-  if (!seconds || seconds < 0) return "—";
+  if (seconds === null || seconds === undefined) return "—";
+  if (seconds <= 0) return "under a second";
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return m > 0 ? `${m}m ${s}s` : `${s}s`;

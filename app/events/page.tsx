@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient, getCurrentProfile, isConfigured } from "@/lib/supabase/server";
+import ConfirmButton from "@/components/ConfirmButton";
+import { deleteEvent } from "@/app/admin/events/actions";
 
 export const metadata: Metadata = {
   title: "Events",
@@ -84,6 +86,23 @@ export default async function EventsPage() {
               {kindLabel[e.kind] ?? "Event"}
               {e.format ? ` · ${e.format}` : ""}
             </span>
+            {isAdmin ? (
+              <span
+                className="small"
+                style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 6 }}
+              >
+                <a href={`/admin/events/${e.id}`}>Edit</a>
+                <form action={deleteEvent}>
+                  <input type="hidden" name="id" value={e.id} />
+                  <ConfirmButton
+                    message="Delete this event?"
+                    style={{ minHeight: 26, fontSize: 12, color: "var(--danger)" }}
+                  >
+                    Delete
+                  </ConfirmButton>
+                </form>
+              </span>
+            ) : null}
           </span>
         </Link>
       );
