@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 
 /**
@@ -10,17 +10,22 @@ import { usePathname } from "next/navigation";
 export default function PageLoader() {
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
+  const startedAt = useRef(0);
 
   // Clear as soon as the new page has rendered.
   useEffect(() => {
-    setLoading(false);
+    const shownAt = Date.now();
+    const elapsed = shownAt - startedAt.current;
+    const wait = Math.max(0, 220 - elapsed);
+    const t = setTimeout(() => setLoading(false), wait);
+    return () => clearTimeout(t);
   }, [pathname]);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
 
     function onClick(event: MouseEvent) {
-      if (event.defaultPrevented || event.button !== 0) return;
+      if (event.button !== 0) return;
       if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 
       const anchor = (event.target as HTMLElement | null)?.closest("a");
@@ -38,6 +43,7 @@ export default function PageLoader() {
         return;
       }
 
+      startedAt.current = Date.now();
       setLoading(true);
       clearTimeout(timer);
       timer = setTimeout(() => setLoading(false), 6000);
