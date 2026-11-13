@@ -14,6 +14,19 @@ export async function signIn(formData: FormData) {
     redirect(`/login?error=${encodeURIComponent(error.message)}`);
   }
 
+  const { data: me } = await supabase
+    .from("profiles")
+    .select("retired_at")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (me?.retired_at) {
+    await supabase.auth.signOut();
+    redirect(
+      `/login?error=${encodeURIComponent("This account has been retired. Ask the committee.")}`
+    );
+  }
+
   redirect("/profile");
 }
 

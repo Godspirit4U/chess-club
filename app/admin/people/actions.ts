@@ -106,15 +106,25 @@ export async function removeMember(formData: FormData) {
     );
   }
 
-  const admin = createAdminClient();
-  const { error } = await admin.auth.admin.deleteUser(id);
+  try {
+    const admin = createAdminClient();
+    const { error } = await admin.auth.admin.deleteUser(id);
 
-  if (error) {
-    redirect(`/admin/people?error=${encodeURIComponent(`Could not remove: ${error.message}`)}`);
+    if (error) {
+      redirect(`/admin/people?error=${encodeURIComponent(`Could not remove: ${error.message}`)}`);
+    }
+
+    // The profile row normally disappears with the auth user; make sure it has.
+    await admin.from("profiles").delete().eq("id", id);
+  } catch (err) {
+    // redirect() throws by design, so let it through.
+    if (err && typeof err === "object" && "digest" in err) throw err;
+    redirect(
+      `/admin/people?error=${encodeURIComponent(
+        err instanceof Error ? err.message : "Could not remove that member."
+      )}`
+    );
   }
-
-  // The profile row normally disappears with the auth user; make sure it has.
-  await admin.from("profiles").delete().eq("id", id);
 
   revalidatePath("/admin/people");
   redirect(`/admin/people?done=${encodeURIComponent(`${email} removed`)}`);
@@ -157,4 +167,59 @@ export async function addMember(formData: FormData) {
 
   revalidatePath("/admin/people");
   redirect(`/admin/people?done=${encodeURIComponent(`${fullName} added`)}`);
+}
+
+
+export async function retireMember(formData: FormData) {
+  const me = await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const name = String(formData.get("name") ?? "Member");
+
+  if (id === me.id) {
+    redirect(`/admin/people?error=${encodeURIComponent("You cannot retire your own account.")}`);
+  }
+
+  const supabase = createClient();
+  const { data: target } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", id)
+    .single();
+
+  if (target?.role === "super_admin") {
+    const supers = await countSuperAdmins(supabase);
+    if (supers <= 1) {
+      redirect(
+        `/admin/people?error=${encodeURIComponent(
+          "This is the last super admin. Promote someone else first."
+        )}`
+      );
+    }
+  }
+
+  if (me.role !== "super_admin" && target?.role !== "member") {
+    redirect(
+      `/admin/people?error=${encodeURIComponent("Only a super admin can retire an admin.")}`
+    );
+  }
+
+  await supabase
+    .from("profiles")
+    .update({ retired_at: new Date().toISOString() })
+    .eq("id", id);
+
+  revalidatePath("/admin/people");
+  redirect(`/admin/people?done=${encodeURIComponent(`${name} retired`)}`);
+}
+
+export async function unretireMember(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("id") ?? "");
+  const name = String(formData.get("name") ?? "Member");
+
+  const supabase = createClient();
+  await supabase.from("profiles").update({ retired_at: null }).eq("id", id);
+
+  revalidatePath("/admin/people");
+  redirect(`/admin/people?done=${encodeURIComponent(`${name} is active again`)}`);
 }

@@ -1,13 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { changeRole, removeMember } from "@/app/admin/people/actions";
+import { changeRole, removeMember, retireMember, unretireMember } from "@/app/admin/people/actions";
 
 type Person = {
   id: string;
   full_name: string;
   email: string;
   role: "member" | "admin" | "super_admin";
+  retired_at?: string | null;
 };
 
 export default function PeopleTable({
@@ -95,6 +96,25 @@ export default function PeopleTable({
                 </td>
                 <td>
                   {p.id !== myId && (isSuper || p.role === "member") ? (
+                    <>
+                    {p.retired_at ? (
+                      <form action={unretireMember}>
+                        <input type="hidden" name="id" value={p.id} />
+                        <input type="hidden" name="name" value={p.full_name} />
+                        <button className="btn secondary" type="submit" style={{ minHeight: 32 }}>
+                          Un-retire
+                        </button>
+                      </form>
+                    ) : (
+                      <form action={retireMember}>
+                        <input type="hidden" name="id" value={p.id} />
+                        <input type="hidden" name="name" value={p.full_name} />
+                        <button className="btn secondary" type="submit" style={{ minHeight: 32 }}>
+                          Retire
+                        </button>
+                      </form>
+                    )}
+
                     <form
                       action={removeMember}
                       onSubmit={(e) => {
@@ -114,6 +134,7 @@ export default function PeopleTable({
                         Remove
                       </button>
                     </form>
+                    </>
                   ) : null}
                 </td>
               </tr>

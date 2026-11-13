@@ -17,7 +17,7 @@ export default async function PeoplePage({ searchParams }: Props) {
   const supabase = createClient();
   const { data: people } = await supabase
     .from("profiles")
-    .select("id,full_name,email,role")
+    .select("id,full_name,email,role,retired_at")
     .order("full_name", { ascending: true });
 
   return (
