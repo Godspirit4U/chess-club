@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { computeStandings, generateSwiss, type MatchRow } from "@/lib/pairings";
+import SubmitButton from "@/components/SubmitButton";
 import {
   completeTournament,
   deleteTournament,
@@ -125,9 +126,7 @@ export default async function ConsolePage({ params, searchParams }: Props) {
         <form action={startTournament} style={{ marginTop: 16 }}>
           <input type="hidden" name="tournament_id" value={tournament.id} />
           <input type="hidden" name="slug" value={tournament.slug} />
-          <button className="btn" type="submit">
-            Start the tournament
-          </button>
+          <SubmitButton pendingLabel="Starting…">Start the tournament</SubmitButton>
         </form>
       ) : null}
 
@@ -135,9 +134,9 @@ export default async function ConsolePage({ params, searchParams }: Props) {
         <form action={generateRound} style={{ marginTop: 16 }}>
           <input type="hidden" name="tournament_id" value={tournament.id} />
           <input type="hidden" name="slug" value={tournament.slug} />
-          <button className="btn" type="submit">
+          <SubmitButton pendingLabel="Pairing…">
             Generate pairings for round {(rounds?.length ?? 0) + 1}
-          </button>
+          </SubmitButton>
         </form>
       ) : null}
 
@@ -184,9 +183,13 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                           <input type="hidden" name="slug" value={tournament.slug} />
                           <input type="hidden" name="white_id" value={m.white_id ?? ""} />
                           <input type="hidden" name="black_id" value={m.black_id ?? ""} />
-                          <button className="btn secondary" type="submit" style={{ minHeight: 36 }}>
+                          <SubmitButton
+                            className="btn secondary"
+                            pendingLabel="…"
+                            style={{ minHeight: 36 }}
+                          >
                             Swap colours
-                          </button>
+                          </SubmitButton>
                         </form>
                       ) : null}
                     </td>
@@ -199,9 +202,9 @@ export default async function ConsolePage({ params, searchParams }: Props) {
           <form action={publishRound} style={{ marginTop: 16 }}>
             <input type="hidden" name="round_id" value={draftRound.id} />
             <input type="hidden" name="slug" value={tournament.slug} />
-            <button className="btn" type="submit">
+            <SubmitButton pendingLabel="Publishing…">
               Publish pairings for round {draftRound.number}
-            </button>
+            </SubmitButton>
           </form>
         </section>
       ) : null}
@@ -244,22 +247,32 @@ export default async function ConsolePage({ params, searchParams }: Props) {
 
                         {isBye ? (
                           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                            <button className="btn secondary" name="result" value="bye" type="submit">
+                            <SubmitButton
+                              className="btn secondary"
+                              name="result"
+                              value="bye"
+                              pendingLabel="Saving…"
+                            >
                               Count as bye
-                            </button>
+                            </SubmitButton>
                           </div>
                         ) : (
                           <>
                             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                              <button className="btn" name="result" value="white" type="submit">
+                              <SubmitButton name="result" value="white" pendingLabel="…">
                                 White won
-                              </button>
-                              <button className="btn secondary" name="result" value="draw" type="submit">
+                              </SubmitButton>
+                              <SubmitButton
+                                className="btn secondary"
+                                name="result"
+                                value="draw"
+                                pendingLabel="…"
+                              >
                                 Draw
-                              </button>
-                              <button className="btn" name="result" value="black" type="submit">
+                              </SubmitButton>
+                              <SubmitButton name="result" value="black" pendingLabel="…">
                                 Black won
-                              </button>
+                              </SubmitButton>
                             </div>
                             <input
                               name="pgn"
@@ -282,9 +295,9 @@ export default async function ConsolePage({ params, searchParams }: Props) {
         <form action={completeTournament} style={{ marginTop: 24 }}>
           <input type="hidden" name="tournament_id" value={tournament.id} />
           <input type="hidden" name="slug" value={tournament.slug} />
-          <button className="btn secondary" type="submit">
+          <SubmitButton className="btn secondary" pendingLabel="Saving…">
             Mark the tournament complete
-          </button>
+          </SubmitButton>
         </form>
       ) : null}
       <section style={{ marginTop: 44, borderTop: "1px solid var(--border)", paddingTop: 20 }}>

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { createClient, getCurrentProfile, isConfigured } from "@/lib/supabase/server";
 import { computeStandings, type MatchRow } from "@/lib/pairings";
 import { registerForTournament, withdrawFromTournament } from "@/app/admin/tournaments/actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export const dynamic = "force-dynamic";
 
@@ -140,9 +141,9 @@ export default async function TournamentPage({ params }: Props) {
               <form action={withdrawFromTournament}>
                 <input type="hidden" name="tournament_id" value={tournament.id} />
                 <input type="hidden" name="slug" value={tournament.slug} />
-                <button className="btn secondary" type="submit">
+                <SubmitButton className="btn secondary" pendingLabel="Withdrawing…">
                   Withdraw my registration
-                </button>
+                </SubmitButton>
               </form>
             ) : null}
           </div>
@@ -151,9 +152,7 @@ export default async function TournamentPage({ params }: Props) {
             <form action={registerForTournament}>
               <input type="hidden" name="tournament_id" value={tournament.id} />
               <input type="hidden" name="slug" value={tournament.slug} />
-              <button className="btn" type="submit">
-                Register
-              </button>
+              <SubmitButton pendingLabel="Registering…">Register</SubmitButton>
             </form>
           ) : (
             <p>

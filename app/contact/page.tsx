@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { club, committee } from "@/lib/club";
 import { sendMessage } from "./actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -120,9 +121,7 @@ export default function ContactPage({ searchParams }: Props) {
             <label htmlFor="body">Message</label>
             <textarea id="body" name="body" rows={5} maxLength={4000} required />
           </div>
-          <button className="btn" type="submit">
-            Send
-          </button>
+          <SubmitButton pendingLabel="Sending…">Send</SubmitButton>
         </form>
       </section>
     </>

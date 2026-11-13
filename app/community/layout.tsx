@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
+import Avatar from "@/components/Avatar";
 
 export default async function CommunityLayout({
   children
@@ -79,8 +80,13 @@ export default async function CommunityLayout({
             </p>
           ) : (
             friendNames.map((f) => (
-              <Link key={f.id} href={`/community/${f.id}`}>
-                {f.full_name}
+              <Link
+                key={f.id}
+                href={`/community/${f.id}`}
+                style={{ display: "flex", alignItems: "center", gap: 10 }}
+              >
+                <Avatar name={f.full_name} size={30} />
+                <span>{f.full_name}</span>
               </Link>
             ))
           )}

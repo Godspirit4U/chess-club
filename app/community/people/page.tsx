@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { removeConnection, respondRequest, sendRequest } from "../actions";
+import Avatar from "@/components/Avatar";
+import SubmitButton from "@/components/SubmitButton";
 
 export const metadata: Metadata = { title: "Find people" };
 export const dynamic = "force-dynamic";
@@ -56,16 +58,16 @@ export default async function PeoplePage() {
                   <form action={respondRequest}>
                     <input type="hidden" name="id" value={c.id} />
                     <input type="hidden" name="decision" value="accepted" />
-                    <button className="btn" type="submit" style={{ minHeight: 36 }}>
+                    <SubmitButton pendingLabel="…" style={{ minHeight: 36 }}>
                       Accept
-                    </button>
+                    </SubmitButton>
                   </form>
                   <form action={respondRequest}>
                     <input type="hidden" name="id" value={c.id} />
                     <input type="hidden" name="decision" value="declined" />
-                    <button className="btn secondary" type="submit" style={{ minHeight: 36 }}>
+                    <SubmitButton className="btn secondary" pendingLabel="…" style={{ minHeight: 36 }}>
                       Decline
-                    </button>
+                    </SubmitButton>
                   </form>
                 </span>
               </div>
@@ -76,78 +78,70 @@ export default async function PeoplePage() {
 
       <section style={{ marginTop: 24 }}>
         <h3>Everyone ({(members ?? []).length})</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Chess username</th>
-              <th />
-            </tr>
-          </thead>
-          <tbody>
-            {(members ?? []).map((m) => {
-              const link = byOther.get(m.id);
-              return (
-                <tr key={m.id}>
-                  <td>
-                    {m.full_name}
-                    {m.id === profile!.id ? <span className="muted small"> (you)</span> : null}
-                    {m.role !== "member" ? (
-                      <span className="badge" style={{ marginLeft: 8 }}>
-                        {m.role.replace("_", " ")}
-                      </span>
-                    ) : null}
-                  </td>
-                  <td className="small muted">{m.chess_username ?? "—"}</td>
-                  <td>
-                    {m.id === profile!.id ? null : !link ? (
-                      <form action={sendRequest}>
-                        <input type="hidden" name="addressee_id" value={m.id} />
-                        <button className="btn secondary" type="submit" style={{ minHeight: 36 }}>
-                          Send request
-                        </button>
+
+        {(members ?? []).map((m) => {
+          const link = byOther.get(m.id);
+          return (
+            <div key={m.id} className="person-row">
+              <Avatar name={m.full_name} />
+
+              <div style={{ minWidth: 0 }}>
+                <div className="person-name">
+                  {m.full_name}
+                  {m.id === profile!.id ? <span className="person-meta"> (you)</span> : null}
+                </div>
+                <div className="person-meta">
+                  {m.chess_username ?? m.role.replace("_", " ")}
+                </div>
+              </div>
+
+              <div className="person-actions">
+                {m.id === profile!.id ? null : !link ? (
+                  <form action={sendRequest}>
+                    <input type="hidden" name="addressee_id" value={m.id} />
+                    <SubmitButton className="btn secondary" pendingLabel="Sending…" style={{ minHeight: 36 }}>
+                      Connect
+                    </SubmitButton>
+                  </form>
+                ) : link.status === "accepted" ? (
+                  <>
+                    <a href={`/community/${m.id}`}>Message</a>
+                    <form action={removeConnection}>
+                      <input type="hidden" name="id" value={link.id} />
+                      <SubmitButton
+                        className="btn secondary"
+                        pendingLabel="…"
+                        style={{ minHeight: 32, fontSize: 13 }}
+                      >
+                        Remove
+                      </SubmitButton>
+                    </form>
+                  </>
+                ) : link.status === "pending" ? (
+                  link.incoming ? (
+                    <span className="person-meta">Wants to connect</span>
+                  ) : (
+                    <>
+                      <span className="person-meta">Requested</span>
+                      <form action={removeConnection}>
+                        <input type="hidden" name="id" value={link.id} />
+                        <SubmitButton
+                          className="btn secondary"
+                          pendingLabel="…"
+                          style={{ minHeight: 32, fontSize: 13 }}
+                        >
+                          Cancel
+                        </SubmitButton>
                       </form>
-                    ) : link.status === "accepted" ? (
-                      <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                        <a href={`/community/${m.id}`}>Message</a>
-                        <form action={removeConnection}>
-                          <input type="hidden" name="id" value={link.id} />
-                          <button
-                            className="btn secondary"
-                            type="submit"
-                            style={{ minHeight: 32, fontSize: 13 }}
-                          >
-                            Remove
-                          </button>
-                        </form>
-                      </span>
-                    ) : link.status === "pending" ? (
-                      link.incoming ? (
-                        <span className="muted small">Wants to connect</span>
-                      ) : (
-                        <span style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                          <span className="muted small">Request sent</span>
-                          <form action={removeConnection}>
-                            <input type="hidden" name="id" value={link.id} />
-                            <button
-                              className="btn secondary"
-                              type="submit"
-                              style={{ minHeight: 32, fontSize: 13 }}
-                            >
-                              Cancel
-                            </button>
-                          </form>
-                        </span>
-                      )
-                    ) : (
-                      <span className="muted small">Declined</span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                    </>
+                  )
+                ) : (
+                  <span className="person-meta">Declined</span>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </section>
     </>
   );

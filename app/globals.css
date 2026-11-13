@@ -434,3 +434,50 @@ h2 {
   background: var(--accent-dark);
   border-color: var(--accent-dark);
 }
+
+/* People lists, avatar rows */
+.person-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.person-row:last-child {
+  border-bottom: 0;
+}
+
+.person-name {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.person-meta {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.person-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Active item in a sidebar: a soft rounded block */
+.side-block a[aria-current="page"] {
+  background: var(--tint);
+  color: var(--accent-dark);
+  border-radius: 6px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: -10px;
+  margin-right: -10px;
+  border-bottom-color: transparent;
+}
+
+.nav-links a[aria-current="page"] {
+  color: var(--accent);
+  font-weight: 600;
+}

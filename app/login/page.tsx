@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requestReset, signIn, signUp } from "@/app/auth/actions";
+import SubmitButton from "@/components/SubmitButton";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -64,9 +65,7 @@ export default function LoginPage({ searchParams }: Props) {
               <label htmlFor="email">Email address</label>
               <input id="email" name="email" type="email" autoComplete="email" required />
             </div>
-            <button className="btn" type="submit">
-              Send reset link
-            </button>
+            <SubmitButton pendingLabel="Sending…">Send reset link</SubmitButton>
           </form>
         ) : isSignUp ? (
           <form action={signUp} className="stack">
@@ -89,9 +88,7 @@ export default function LoginPage({ searchParams }: Props) {
                 required
               />
             </div>
-            <button className="btn" type="submit">
-              Create account
-            </button>
+            <SubmitButton pendingLabel="Creating…">Create account</SubmitButton>
           </form>
         ) : (
           <form action={signIn} className="stack">
@@ -109,9 +106,7 @@ export default function LoginPage({ searchParams }: Props) {
                 required
               />
             </div>
-            <button className="btn" type="submit">
-              Sign in
-            </button>
+            <SubmitButton pendingLabel="Signing in…">Sign in</SubmitButton>
           </form>
         )}
       </div>
