@@ -5,77 +5,41 @@ import SubmitButton from "@/components/SubmitButton";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Reach the SaiU Chess Club committee, or report a problem with the site."
+  description: "Reach the Sai University Chess Club committee."
 };
 
 type Props = { searchParams: { sent?: string; error?: string } };
 
 export default function ContactPage({ searchParams }: Props) {
-  const hasChannels = club.email || club.instagram || club.whatsapp;
-
   return (
     <>
       <h1>Contact</h1>
 
-      {committee.length > 0 ? (
-        <section style={{ marginTop: 20 }}>
-          <h2>The committee</h2>
-          <table>
-            <tbody>
-              {committee.map((c) => (
-                <tr key={c.role}>
-                  <th scope="row">{c.role}</th>
-                  <td>{c.name}</td>
-                  <td>
-                    {c.email ? <a href={`mailto:${c.email}`}>{c.email}</a> : <span className="muted">—</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
-      ) : null}
-
-      {hasChannels ? (
-        <section style={{ marginTop: 24 }}>
-          <h2>Where to find us</h2>
-          <table style={{ maxWidth: 520 }}>
-            <tbody>
-              {club.email ? (
-                <tr>
-                  <th scope="row">Email</th>
-                  <td>
-                    <a href={`mailto:${club.email}`}>{club.email}</a>
-                  </td>
-                </tr>
-              ) : null}
-              {club.instagram ? (
-                <tr>
-                  <th scope="row">Instagram</th>
-                  <td>
-                    <a href={`https://instagram.com/${club.instagram}`}>@{club.instagram}</a>
-                  </td>
-                </tr>
-              ) : null}
-              {club.whatsapp ? (
-                <tr>
-                  <th scope="row">WhatsApp</th>
-                  <td>
-                    <a href={club.whatsapp}>Join the group</a>
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
-        </section>
-      ) : null}
+      <section style={{ marginTop: 16 }}>
+        <h2>Who to ask</h2>
+        <table style={{ marginTop: 8 }}>
+          <tbody>
+            {committee.map((c) => (
+              <tr key={c.role}>
+                <th scope="row" style={{ width: "32%" }}>
+                  {c.role}
+                </th>
+                <td>{c.name}</td>
+                <td className="small">
+                  <a href={`mailto:${c.email}`}>{c.email}</a>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="muted small" style={{ marginTop: 8 }}>
+          For general queries, write to{" "}
+          <a href={`mailto:${club.email}`}>{club.email}</a>.
+        </p>
+      </section>
 
       <section style={{ marginTop: 28 }}>
         <h2>Report a problem or send feedback</h2>
-        <p className="muted small">
-          A wrong result, something broken on the site, or an idea for the club. Goes straight
-          to the committee.
-        </p>
 
         {searchParams.sent ? (
           <p
@@ -89,7 +53,7 @@ export default function ContactPage({ searchParams }: Props) {
               fontSize: 14
             }}
           >
-            Sent. The committee will see it.
+            Sent.
           </p>
         ) : null}
 
@@ -99,7 +63,7 @@ export default function ContactPage({ searchParams }: Props) {
           </p>
         ) : null}
 
-        <form action={sendMessage} className="card stack" style={{ maxWidth: 520 }}>
+        <form action={sendMessage} className="card stack" style={{ maxWidth: 540, marginTop: 12 }}>
           <div className="field">
             <label htmlFor="kind">What is this about</label>
             <select id="kind" name="kind" defaultValue="feedback">

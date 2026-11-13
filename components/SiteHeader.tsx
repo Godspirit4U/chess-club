@@ -45,7 +45,7 @@ export default function SiteHeader({
               height={32}
               style={{ borderRadius: "50%", display: "block" }}
             />
-            <span>SaiU Chess Club</span>
+            <span>Sai University Chess Club</span>
           </Link>
 
           <nav className="nav-links" aria-label="Main">
