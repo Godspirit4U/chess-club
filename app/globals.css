@@ -648,18 +648,4 @@ h2::after {
   }
 }
 
-/* Page-loading overlay: covers the outgoing page so the skeleton is all you see */
-.page-loader {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  background: var(--paper);
-  padding-top: 90px;
-  overflow: hidden;
-}
 
-.page-loader .container {
-  max-width: var(--maxw);
-  margin: 0 auto;
-  padding: 0 20px;
-}
