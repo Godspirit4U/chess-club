@@ -268,13 +268,54 @@ export default async function TournamentPage({ params }: Props) {
                               : m.result === "bye"
                                 ? "bye"
                                 : "";
+                      const whiteId = m.white_id;
+                      const blackId = m.black_id;
+
                       return (
-                        <li key={m.id} className="small">
-                          {whiteName?.profiles?.full_name ?? "—"} vs{" "}
-                          {blackName?.profiles?.full_name ?? "bye"}{" "}
-                          {score ? <strong>{score}</strong> : null}{" "}
-                          <Link href={`/tournaments/${tournament.slug}/matches/${m.id}`}>
-                            open
+                        <li
+                          key={m.id}
+                          className="small"
+                          style={{
+                            display: "flex",
+                            gap: 10,
+                            alignItems: "center",
+                            flexWrap: "wrap",
+                            padding: "6px 0",
+                            borderTop: "1px solid var(--border)",
+                            listStyle: "none",
+                            marginLeft: -18
+                          }}
+                        >
+                          <span style={{ width: 34, color: "var(--muted)" }}>
+                            {m.board}
+                          </span>
+
+                          {whiteId ? (
+                            <Link href={`/members/${whiteId}`} style={{ fontWeight: 600 }}>
+                              {whiteName?.profiles?.full_name ?? "Member"}
+                            </Link>
+                          ) : (
+                            <span>—</span>
+                          )}
+
+                          <span className="muted">vs</span>
+
+                          {blackId ? (
+                            <Link href={`/members/${blackId}`} style={{ fontWeight: 600 }}>
+                              {blackName?.profiles?.full_name ?? "Member"}
+                            </Link>
+                          ) : (
+                            <span className="muted">bye</span>
+                          )}
+
+                          {score ? <strong style={{ marginLeft: 4 }}>{score}</strong> : null}
+
+                          <Link
+                            className="btn secondary"
+                            href={`/tournaments/${tournament.slug}/matches/${m.id}`}
+                            style={{ marginLeft: "auto", minHeight: 30, fontSize: 13 }}
+                          >
+                            Match
                           </Link>
                         </li>
                       );
