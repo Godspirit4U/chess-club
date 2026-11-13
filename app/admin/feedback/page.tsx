@@ -22,15 +22,9 @@ export default async function FeedbackPage() {
   return (
     <>
       <h1>Feedback</h1>
-      <p className="muted">
-        Everything sent through the contact form: problems, bugs and suggestions.
-      </p>
 
-      {(messages ?? []).length === 0 ? (
-        <p className="empty">
-          Nothing yet. When a member reports a problem or sends an idea, it appears here.
-        </p>
-      ) : (
+
+      {(messages ?? []).length === 0 ? null : (
         <div className="stack" style={{ marginTop: 16 }}>
           {(messages ?? []).map((m) => (
             <article key={m.id} className="card">

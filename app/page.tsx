@@ -46,10 +46,7 @@ export default async function HomePage() {
     <>
       <section className="hero">
         <h1>The club, on one page.</h1>
-        <p className="lede">
-          Tournaments, pairings, the points table and a puzzle a day. Sign in with your
-          college email and everything you need is here.
-        </p>
+
       </section>
 
       <section className="grid two" aria-label="What is on now">
@@ -66,11 +63,7 @@ export default async function HomePage() {
                 {next.starts_at ? ` · starts ${new Date(next.starts_at).toDateString()}` : ""}
               </p>
             </>
-          ) : (
-            <p className="muted">
-              Nothing scheduled yet. When an admin creates a tournament it appears here.
-            </p>
-          )}
+          ) : null}
         </div>
 
         <div className="card">
@@ -82,12 +75,7 @@ export default async function HomePage() {
               </h3>
               <p className="muted small">{puzzle.note ?? "Find the best move for the side to play."}</p>
             </>
-          ) : (
-            <p className="muted">
-              No puzzle posted today. Puzzles appear here every morning once an admin
-              adds one.
-            </p>
-          )}
+          ) : null}
         </div>
       </section>
 
@@ -100,11 +88,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {posts.length === 0 ? (
-            <p className="empty">
-              No posts yet. Announcements, recaps and tournament reports will appear here.
-            </p>
-          ) : (
+          {posts.length === 0 ? null : (
             <div className="grid three">
               {posts.map((p) => (
                 <article key={p.slug} className="card">

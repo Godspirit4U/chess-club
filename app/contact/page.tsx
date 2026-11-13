@@ -15,7 +15,6 @@ export default function ContactPage({ searchParams }: Props) {
   return (
     <>
       <h1>Contact</h1>
-      <p className="muted">Reach the committee directly, or send a message below.</p>
 
       {committee.length > 0 ? (
         <section style={{ marginTop: 20 }}>

@@ -114,9 +114,7 @@ export default function ChatRoom({
       </div>
 
       <div style={{ maxHeight: 420, overflowY: "auto", padding: "12px 16px" }}>
-        {messages.length === 0 ? (
-          <p className="muted small">No messages yet. Say something.</p>
-        ) : (
+        {messages.length === 0 ? null : (
           messages.map((m) => (
             <div key={m.id} style={{ marginBottom: 10 }}>
               <div className="small muted">

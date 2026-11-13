@@ -22,7 +22,7 @@ export default async function AdminChatPage() {
   return (
     <>
       <h2 style={{ marginTop: 0 }}>Admin chat</h2>
-      <p className="muted small">Committee only. Members cannot see this room.</p>
+
       <ChatRoom
         canModerate
         room="admin"

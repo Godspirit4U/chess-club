@@ -121,7 +121,7 @@ export default async function AdminPage() {
   return (
     <>
       <h1 style={{ marginTop: 0 }}>Dashboard</h1>
-      <p className="muted">Signed in as {profile?.full_name}.</p>
+
 
       <div className="grid two" style={{ marginTop: 20 }}>
         <Panel
@@ -130,11 +130,7 @@ export default async function AdminPage() {
           href="/tournaments"
           hrefLabel="Public list"
         >
-          {running.length === 0 ? (
-            <p className="muted small" style={{ margin: 0 }}>
-              No tournament is running. Start one from its console when registration closes.
-            </p>
-          ) : (
+          {(
             running.slice(0, 4).map((t) =>
               row(t.name, "In progress", `/admin/tournaments/${t.slug}/console`, "Console")
             )
@@ -142,11 +138,7 @@ export default async function AdminPage() {
         </Panel>
 
         <Panel title="Open for registration" count={open.length} href="/admin/tournaments/new" hrefLabel="New">
-          {open.length === 0 ? (
-            <p className="muted small" style={{ margin: 0 }}>
-              Nothing open. Create a tournament and it appears on the public list.
-            </p>
-          ) : (
+          {(
             open.slice(0, 4).map((t) =>
               row(
                 t.name,
@@ -164,11 +156,7 @@ export default async function AdminPage() {
         </Panel>
 
         <Panel title="Upcoming events" count={events.length} href="/admin/events" hrefLabel="Add">
-          {events.length === 0 ? (
-            <p className="muted small" style={{ margin: 0 }}>
-              No events scheduled. Training sessions and casual meets go here.
-            </p>
-          ) : (
+          {(
             events.map((e) =>
               row(
                 e.title,
@@ -184,11 +172,7 @@ export default async function AdminPage() {
         </Panel>
 
         <Panel title="Recent feedback" count={feedback.length} href="/admin/feedback" hrefLabel="All">
-          {feedback.length === 0 ? (
-            <p className="muted small" style={{ margin: 0 }}>
-              Nothing reported yet. Messages from the contact form land here.
-            </p>
-          ) : (
+          {(
             feedback.map((f) =>
               row(
                 `${kindLabel[f.kind] ?? "Other"} from ${f.name}`,
@@ -201,11 +185,7 @@ export default async function AdminPage() {
         </Panel>
 
         <Panel title="Drafts" count={drafts.length} href="/admin/tournaments/new" hrefLabel="New">
-          {drafts.length === 0 ? (
-            <p className="muted small" style={{ margin: 0 }}>
-              No drafts. Anything you create without publishing waits here.
-            </p>
-          ) : (
+          {(
             drafts.slice(0, 4).map((t) =>
               row(t.name, "Not published", `/admin/tournaments/${t.slug}/console`, "Console")
             )

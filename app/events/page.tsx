@@ -81,11 +81,9 @@ export default async function EventsPage() {
           </Link>
         ) : null}
       </div>
-      <p className="muted">Everything the club is doing: tournaments, training and casual meets.</p>
 
-      {events.length === 0 ? (
-        <p className="empty">Nothing scheduled yet. Events appear here as the committee adds them.</p>
-      ) : null}
+
+
 
       {upcoming.length > 0 ? (
         <section style={{ marginTop: 20 }}>

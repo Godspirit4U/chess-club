@@ -79,12 +79,7 @@ export default async function TournamentsPage() {
         ) : null}
       </div>
 
-      {rows.length === 0 ? (
-        <p className="empty">
-          No tournaments yet. When an admin creates one it appears here, and members can
-          register from its page.
-        </p>
-      ) : null}
+
 
       {running.length > 0 ? (
         <section style={{ marginTop: 24 }}>

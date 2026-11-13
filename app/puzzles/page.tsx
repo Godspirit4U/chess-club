@@ -53,7 +53,7 @@ export default async function PuzzlesPage() {
           </Link>
         ) : null}
       </div>
-      <p className="muted">One position a day. Solve it on the board and your count goes up.</p>
+
 
       {profile ? (
         <p className="small">
@@ -74,9 +74,7 @@ export default async function PuzzlesPage() {
             Open the puzzle
           </Link>
         </div>
-      ) : (
-        <p className="empty">No puzzle posted yet. One appears here each morning.</p>
-      )}
+      ) : null}
 
       {puzzles.length > 1 ? (
         <section style={{ marginTop: 28 }}>

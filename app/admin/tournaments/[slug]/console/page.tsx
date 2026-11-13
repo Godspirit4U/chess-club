@@ -99,6 +99,12 @@ export default async function ConsolePage({ params, searchParams }: Props) {
         {tournament.rounds} rounds created
       </p>
 
+      <p style={{ marginTop: 8 }}>
+        <a className="btn secondary" href={`/admin/tournaments/${tournament.slug}/export`}>
+          Export player list
+        </a>
+      </p>
+
       {searchParams.error ? (
         <p
           role="alert"

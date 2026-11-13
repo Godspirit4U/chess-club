@@ -35,9 +35,7 @@ export default async function PeoplePage() {
   return (
     <>
       <h2 style={{ marginTop: 0 }}>Find people</h2>
-      <p className="muted small">
-        Send a request to anyone. Once they accept, a private chat appears in your sidebar.
-      </p>
+
 
       {incoming.length > 0 ? (
         <section style={{ marginTop: 20 }}>

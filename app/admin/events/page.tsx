@@ -58,9 +58,7 @@ export default async function AdminEventsPage({ searchParams }: Props) {
 
       <section style={{ marginTop: 28 }}>
         <h2>All events</h2>
-        {(events ?? []).length === 0 ? (
-          <p className="empty">No events yet.</p>
-        ) : (
+        {(events ?? []).length === 0 ? null : (
           <table>
             <thead>
               <tr>

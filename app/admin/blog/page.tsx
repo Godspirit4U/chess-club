@@ -49,9 +49,7 @@ export default async function AdminBlogPage({ searchParams }: Props) {
 
       <section style={{ marginTop: 28 }}>
         <h2>All posts</h2>
-        {(posts ?? []).length === 0 ? (
-          <p className="empty">No posts yet.</p>
-        ) : (
+        {(posts ?? []).length === 0 ? null : (
           <table>
             <thead>
               <tr>

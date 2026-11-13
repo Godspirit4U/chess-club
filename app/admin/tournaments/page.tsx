@@ -39,11 +39,8 @@ export default async function AdminTournamentsPage() {
           Create a tournament
         </Link>
       </div>
-      <p className="muted">Every tournament, whatever its status.</p>
 
-      {(tournaments ?? []).length === 0 ? (
-        <p className="empty">No tournaments yet. Create one and it appears here and on the public list.</p>
-      ) : (
+      {(tournaments ?? []).length === 0 ? null : (
         <table style={{ marginTop: 16 }}>
           <thead>
             <tr>

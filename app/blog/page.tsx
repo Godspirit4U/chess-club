@@ -42,13 +42,9 @@ export default async function BlogPage() {
           </Link>
         ) : null}
       </div>
-      <p className="muted">Announcements, recaps and reports, written by the committee.</p>
 
-      {posts.length === 0 ? (
-        <p className="empty">
-          Nothing published yet. Announcements and tournament recaps will appear here.
-        </p>
-      ) : (
+
+      {posts.length === 0 ? null : (
         <div className="stack" style={{ marginTop: 20 }}>
           {posts.map((p) => (
             <article key={p.slug} className="card">

@@ -23,7 +23,7 @@ export default async function PeoplePage({ searchParams }: Props) {
   return (
     <>
       <h1>People</h1>
-      <p className="muted">Search for anyone in the club, change their role, or remove them.</p>
+
 
       {searchParams.error ? (
         <p role="alert" style={{ color: "var(--danger)", fontSize: 14 }}>
@@ -41,10 +41,7 @@ export default async function PeoplePage({ searchParams }: Props) {
 
       <section style={{ marginTop: 36 }}>
         <h2>Add someone who could not register</h2>
-        <p className="muted small">
-          Creates an account with a password you choose. Tell them the password; they can
-          change it once password settings are added.
-        </p>
+
 
         {hasServiceRole ? (
           <form action={addMember} className="card stack" style={{ maxWidth: 480 }}>

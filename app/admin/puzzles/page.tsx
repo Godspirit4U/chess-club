@@ -49,9 +49,7 @@ export default async function AdminPuzzlesPage({ searchParams }: Props) {
 
       <section style={{ marginTop: 28 }}>
         <h2>Recent puzzles</h2>
-        {(puzzles ?? []).length === 0 ? (
-          <p className="empty">No puzzles yet.</p>
-        ) : (
+        {(puzzles ?? []).length === 0 ? null : (
           <table>
             <thead>
               <tr>

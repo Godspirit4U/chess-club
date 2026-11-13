@@ -49,9 +49,7 @@ export default function PeopleTable({
         {people.length === 1 ? "person" : "people"}
       </p>
 
-      {filtered.length === 0 ? (
-        <p className="empty">Nobody matches that search.</p>
-      ) : (
+      {filtered.length === 0 ? null : (
         <table>
           <thead>
             <tr>

@@ -178,9 +178,7 @@ export default async function TournamentPage({ params }: Props) {
 
       <section style={{ marginTop: 28 }}>
         <h2>Players ({active.length})</h2>
-        {active.length === 0 ? (
-          <p className="empty">Nobody has registered yet.</p>
-        ) : (
+        {active.length === 0 ? null : (
           <ul style={{ paddingLeft: 18, margin: 0 }}>
             {active.map((p: any) => (
               <li key={p.profile_id}>{p.profiles?.full_name ?? "Member"}</li>
