@@ -5,6 +5,7 @@ import { createClient, getCurrentProfile, isConfigured } from "@/lib/supabase/se
 import { computeStandings, type MatchRow } from "@/lib/pairings";
 import { registerForTournament, withdrawFromTournament } from "@/app/admin/tournaments/actions";
 import SubmitButton from "@/components/SubmitButton";
+import ShareTournament from "@/components/ShareTournament";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +25,7 @@ async function loadTournament(slug: string) {
   const { data } = await supabase
     .from("tournaments")
     .select(
-      "id,slug,name,description,status,format,rounds,time_control,rules,structure,starts_at,registration_deadline"
+      "id,slug,name,description,status,format,rounds,time_control,rules,structure,starts_at,registration_deadline,share_code"
     )
     .eq("slug", slug)
     .single();
@@ -178,6 +179,15 @@ export default async function TournamentPage({ params }: Props) {
           </p>
         )}
       </div>
+
+      {tournament.share_code ? (
+        <ShareTournament
+          title={tournament.name}
+          code={tournament.share_code}
+          url={`https://saiu-chess-club.vercel.app/tournaments/${tournament.slug}`}
+          shortUrl={`https://saiu-chess-club.vercel.app/t/${tournament.share_code}`}
+        />
+      ) : null}
 
       <section style={{ marginTop: 28 }}>
         <h2>Players ({active.length})</h2>

@@ -34,9 +34,12 @@ export async function createTournament(formData: FormData) {
   const publish = formData.get("publish") === "on";
   const supabase = createClient();
 
+  const shareCode = Math.random().toString(36).slice(2, 8).toUpperCase();
+
   const { data, error } = await supabase
     .from("tournaments")
     .insert({
+      share_code: shareCode,
       slug: makeSlug(name),
       name,
       description: String(formData.get("description") ?? "").trim() || null,
