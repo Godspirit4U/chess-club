@@ -59,11 +59,17 @@ export default function SiteHeader({
               </>
             ) : (
               <>
-                {links.map((l) => (
-                  <Link key={l.href} href={l.href}>
-                    {l.label}
-                  </Link>
-                ))}
+                {links.map((l) => {
+                  const active =
+                    l.href === "/"
+                      ? pathname === "/"
+                      : pathname === l.href || pathname?.startsWith(l.href + "/");
+                  return (
+                    <Link key={l.href} href={l.href} aria-current={active ? "page" : undefined}>
+                      {l.label}
+                    </Link>
+                  );
+                })}
 
                 {isAdmin ? (
                   <Link href="/admin" style={{ fontWeight: 600 }}>
@@ -107,11 +113,22 @@ export default function SiteHeader({
               </>
             ) : (
               <>
-                {all.map((l) => (
-                  <Link key={l.href} href={l.href} onClick={() => setOpen(false)}>
-                    {l.label}
-                  </Link>
-                ))}
+                {all.map((l) => {
+                  const active =
+                    l.href === "/"
+                      ? pathname === "/"
+                      : pathname === l.href || pathname?.startsWith(l.href + "/");
+                  return (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      onClick={() => setOpen(false)}
+                      aria-current={active ? "page" : undefined}
+                    >
+                      {l.label}
+                    </Link>
+                  );
+                })}
                 {isAdmin ? (
                   <Link href="/admin" onClick={() => setOpen(false)}>
                     Admin

@@ -548,3 +548,61 @@ h2 {
   font-size: 13px;
   line-height: 1;
 }
+
+/* Hero band: the one place the accent covers a whole block */
+.hero {
+  background: var(--accent);
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 30px 26px;
+  margin-top: 8px;
+}
+
+.hero h1 {
+  color: #ffffff;
+  margin: 0 0 8px;
+}
+
+.hero .lede {
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0 0 14px;
+}
+
+.hero .btn {
+  background: #ffffff;
+  border-color: #ffffff;
+  color: var(--accent-dark);
+}
+
+.hero .btn:hover {
+  background: var(--tint);
+  border-color: var(--tint);
+  color: var(--accent-dark);
+}
+
+.hero .btn.secondary {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.55);
+  color: #ffffff;
+}
+
+.hero .btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+/* Section headings carry a short accent rule */
+h2::after {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: var(--amber);
+  margin-top: 6px;
+  border-radius: 2px;
+}
+
+.card h2::after {
+  display: none;
+}

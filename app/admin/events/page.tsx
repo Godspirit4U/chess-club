@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { createEvent, deleteEvent } from "./actions";
+import ImageUpload from "@/components/ImageUpload";
+import SubmitButton from "@/components/SubmitButton";
 import ConfirmButton from "@/components/ConfirmButton";
 
 export const metadata: Metadata = { title: "Events" };
@@ -12,7 +14,7 @@ export default async function AdminEventsPage({ searchParams }: Props) {
   const supabase = createClient();
   const { data: events } = await supabase
     .from("events")
-    .select("id,title,starts_at,kind")
+    .select("id,slug,title,starts_at,kind")
     .order("starts_at", { ascending: false })
     .limit(30);
 
@@ -44,17 +46,23 @@ export default async function AdminEventsPage({ searchParams }: Props) {
           <label htmlFor="starts_at">Starts</label>
           <input id="starts_at" name="starts_at" type="datetime-local" required />
         </div>
-        <div className="field">
-          <label htmlFor="location">Venue</label>
-          <input id="location" name="location" />
+        <div className="grid two" style={{ gap: 16 }}>
+          <div className="field">
+            <label htmlFor="location">Venue</label>
+            <input id="location" name="location" />
+          </div>
+          <div className="field">
+            <label htmlFor="format">Format</label>
+            <input id="format" name="format" placeholder="Swiss, Blitz, Beginner session" />
+          </div>
         </div>
+
+        <ImageUpload />
         <div className="field">
           <label htmlFor="description">Description</label>
           <textarea id="description" name="description" rows={3} />
         </div>
-        <button className="btn" type="submit">
-          Add event
-        </button>
+        <SubmitButton>Add event</SubmitButton>
       </form>
 
       <section style={{ marginTop: 28 }}>
@@ -66,7 +74,7 @@ export default async function AdminEventsPage({ searchParams }: Props) {
                 <th>Title</th>
                 <th>Kind</th>
                 <th>When</th>
-                <th />
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -81,10 +89,19 @@ export default async function AdminEventsPage({ searchParams }: Props) {
                     })}
                   </td>
                   <td>
-                    <form action={deleteEvent}>
-                      <input type="hidden" name="id" value={e.id} />
-                      <ConfirmButton message="Delete this event?" style={{ minHeight: 32, color: "var(--danger)" }}>Delete</ConfirmButton>
-                    </form>
+                    <span style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                      <a href={`/admin/events/${e.id}`}>Edit</a>
+                      <a href={`/events/${e.slug}`}>View</a>
+                      <form action={deleteEvent}>
+                        <input type="hidden" name="id" value={e.id} />
+                        <ConfirmButton
+                          message="Delete this event?"
+                          style={{ minHeight: 32, color: "var(--danger)" }}
+                        >
+                          Delete
+                        </ConfirmButton>
+                      </form>
+                    </span>
                   </td>
                 </tr>
               ))}

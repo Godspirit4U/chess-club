@@ -10,11 +10,14 @@ export const dynamic = "force-dynamic";
 
 type Event = {
   id: string;
+  slug: string;
   title: string;
   description: string | null;
   kind: string;
+  format: string | null;
   starts_at: string;
   location: string | null;
+  cover_path: string | null;
 };
 
 const kindLabel: Record<string, string> = {
@@ -34,7 +37,7 @@ export default async function EventsPage() {
     const supabase = createClient();
     const { data } = await supabase
       .from("events")
-      .select("id,title,description,kind,starts_at,location")
+      .select("id,slug,title,description,kind,format,starts_at,location,cover_path")
       .order("starts_at", { ascending: true });
     events = data ?? [];
   }
@@ -46,22 +49,45 @@ export default async function EventsPage() {
     .reverse();
 
   const render = (list: Event[]) =>
-    list.map((e) => (
-      <div key={e.id} className="card" style={{ marginBottom: 12 }}>
-        <p className="muted small" style={{ margin: 0 }}>
-          {new Date(e.starts_at).toLocaleString("en-IN", {
-            dateStyle: "medium",
-            timeStyle: "short"
-          })}
-          {e.location ? ` · ${e.location}` : ""}
-        </p>
-        <h3 style={{ margin: "4px 0" }}>{e.title}</h3>
-        <p className="muted small" style={{ margin: 0 }}>
-          {kindLabel[e.kind] ?? "Event"}
-          {e.description ? ` · ${e.description}` : ""}
-        </p>
-      </div>
-    ));
+    list.map((e) => {
+      const cover = e.cover_path
+        ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/covers/${e.cover_path}`
+        : null;
+
+      return (
+        <Link
+          key={e.id}
+          href={`/events/${e.slug}`}
+          className="card"
+          style={{ display: "flex", gap: 14, alignItems: "flex-start", marginBottom: 12 }}
+        >
+          {cover ? (
+            <img
+              src={cover}
+              alt=""
+              width={88}
+              height={88}
+              style={{ width: 88, height: 88, objectFit: "cover", borderRadius: 6, flexShrink: 0 }}
+            />
+          ) : null}
+
+          <span style={{ minWidth: 0 }}>
+            <span className="muted small" style={{ display: "block" }}>
+              {new Date(e.starts_at).toLocaleString("en-IN", {
+                dateStyle: "medium",
+                timeStyle: "short"
+              })}
+              {e.location ? ` · ${e.location}` : ""}
+            </span>
+            <span style={{ display: "block", fontWeight: 600, marginTop: 2 }}>{e.title}</span>
+            <span className="muted small" style={{ display: "block" }}>
+              {kindLabel[e.kind] ?? "Event"}
+              {e.format ? ` · ${e.format}` : ""}
+            </span>
+          </span>
+        </Link>
+      );
+    });
 
   return (
     <>
