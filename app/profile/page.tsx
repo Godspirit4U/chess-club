@@ -97,11 +97,35 @@ export default async function ProfilePage() {
             {profile.email}
             {profile.role !== "member" ? ` · ${profile.role.replace("_", " ")}` : ""}
           </p>
-          {profile.chess_username ? (
-            <p className="muted small" style={{ margin: "2px 0 0" }}>
-              {profile.chess_username}
-            </p>
-          ) : null}
+          <div style={{ display: "flex", gap: 10, marginTop: 6, flexWrap: "wrap" }}>
+            {profile.lichess_username ? (
+              <a
+                href={`https://lichess.org/@/${profile.lichess_username}`}
+                target="_blank"
+                rel="noreferrer"
+                className="site-link"
+              >
+                <span aria-hidden="true" className="site-mark">
+                  ♞
+                </span>
+                Lichess
+              </a>
+            ) : null}
+
+            {profile.chesscom_username ? (
+              <a
+                href={`https://www.chess.com/member/${profile.chesscom_username}`}
+                target="_blank"
+                rel="noreferrer"
+                className="site-link"
+              >
+                <span aria-hidden="true" className="site-mark">
+                  ♟
+                </span>
+                Chess.com
+              </a>
+            ) : null}
+          </div>
         </div>
       </div>
 

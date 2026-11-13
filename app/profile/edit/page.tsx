@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
+import ChessAccounts from "@/components/ChessAccounts";
+import SubmitButton from "@/components/SubmitButton";
 
 export const metadata: Metadata = { title: "Edit profile" };
 export const dynamic = "force-dynamic";
@@ -28,15 +30,22 @@ export default async function EditProfilePage({ searchParams }: Props) {
 
     const fullName = String(formData.get("full_name") ?? "").trim();
     const platform = String(formData.get("chess_platform") ?? "none");
-    const username = String(formData.get("chess_username") ?? "").trim();
+    const lichess = String(formData.get("lichess_username") ?? "").trim();
+    const chesscom = String(formData.get("chesscom_username") ?? "").trim();
 
     if (!fullName) {
       redirect(`/profile/edit?error=${encodeURIComponent("A name is required.")}`);
     }
 
-    if (platform !== "none" && !username) {
+    if (platform === "lichess" && !lichess) {
+      redirect(`/profile/edit?error=${encodeURIComponent("Add your Lichess username.")}`);
+    }
+    if (platform === "chesscom" && !chesscom) {
+      redirect(`/profile/edit?error=${encodeURIComponent("Add your Chess.com username.")}`);
+    }
+    if (platform === "both" && (!lichess || !chesscom)) {
       redirect(
-        `/profile/edit?error=${encodeURIComponent("Add your username, or choose None.")}`
+        `/profile/edit?error=${encodeURIComponent("Add both usernames, or choose a single site.")}`
       );
     }
 
@@ -46,14 +55,13 @@ export default async function EditProfilePage({ searchParams }: Props) {
       .update({
         full_name: fullName,
         chess_platform: platform === "none" ? null : platform,
-        chess_username: platform === "none" ? null : username
+        lichess_username: platform === "lichess" || platform === "both" ? lichess : null,
+        chesscom_username: platform === "chesscom" || platform === "both" ? chesscom : null
       })
       .eq("id", me.id);
 
-    redirect("/profile/edit?saved=1");
+    redirect("/profile");
   }
-
-  const current = (profile as any).chess_platform ?? "none";
 
   return (
     <>
@@ -112,28 +120,11 @@ export default async function EditProfilePage({ searchParams }: Props) {
               <input id="full_name" name="full_name" defaultValue={profile.full_name} required />
             </div>
 
-            <div className="field">
-              <label htmlFor="chess_platform">Where do you play online?</label>
-              <select id="chess_platform" name="chess_platform" defaultValue={current}>
-                <option value="none">I do not play online</option>
-                <option value="lichess">Lichess</option>
-                <option value="chesscom">Chess.com</option>
-                <option value="both">Both</option>
-              </select>
-            </div>
-
-            <div className="field" style={{ marginBottom: 0 }}>
-              <label htmlFor="chess_username">Username</label>
-              <input
-                id="chess_username"
-                name="chess_username"
-                defaultValue={profile.chess_username ?? ""}
-                placeholder="the name you use on that site"
-              />
-              <p className="muted small" style={{ margin: "6px 0 0" }}>
-                Used for pairings, game links and your ratings once we pull them in.
-              </p>
-            </div>
+            <ChessAccounts
+              defaultPlatform={profile.chess_platform ?? "none"}
+              defaultLichess={profile.lichess_username ?? ""}
+              defaultChesscom={profile.chesscom_username ?? ""}
+            />
           </div>
 
           <div className="card stack">
@@ -162,9 +153,7 @@ export default async function EditProfilePage({ searchParams }: Props) {
         </div>
 
         <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap" }}>
-          <button className="btn" type="submit">
-            Save changes
-          </button>
+          <SubmitButton>Save changes</SubmitButton>
           <Link className="btn secondary" href="/profile">
             Cancel
           </Link>

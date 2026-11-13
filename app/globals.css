@@ -515,3 +515,36 @@ h2 {
     opacity: 1;
   }
 }
+
+/* Links out to Lichess and Chess.com */
+.site-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--surface);
+}
+
+.site-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.site-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--tint);
+  color: var(--accent-dark);
+  font-size: 13px;
+  line-height: 1;
+}

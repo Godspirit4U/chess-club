@@ -185,8 +185,7 @@ export default async function HomePage() {
           <h2 style={{ marginTop: 0 }}>Joining</h2>
           <p className="muted small">{club.membership.eligibility}</p>
           <p className="muted small" style={{ marginBottom: 12 }}>
-            {members > 0 ? `${members} members on the site. ` : ""}
-            {club.membership.capacity}. {club.membership.joining}
+            {club.membership.joining}
           </p>
           {!profile ? (
             <Link className="btn" href="/login?mode=signup">
