@@ -68,10 +68,6 @@ export default function AboutPage() {
               <td>{club.membership.eligibility}</td>
             </tr>
             <tr>
-              <th scope="row">Size</th>
-              <td>{club.membership.capacity}</td>
-            </tr>
-            <tr>
               <th scope="row">How long</th>
               <td>{club.membership.term}</td>
             </tr>
