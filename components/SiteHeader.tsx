@@ -26,7 +26,7 @@ export default function SiteHeader({
 
   const all = [
     ...links,
-    ...(signedIn ? [{ href: "/profile", label: name ? name.split(" ")[0] : "Profile" }] : [])
+    ...(signedIn ? [{ href: "/profile", label: "Profile" }] : [])
   ];
 
   return (
@@ -51,7 +51,7 @@ export default function SiteHeader({
             ) : null}
 
             {signedIn ? (
-              <Link href="/profile">{name ? name.split(" ")[0] : "Profile"}</Link>
+              <Link href="/profile">Profile</Link>
             ) : (
               <Link href="/login">Sign in</Link>
             )}
