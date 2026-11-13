@@ -1,44 +1,17 @@
 export default function Loading() {
   return (
-    <div aria-busy="true" aria-live="polite" style={{ paddingTop: 12 }}>
-      <p className="muted small">Loading…</p>
+    <div aria-busy="true" aria-label="Loading page" style={{ paddingTop: 8 }}>
       <div
         style={{
-          height: 28,
-          width: "55%",
-          background: "var(--border)",
-          borderRadius: 4,
-          marginBottom: 18
+          height: 3,
+          width: "100%",
+          borderRadius: 3,
+          background:
+            "linear-gradient(90deg, var(--border) 0%, var(--accent) 50%, var(--border) 100%)",
+          backgroundSize: "200% 100%",
+          animation: "pageSweep 1.1s linear infinite"
         }}
       />
-      <div className="grid two">
-        {[0, 1].map((i) => (
-          <div
-            key={i}
-            className="card"
-            style={{ height: 120, background: "var(--surface)" }}
-            aria-hidden="true"
-          >
-            <div
-              style={{
-                height: 12,
-                width: "40%",
-                background: "var(--border)",
-                borderRadius: 3,
-                marginBottom: 10
-              }}
-            />
-            <div
-              style={{
-                height: 12,
-                width: "70%",
-                background: "var(--border)",
-                borderRadius: 3
-              }}
-            />
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
