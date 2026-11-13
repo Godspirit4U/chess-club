@@ -83,6 +83,38 @@ export default async function TournamentPage({ params }: Props) {
     : false;
   const registrationOpen = tournament.status === "open" && !deadlinePassed;
 
+  const shareUrl = `https://saiu-chess-club.vercel.app/tournaments/${tournament.slug}`;
+
+  const shareSummary = [
+    `${labels[tournament.format] ?? tournament.format} · ${tournament.rounds} rounds`,
+    tournament.time_control ? `Time control ${tournament.time_control}` : "",
+    tournament.starts_at
+      ? `Starts ${new Date(tournament.starts_at).toLocaleString("en-IN", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+          hour: "numeric",
+          minute: "2-digit"
+        })}`
+      : "",
+    registrationOpen ? "Registration is open" : "Registration is closed"
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  let qrSvg = "";
+  try {
+    const QR = await import("qrcode");
+    qrSvg = await QR.toString(shareUrl, {
+      type: "svg",
+      margin: 1,
+      width: 148,
+      color: { dark: "#14201a", light: "#ffffff" }
+    });
+  } catch {
+    qrSvg = "";
+  }
+
   const statusLabel =
     tournament.status === "running"
       ? "Running now"
@@ -180,12 +212,12 @@ export default async function TournamentPage({ params }: Props) {
         )}
       </div>
 
-      {tournament.share_code ? (
+      {profile && profile.role !== "member" && qrSvg ? (
         <ShareTournament
           title={tournament.name}
-          code={tournament.share_code}
-          url={`https://saiu-chess-club.vercel.app/tournaments/${tournament.slug}`}
-          shortUrl={`https://saiu-chess-club.vercel.app/t/${tournament.share_code}`}
+          summary={shareSummary}
+          url={shareUrl}
+          qr={qrSvg}
         />
       ) : null}
 
