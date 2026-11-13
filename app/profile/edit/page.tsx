@@ -3,12 +3,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import ChessAccounts from "@/components/ChessAccounts";
+import AvatarUpload from "@/components/AvatarUpload";
 import SubmitButton from "@/components/SubmitButton";
 
 export const metadata: Metadata = { title: "Edit profile" };
 export const dynamic = "force-dynamic";
 
-type Props = { searchParams: { error?: string; saved?: string } };
+type Props = { searchParams: { error?: string; saved?: string; welcome?: string } };
 
 function initials(name: string) {
   return name
@@ -69,32 +70,27 @@ export default async function EditProfilePage({ searchParams }: Props) {
         <Link href="/profile">Profile</Link>
       </p>
 
-      <div className="card" style={{ display: "flex", gap: 14, alignItems: "center" }}>
-        <div
-          aria-hidden="true"
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: "50%",
-            background: "var(--tint)",
-            color: "var(--accent-dark)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 20,
-            fontWeight: 700,
-            flexShrink: 0
-          }}
-        >
-          {initials(profile.full_name) || "?"}
-        </div>
-        <div>
-          <h1 style={{ margin: 0, fontSize: 22 }}>Edit profile</h1>
-          <p className="muted small" style={{ margin: "2px 0 0" }}>
-            {profile.email}
-          </p>
-        </div>
+      <div className="card" style={{ marginBottom: 16 }}>
+        <AvatarUpload
+          userId={profile.id}
+          name={profile.full_name}
+          currentUrl={
+            profile.avatar_path
+              ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${profile.avatar_path}`
+              : null
+          }
+        />
+        <h1 style={{ margin: "14px 0 0", fontSize: 22 }}>Edit profile</h1>
+        <p className="muted small" style={{ margin: "2px 0 0" }}>
+          {profile.email}
+        </p>
       </div>
+
+      {searchParams.welcome ? (
+        <p role="status" style={{ color: "var(--accent)", fontSize: 14, marginTop: 0 }}>
+          Welcome. Add a photo and your chess usernames, then save.
+        </p>
+      ) : null}
 
       {searchParams.saved ? (
         <p role="status" style={{ color: "var(--accent)", fontSize: 14, marginTop: 12 }}>

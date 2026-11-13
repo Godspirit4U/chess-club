@@ -108,7 +108,9 @@ export default async function ProfilePage() {
                 <span aria-hidden="true" className="site-mark">
                   ♞
                 </span>
-                Lichess
+                <span>
+                  <strong>Lichess</strong> <span className="site-user">@{profile.lichess_username}</span>
+                </span>
               </a>
             ) : null}
 
@@ -122,7 +124,10 @@ export default async function ProfilePage() {
                 <span aria-hidden="true" className="site-mark">
                   ♟
                 </span>
-                Chess.com
+                <span>
+                  <strong>Chess.com</strong>{" "}
+                  <span className="site-user">{profile.chesscom_username}</span>
+                </span>
               </a>
             ) : null}
           </div>

@@ -57,7 +57,8 @@ export default async function HomePage() {
 
   return (
     <>
-      <section className="hero">
+      <section className="hero hero-image">
+        <div className="hero-inner">
         <h1>{club.name}</h1>
         <p className="lede">{club.tagline}</p>
 
@@ -74,6 +75,7 @@ export default async function HomePage() {
           <Link className="btn secondary" href="/about">
             About us
           </Link>
+        </div>
         </div>
       </section>
 

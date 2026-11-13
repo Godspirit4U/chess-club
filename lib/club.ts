@@ -7,8 +7,8 @@ export const club = {
   shortName: "SaiU Chess Club",
   university: "Sai University",
   email: "chessclub@saiuniversity.edu.in",
-  instagram: "",
-  whatsapp: "",
+  instagram: "saiuchessclub",
+  whatsapp: "https://chat.whatsapp.com/EgUqiLPhitgL1TGOF3gUBc",
   founded: "15 August 2023",
   tagline:
     "A student-led community that promotes chess by developing strategic thinking, problem-solving and sportsmanship.",

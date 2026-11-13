@@ -90,7 +90,14 @@ export default async function MatchPage({ params }: Props) {
           <p className="small" style={{ marginTop: 12 }}>
             <a
               href={`https://lichess.org/analysis/pgn/${encodeURIComponent(
-                match.pgn.replace(/\[[^\]]*\]\s*/g, "").replace(/\s+/g, "_")
+                match.pgn
+                  .replace(/\[[^\]]*\]/g, " ")
+                  .replace(/\{[^}]*\}/g, " ")
+                  .replace(/\d+\.(\.\.)?/g, " ")
+                  .replace(/\b(1-0|0-1|1\/2-1\/2|\*)\b/g, " ")
+                  .replace(/[?!]+/g, "")
+                  .trim()
+                  .replace(/\s+/g, "_")
               )}`}
               target="_blank"
               rel="noreferrer"

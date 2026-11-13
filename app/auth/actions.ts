@@ -58,7 +58,7 @@ export async function signUp(formData: FormData) {
     redirect(`/login?mode=signup&error=${encodeURIComponent(message)}`);
   }
 
-  redirect("/profile");
+  redirect("/profile/edit?welcome=1");
 }
 
 export async function signOut() {

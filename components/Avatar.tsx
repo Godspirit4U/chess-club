@@ -1,10 +1,25 @@
 export default function Avatar({
   name,
-  size = 40
+  size = 40,
+  path
 }: {
   name: string;
   size?: number;
+  path?: string | null;
 }) {
+  if (path) {
+    const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${path}`;
+    return (
+      <img
+        src={url}
+        alt=""
+        width={size}
+        height={size}
+        style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
+      />
+    );
+  }
+
   const initials = name
     .split(/\s+/)
     .filter(Boolean)

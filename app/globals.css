@@ -606,3 +606,34 @@ h2::after {
 .card h2::after {
   display: none;
 }
+
+/* Hero with a photograph behind it */
+.hero-image {
+  position: relative;
+  background-image: linear-gradient(rgba(10, 30, 22, 0.72), rgba(10, 30, 22, 0.78)),
+    url("/hero.jpg");
+  background-size: cover;
+  background-position: center;
+  padding: 40px 26px;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 640px;
+}
+
+@media (max-width: 640px) {
+  .hero-image {
+    padding: 30px 20px;
+  }
+}
+
+.site-user {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.site-link strong {
+  font-weight: 700;
+}
