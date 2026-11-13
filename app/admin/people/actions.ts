@@ -98,31 +98,12 @@ export async function removeMember(formData: FormData) {
     );
   }
 
-  if (!hasServiceRole) {
+  const supabase = createClient();
+  const { error: removeError } = await supabase.rpc("delete_member", { target: id });
+
+  if (removeError) {
     redirect(
-      `/admin/people?error=${encodeURIComponent(
-        "Removing a member needs the service role key in the environment variables."
-      )}`
-    );
-  }
-
-  try {
-    const admin = createAdminClient();
-    const { error } = await admin.auth.admin.deleteUser(id);
-
-    if (error) {
-      redirect(`/admin/people?error=${encodeURIComponent(`Could not remove: ${error.message}`)}`);
-    }
-
-    // The profile row normally disappears with the auth user; make sure it has.
-    await admin.from("profiles").delete().eq("id", id);
-  } catch (err) {
-    // redirect() throws by design, so let it through.
-    if (err && typeof err === "object" && "digest" in err) throw err;
-    redirect(
-      `/admin/people?error=${encodeURIComponent(
-        err instanceof Error ? err.message : "Could not remove that member."
-      )}`
+      `/admin/people?error=${encodeURIComponent(`Could not remove: ${removeError.message}`)}`
     );
   }
 
