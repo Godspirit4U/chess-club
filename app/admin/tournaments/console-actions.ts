@@ -226,3 +226,18 @@ export async function deleteTournament(formData: FormData) {
   revalidatePath("/admin");
   redirect("/tournaments");
 }
+
+/** Removes a published round and its pairings, so it can be generated again. */
+export async function deleteRound(formData: FormData) {
+  await requireAdmin();
+
+  const roundId = String(formData.get("round_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+
+  const supabase = createClient();
+  await supabase.from("rounds").delete().eq("id", roundId);
+
+  revalidatePath(`/tournaments/${slug}`);
+  revalidatePath(`/admin/tournaments/${slug}/console`);
+  redirect(`/admin/tournaments/${slug}/console`);
+}

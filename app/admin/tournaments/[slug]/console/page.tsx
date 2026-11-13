@@ -4,8 +4,10 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { computeStandings, generateSwiss, type MatchRow } from "@/lib/pairings";
 import SubmitButton from "@/components/SubmitButton";
+import ConfirmButton from "@/components/ConfirmButton";
 import {
   completeTournament,
+  deleteRound,
   deleteTournament,
   generateRound,
   publishRound,
@@ -221,7 +223,27 @@ export default async function ConsolePage({ params, searchParams }: Props) {
               const rows = (matches ?? []).filter((m) => m.round_id === r.id);
               return (
                 <div key={r.id} className="card" style={{ marginBottom: 16 }}>
-                  <h3>Round {r.number}</h3>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 12,
+                      flexWrap: "wrap"
+                    }}
+                  >
+                    <h3 style={{ margin: 0 }}>Round {r.number}</h3>
+                    <form action={deleteRound}>
+                      <input type="hidden" name="round_id" value={r.id} />
+                      <input type="hidden" name="slug" value={tournament.slug} />
+                      <ConfirmButton
+                        message={`Delete the pairings and results for round ${r.number}?`}
+                        style={{ minHeight: 32, fontSize: 13, color: "var(--danger)" }}
+                      >
+                        Delete round
+                      </ConfirmButton>
+                    </form>
+                  </div>
                   {rows.map((m) => {
                     const isBye = !m.black_id;
                     return (
