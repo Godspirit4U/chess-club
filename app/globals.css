@@ -1,26 +1,23 @@
 :root {
-  /* Ground: the bright colour the whole site sits on */
-  --paper: #1663d6;
-  --paper-deep: #0e4ba8;   /* header and footer bands */
-  --surface: #ffffff;      /* every card, table and input */
-  --hover: #f2f5fa;
-  --border: #dce3ec;
+  /* Surfaces */
+  --paper: #fbf9f3;      /* page */
+  --surface: #ffffff;    /* cards, tables, inputs */
+  --hover: #f1eee3;      /* row or card under the cursor */
+  --border: #e0dac8;     /* hairlines */
 
-  /* Text on cards */
-  --ink: #0f1b2e;
-  --muted: #5a6472;
-  --disabled: #98a0ac;
+  /* Text */
+  --ink: #0f1f14;        /* body and headings */
+  --muted: #5a6659;      /* captions, dates */
+  --disabled: #8c9288;   /* fields that cannot be edited */
 
   /* Action */
-  --accent: #1663d6;       /* links and buttons inside cards */
-  --accent-dark: #0e4ba8;
-  --tint: #e3edfb;
-  --mint: #4fe3a1;         /* primary buttons, highlights on the blue */
-  --fuchsia: #c2185b;      /* the loud one, used sparingly */
+  --accent: #0f7d52;     /* every link and primary button */
+  --accent-dark: #0b6342;
+  --tint: #dff3e7;       /* badges, selected row */
 
   /* Status */
-  --amber: #a85a0f;
-  --danger: #a32b2b;
+  --amber: #c2560f;      /* live, in progress, warnings */
+  --danger: #a32b2b;     /* delete, errors */
 
   /* Layout */
   --radius: 6px;
@@ -426,177 +423,4 @@ h2 {
 .btn:hover {
   background: var(--accent-dark);
   border-color: var(--accent-dark);
-}
-
-
-/* ---------------------------------------------------------------- bright ground
-   The page is the colour; every block of content is a white card on top of it. */
-
-body {
-  background: var(--paper);
-  color: #ffffff;
-}
-
-h1, h2, h3 {
-  color: inherit;
-}
-
-body a {
-  color: var(--mint);
-}
-
-body a:hover {
-  color: #ffffff;
-}
-
-/* Content sits on white, so text inside it goes dark again */
-.card,
-.empty,
-table,
-input,
-textarea,
-select,
-.btn.secondary {
-  color: var(--ink);
-}
-
-.card a,
-.empty a,
-td a {
-  color: var(--accent);
-}
-
-.card a:hover,
-.empty a:hover,
-td a:hover {
-  color: var(--accent-dark);
-}
-
-/* Header and footer are a deeper band of the same colour */
-.site-header {
-  background: var(--paper-deep);
-  border-bottom: 0;
-}
-
-.brand,
-.nav-links a {
-  color: #ffffff;
-}
-
-.nav-links a:hover {
-  color: var(--mint);
-}
-
-.menu-toggle {
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.5);
-  background: transparent;
-}
-
-.mobile-nav a {
-  color: #ffffff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-}
-
-.site-footer {
-  border-top: 0;
-  background: var(--paper-deep);
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.site-footer a {
-  color: #ffffff;
-}
-
-/* Primary buttons are mint on the blue, and still readable on white */
-.btn {
-  background: var(--mint);
-  border-color: var(--mint);
-  color: var(--ink);
-}
-
-.btn:hover {
-  background: #3fd694;
-  border-color: #3fd694;
-  color: var(--ink);
-}
-
-.btn.secondary {
-  background: transparent;
-  border-color: var(--border);
-  color: var(--accent);
-}
-
-.btn.secondary:hover {
-  background: var(--tint);
-}
-
-/* Badges */
-.badge {
-  background: var(--tint);
-  color: var(--accent-dark);
-}
-
-.badge.live {
-  background: #fbeee2;
-  color: var(--amber);
-}
-
-/* Tables on white */
-th {
-  color: var(--muted);
-}
-
-/* Cards get a touch more presence against the colour */
-.card {
-  border-color: transparent;
-  box-shadow: 0 1px 2px rgba(8, 26, 58, 0.12);
-}
-
-.card:hover {
-  border-color: var(--accent);
-}
-
-/* Sidebars sit on the colour too */
-.admin-side a,
-.community-side a {
-  color: #ffffff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-}
-
-.admin-side a:hover,
-.community-side a:hover {
-  color: var(--mint);
-}
-
-.side-label {
-  color: rgba(255, 255, 255, 0.75);
-}
-
-/* Secondary text follows whatever it sits on */
-.muted {
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.card .muted,
-.empty .muted,
-table .muted,
-.side-block .muted {
-  color: var(--muted);
-}
-
-.hero p.lede {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-/* Section headings on the colour */
-h2 {
-  color: #ffffff;
-}
-
-.card h2,
-.card h3,
-.empty h2,
-td h2 {
-  color: var(--ink);
 }
