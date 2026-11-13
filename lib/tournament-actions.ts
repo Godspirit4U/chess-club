@@ -92,8 +92,45 @@ export async function generateRound(formData: FormData) {
   }
 
   const mode = String(formData.get("pairing_format") ?? "swiss");
+  const requestedBye = String(formData.get("bye_player") ?? "");
 
   const draft = generateSwiss(standings, previous);
+
+  // If the admin named someone for the bye, swap them into it.
+  if (requestedBye) {
+    if (draft.bye && draft.bye !== requestedBye) {
+      for (const b of draft.boards) {
+        if (b.white === requestedBye) {
+          b.white = draft.bye;
+          draft.bye = requestedBye;
+          break;
+        }
+        if (b.black === requestedBye) {
+          b.black = draft.bye;
+          draft.bye = requestedBye;
+          break;
+        }
+      }
+    } else if (!draft.bye) {
+      // Even number of players: remove them from their board and make it a bye.
+      for (const b of draft.boards) {
+        if (b.white === requestedBye) {
+          b.white = null;
+          b.black = null;
+          draft.bye = requestedBye;
+          break;
+        }
+        if (b.black === requestedBye) {
+          b.white = null;
+          b.black = null;
+          draft.bye = requestedBye;
+          break;
+        }
+      }
+      draft.boards = draft.boards.filter((b) => b.white && b.black);
+      draft.boards = draft.boards.map((b, i) => ({ ...b, board: i + 1 }));
+    }
+  }
 
   // Random mode keeps the same players and colours but ignores the score order.
   if (mode === "random") {
@@ -158,6 +195,38 @@ export async function swapColours(formData: FormData) {
 
   revalidatePath(`/tournaments/${slug}/console`);
   redirect(`/tournaments/${slug}/console`);
+}
+
+/** Deletes the current draft and builds a fresh one with new settings. */
+export async function regenerateRound(formData: FormData) {
+  await requireAdmin();
+
+  const tournamentId = String(formData.get("tournament_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const roundId = String(formData.get("round_id") ?? "");
+
+  const supabase = createClient();
+
+  // Only an unpublished round may be regenerated.
+  const { data: round } = await supabase
+    .from("rounds")
+    .select("id,published_at")
+    .eq("id", roundId)
+    .single();
+
+  if (!round || round.published_at) {
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent("That round is already published.")}`);
+  }
+
+  await supabase.from("rounds").delete().eq("id", roundId);
+
+  const forwarded = new FormData();
+  forwarded.set("tournament_id", tournamentId);
+  forwarded.set("slug", slug);
+  forwarded.set("pairing_format", String(formData.get("pairing_format") ?? "swiss"));
+  forwarded.set("bye_player", String(formData.get("bye_player") ?? ""));
+
+  return generateRound(forwarded);
 }
 
 export async function publishRound(formData: FormData) {

@@ -12,6 +12,7 @@ import {
   deleteTournament,
   generateRound,
   publishRound,
+  regenerateRound,
   saveResult,
   startTournament,
   swapColours
@@ -162,6 +163,46 @@ export default async function ConsolePage({ params, searchParams }: Props) {
             Nothing here is public yet. Members see only the list of participants until
             you publish.
           </p>
+
+          <form
+            action={regenerateRound}
+            className="card"
+            style={{ marginTop: 12, display: "grid", gap: 12 }}
+          >
+            <input type="hidden" name="tournament_id" value={tournament.id} />
+            <input type="hidden" name="slug" value={tournament.slug} />
+            <input type="hidden" name="round_id" value={draftRound.id} />
+
+            <h3 style={{ margin: 0, fontSize: 15 }}>Round settings</h3>
+
+            <div className="field" style={{ margin: 0 }}>
+              <label htmlFor="pairing_format">Pairing method</label>
+              <select id="pairing_format" name="pairing_format" defaultValue="swiss">
+                <option value="swiss">Swiss: by score, no repeat opponents</option>
+                <option value="random">Random draw</option>
+              </select>
+            </div>
+
+            <div className="field" style={{ margin: 0 }}>
+              <label htmlFor="bye_player">Give the bye to</label>
+              <select id="bye_player" name="bye_player" defaultValue="">
+                <option value="">Automatic (lowest score without a bye)</option>
+                {(players ?? []).map((pl) => (
+                  <option key={pl.profile_id} value={pl.profile_id}>
+                    {((pl.profiles as any)?.full_name ?? (pl.profiles as any)?.[0]?.full_name) ?? "Member"}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <p className="muted small" style={{ margin: 0 }}>
+              Colours follow FIDE rules: balanced, alternating, never three in a row.
+            </p>
+
+            <div>
+              <SubmitButton className="btn secondary">Regenerate pairings</SubmitButton>
+            </div>
+          </form>
 
           <table style={{ marginTop: 12 }}>
             <thead>
