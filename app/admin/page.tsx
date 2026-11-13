@@ -132,7 +132,7 @@ export default async function AdminPage() {
         >
           {(
             running.slice(0, 4).map((t) =>
-              row(t.name, "In progress", `/admin/tournaments/${t.slug}/console`, "Console")
+              row(t.name, "In progress", `/tournaments/${t.slug}/console`, "Console")
             )
           )}
         </Panel>
@@ -148,7 +148,7 @@ export default async function AdminPage() {
                       month: "short"
                     })}`
                   : "No start date",
-                `/admin/tournaments/${t.slug}/console`,
+                `/tournaments/${t.slug}/console`,
                 "Console"
               )
             )
@@ -187,7 +187,7 @@ export default async function AdminPage() {
         <Panel title="Drafts" count={drafts.length} href="/admin/tournaments/new" hrefLabel="New">
           {(
             drafts.slice(0, 4).map((t) =>
-              row(t.name, "Not published", `/admin/tournaments/${t.slug}/console`, "Console")
+              row(t.name, "Not published", `/tournaments/${t.slug}/console`, "Console")
             )
           )}
         </Panel>

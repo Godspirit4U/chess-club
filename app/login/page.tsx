@@ -65,6 +65,24 @@ export default function LoginPage({ searchParams }: Props) {
               <label htmlFor="email">Email address</label>
               <input id="email" name="email" type="email" autoComplete="email" required />
             </div>
+
+            <div className="field">
+              <label htmlFor="phone">Mobile number (WhatsApp)</label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                placeholder="10 digits"
+                required
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="chesscom_username">Chess.com username</label>
+              <input id="chesscom_username" name="chesscom_username" required />
+            </div>
             <SubmitButton>Send reset link</SubmitButton>
           </form>
         ) : isSignUp ? (
@@ -76,6 +94,24 @@ export default function LoginPage({ searchParams }: Props) {
             <div className="field">
               <label htmlFor="email">Email address</label>
               <input id="email" name="email" type="email" autoComplete="email" required />
+            </div>
+
+            <div className="field">
+              <label htmlFor="phone">Mobile number (WhatsApp)</label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                placeholder="10 digits"
+                required
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="chesscom_username">Chess.com username</label>
+              <input id="chesscom_username" name="chesscom_username" required />
             </div>
             <div className="field">
               <label htmlFor="password">Password</label>
@@ -95,6 +131,24 @@ export default function LoginPage({ searchParams }: Props) {
             <div className="field">
               <label htmlFor="email">Email address</label>
               <input id="email" name="email" type="email" autoComplete="email" required />
+            </div>
+
+            <div className="field">
+              <label htmlFor="phone">Mobile number (WhatsApp)</label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                placeholder="10 digits"
+                required
+              />
+            </div>
+
+            <div className="field">
+              <label htmlFor="chesscom_username">Chess.com username</label>
+              <input id="chesscom_username" name="chesscom_username" required />
             </div>
             <div className="field">
               <label htmlFor="password">Password</label>

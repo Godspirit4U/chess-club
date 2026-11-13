@@ -73,7 +73,7 @@ export default async function TournamentsPage() {
       >
         <h1 style={{ margin: 0 }}>Tournaments</h1>
         {isAdmin ? (
-          <Link className="btn" href="/admin/tournaments/new">
+          <Link className="btn" href="/tournaments/new">
             Create a tournament
           </Link>
         ) : null}

@@ -48,7 +48,7 @@ export default async function PuzzlesPage() {
       >
         <h1 style={{ margin: 0 }}>Puzzles</h1>
         {isAdmin ? (
-          <Link className="btn" href="/admin/puzzles">
+          <Link className="btn" href="/puzzles/new">
             Add a puzzle
           </Link>
         ) : null}

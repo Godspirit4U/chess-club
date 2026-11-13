@@ -102,7 +102,7 @@ export default async function EventsPage() {
       >
         <h1 style={{ margin: 0 }}>Events</h1>
         {isAdmin ? (
-          <Link className="btn" href="/admin/events">
+          <Link className="btn" href="/events/new">
             Add an event
           </Link>
         ) : null}

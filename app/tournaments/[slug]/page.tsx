@@ -107,8 +107,12 @@ export default async function TournamentPage({ params }: Props) {
         </p>
         {profile && profile.role !== "member" ? (
           <p className="small" style={{ margin: 0, display: "flex", gap: 12 }}>
-            <Link href={`/admin/tournaments/${tournament.slug}/console`}>Open console</Link>
-            <Link href="/admin/tournaments/new">Create a tournament</Link>
+            <Link className="btn" href={`/tournaments/${tournament.slug}/console`}>
+              Open console
+            </Link>
+            <Link className="btn secondary" href={`/tournaments/${tournament.slug}/edit`}>
+              Edit
+            </Link>
           </p>
         ) : null}
       </div>

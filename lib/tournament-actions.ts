@@ -19,9 +19,9 @@ export async function startTournament(formData: FormData) {
   const supabase = createClient();
   await supabase.from("tournaments").update({ status: "running" }).eq("id", id);
 
-  revalidatePath(`/admin/tournaments/${slug}/console`);
+  revalidatePath(`/tournaments/${slug}/console`);
   revalidatePath(`/tournaments/${slug}`);
-  redirect(`/admin/tournaments/${slug}/console`);
+  redirect(`/tournaments/${slug}/console`);
 }
 
 export async function generateRound(formData: FormData) {
@@ -37,7 +37,7 @@ export async function generateRound(formData: FormData) {
     .eq("id", tournamentId)
     .single();
 
-  if (!tournament) redirect(`/admin/tournaments/${slug}/console`);
+  if (!tournament) redirect(`/tournaments/${slug}/console`);
 
   const { data: players } = await supabase
     .from("tournament_players")
@@ -54,7 +54,7 @@ export async function generateRound(formData: FormData) {
   const nextNumber = (rounds?.length ?? 0) + 1;
 
   if (nextNumber > tournament.rounds) {
-    redirect(`/admin/tournaments/${slug}/console?error=${encodeURIComponent("All rounds have been generated.")}`);
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent("All rounds have been generated.")}`);
   }
 
   const roundIds = (rounds ?? []).map((r) => r.id);
@@ -88,10 +88,22 @@ export async function generateRound(formData: FormData) {
   );
 
   if (standings.length < 2) {
-    redirect(`/admin/tournaments/${slug}/console?error=${encodeURIComponent("At least two players are needed.")}`);
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent("At least two players are needed.")}`);
   }
 
+  const mode = String(formData.get("pairing_format") ?? "swiss");
+
   const draft = generateSwiss(standings, previous);
+
+  // Random mode keeps the same players and colours but ignores the score order.
+  if (mode === "random") {
+    const shuffled = [...draft.boards];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    draft.boards = shuffled.map((b, index) => ({ ...b, board: index + 1 }));
+  }
 
   const { data: round, error } = await supabase
     .from("rounds")
@@ -100,7 +112,7 @@ export async function generateRound(formData: FormData) {
     .single();
 
   if (error || !round) {
-    redirect(`/admin/tournaments/${slug}/console?error=${encodeURIComponent(error?.message ?? "Could not create the round.")}`);
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent(error?.message ?? "Could not create the round.")}`);
   }
 
   const rows = draft.boards.map((b) => ({
@@ -125,8 +137,8 @@ export async function generateRound(formData: FormData) {
 
   await supabase.from("matches").insert(rows);
 
-  revalidatePath(`/admin/tournaments/${slug}/console`);
-  redirect(`/admin/tournaments/${slug}/console`);
+  revalidatePath(`/tournaments/${slug}/console`);
+  redirect(`/tournaments/${slug}/console`);
 }
 
 export async function swapColours(formData: FormData) {
@@ -144,8 +156,8 @@ export async function swapColours(formData: FormData) {
       .eq("id", matchId);
   }
 
-  revalidatePath(`/admin/tournaments/${slug}/console`);
-  redirect(`/admin/tournaments/${slug}/console`);
+  revalidatePath(`/tournaments/${slug}/console`);
+  redirect(`/tournaments/${slug}/console`);
 }
 
 export async function publishRound(formData: FormData) {
@@ -159,9 +171,9 @@ export async function publishRound(formData: FormData) {
     .update({ published_at: new Date().toISOString() })
     .eq("id", roundId);
 
-  revalidatePath(`/admin/tournaments/${slug}/console`);
+  revalidatePath(`/tournaments/${slug}/console`);
   revalidatePath(`/tournaments/${slug}`);
-  redirect(`/admin/tournaments/${slug}/console`);
+  redirect(`/tournaments/${slug}/console`);
 }
 
 export async function saveResult(formData: FormData) {
@@ -173,7 +185,7 @@ export async function saveResult(formData: FormData) {
   const pgn = String(formData.get("pgn") ?? "").trim();
 
   const allowed = ["white", "black", "draw", "bye", "forfeit_white", "forfeit_black", "unplayed"];
-  if (!allowed.includes(result)) redirect(`/admin/tournaments/${slug}/console`);
+  if (!allowed.includes(result)) redirect(`/tournaments/${slug}/console`);
 
   const supabase = createClient();
   await supabase
@@ -185,9 +197,9 @@ export async function saveResult(formData: FormData) {
     })
     .eq("id", matchId);
 
-  revalidatePath(`/admin/tournaments/${slug}/console`);
+  revalidatePath(`/tournaments/${slug}/console`);
   revalidatePath(`/tournaments/${slug}`);
-  redirect(`/admin/tournaments/${slug}/console`);
+  redirect(`/tournaments/${slug}/console`);
 }
 
 export async function completeTournament(formData: FormData) {
@@ -213,7 +225,7 @@ export async function deleteTournament(formData: FormData) {
 
   if (!confirmed) {
     redirect(
-      `/admin/tournaments/${slug}/console?error=${encodeURIComponent(
+      `/tournaments/${slug}/console?error=${encodeURIComponent(
         "Tick the box to confirm deleting this tournament."
       )}`
     );
@@ -238,6 +250,41 @@ export async function deleteRound(formData: FormData) {
   await supabase.from("rounds").delete().eq("id", roundId);
 
   revalidatePath(`/tournaments/${slug}`);
-  revalidatePath(`/admin/tournaments/${slug}/console`);
-  redirect(`/admin/tournaments/${slug}/console`);
+  revalidatePath(`/tournaments/${slug}/console`);
+  redirect(`/tournaments/${slug}/console`);
+}
+
+export async function updateTournament(formData: FormData) {
+  const me = await getCurrentProfile();
+  if (!me || me.role === "member") redirect("/");
+
+  const id = String(formData.get("id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+  const startsAt = String(formData.get("starts_at") ?? "");
+  const deadline = String(formData.get("registration_deadline") ?? "");
+
+  const back = (msg: string) =>
+    `/tournaments/${slug}/edit?error=${encodeURIComponent(msg)}`;
+
+  if (!name) redirect(back("A name is required."));
+
+  const supabase = createClient();
+  await supabase
+    .from("tournaments")
+    .update({
+      name,
+      description: String(formData.get("description") ?? "").trim() || null,
+      format: String(formData.get("format") ?? "swiss"),
+      rounds: Number(formData.get("rounds") ?? 5),
+      time_control: String(formData.get("time_control") ?? "").trim() || null,
+      rules: String(formData.get("rules") ?? "").trim() || null,
+      structure: String(formData.get("structure") ?? "").trim() || null,
+      starts_at: startsAt ? new Date(startsAt).toISOString() : null,
+      registration_deadline: deadline ? new Date(deadline).toISOString() : null
+    })
+    .eq("id", id);
+
+  revalidatePath(`/tournaments/${slug}`);
+  redirect(`/tournaments/${slug}`);
 }

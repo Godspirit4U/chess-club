@@ -28,12 +28,12 @@ export async function GET(
   const { data: rows } = await supabase
     .from("tournament_players")
     .select(
-      "registered_at,withdrawn_at,profiles(full_name,email,chess_username,chess_platform)"
+      "registered_at,withdrawn_at,profiles(full_name,email,phone,chesscom_username,lichess_username,chess_username,chess_platform)"
     )
     .eq("tournament_id", tournament.id)
     .order("registered_at", { ascending: true });
 
-  const header = ["Name", "Email", "Platform", "Chess username", "Registered", "Status"];
+  const header = ["Name", "Email", "Mobile", "Chess.com", "Lichess", "Registered", "Status"];
 
   const lines = [header.map(cell).join(",")];
 
@@ -43,8 +43,9 @@ export async function GET(
       [
         cell(p.full_name),
         cell(p.email),
-        cell(p.chess_platform ?? ""),
-        cell(p.chess_username ?? ""),
+        cell(p.phone ?? ""),
+        cell(p.chesscom_username ?? p.chess_username ?? ""),
+        cell(p.lichess_username ?? ""),
         cell(
           row.registered_at
             ? new Date(row.registered_at).toLocaleString("en-IN")

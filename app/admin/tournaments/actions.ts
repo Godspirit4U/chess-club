@@ -28,7 +28,7 @@ export async function createTournament(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
 
   if (!name) {
-    redirect(`/admin/tournaments/new?error=${encodeURIComponent("A tournament needs a name.")}`);
+    redirect(`/tournaments/new?error=${encodeURIComponent("A tournament needs a name.")}`);
   }
 
   const publish = formData.get("publish") === "on";
@@ -54,7 +54,7 @@ export async function createTournament(formData: FormData) {
     .single();
 
   if (error) {
-    redirect(`/admin/tournaments/new?error=${encodeURIComponent(error.message)}`);
+    redirect(`/tournaments/new?error=${encodeURIComponent(error.message)}`);
   }
 
   revalidatePath("/tournaments");

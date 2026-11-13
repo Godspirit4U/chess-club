@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentProfile } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { computeStandings, generateSwiss, type MatchRow } from "@/lib/pairings";
 import SubmitButton from "@/components/SubmitButton";
 import ConfirmButton from "@/components/ConfirmButton";
@@ -14,7 +15,7 @@ import {
   saveResult,
   startTournament,
   swapColours
-} from "@/app/admin/tournaments/console-actions";
+} from "@/lib/tournament-actions";
 
 export const metadata: Metadata = { title: "Tournament console" };
 export const dynamic = "force-dynamic";
@@ -25,6 +26,10 @@ type Props = {
 };
 
 export default async function ConsolePage({ params, searchParams }: Props) {
+  const me = await getCurrentProfile();
+  if (!me) redirect("/login");
+  if (me.role === "member") redirect("/");
+
   const supabase = createClient();
 
   const { data: tournament } = await supabase
@@ -136,6 +141,14 @@ export default async function ConsolePage({ params, searchParams }: Props) {
         <form action={generateRound} style={{ marginTop: 16 }}>
           <input type="hidden" name="tournament_id" value={tournament.id} />
           <input type="hidden" name="slug" value={tournament.slug} />
+          <div className="field" style={{ marginBottom: 10 }}>
+            <label htmlFor="pairing_format">How should this round be paired?</label>
+            <select id="pairing_format" name="pairing_format" defaultValue="swiss">
+              <option value="swiss">Swiss: by score, no repeat opponents</option>
+              <option value="random">Random draw</option>
+            </select>
+          </div>
+
           <SubmitButton>
             Generate pairings for round {(rounds?.length ?? 0) + 1}
           </SubmitButton>

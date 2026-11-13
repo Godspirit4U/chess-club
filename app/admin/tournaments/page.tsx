@@ -68,7 +68,7 @@ export default async function AdminTournamentsPage() {
                     : "—"}
                 </td>
                 <td>
-                  <Link href={`/admin/tournaments/${t.slug}/console`}>Console</Link>
+                  <Link href={`/tournaments/${t.slug}/console`}>Console</Link>
                 </td>
               </tr>
             ))}

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import ChessBoard from "@/components/ChessBoard";
 
 export const dynamic = "force-dynamic";
@@ -36,12 +36,16 @@ async function load(slug: string, id: string) {
 
   const ids = [match.white_id, match.black_id].filter(Boolean) as string[];
   const { data: people } = ids.length
-    ? await supabase.from("profiles").select("id,full_name").in("id", ids)
-    : { data: [] as { id: string; full_name: string }[] };
+    ? await supabase
+        .from("profiles")
+        .select("id,full_name,phone,chesscom_username,lichess_username")
+        .in("id", ids)
+    : { data: [] as any[] };
 
   const names = new Map((people ?? []).map((p) => [p.id, p.full_name]));
+  const players = new Map((people ?? []).map((p) => [p.id, p]));
 
-  return { tournament, match, names };
+  return { tournament, match, names, players };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -56,10 +60,19 @@ export default async function MatchPage({ params }: Props) {
   const data = await load(params.slug, params.id);
   if (!data) notFound();
 
-  const { tournament, match, names } = data;
+  const { tournament, match, names, players } = data;
   const white = match.white_id ? names.get(match.white_id) ?? "Member" : "—";
   const black = match.black_id ? names.get(match.black_id) ?? "Member" : "Bye";
   const round = (match as any).rounds?.number;
+
+  const viewer = await getCurrentProfile();
+  const opponentId =
+    viewer && match.white_id === viewer.id
+      ? match.black_id
+      : viewer && match.black_id === viewer.id
+        ? match.white_id
+        : null;
+  const opponent = opponentId ? (players.get(opponentId) ?? null) : null;
 
   return (
     <>
@@ -81,6 +94,68 @@ export default async function MatchPage({ params }: Props) {
             })}`
           : ""}
       </p>
+
+      {opponent ? (
+        <section className="card" style={{ marginTop: 16 }}>
+          <h2 style={{ fontSize: 16, marginTop: 0 }}>
+            Playing {opponent.full_name}
+          </h2>
+          <p className="muted small" style={{ marginTop: 0 }}>
+            Arrange the game before the round starts.
+          </p>
+
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+            <Link className="btn secondary" href={`/members/${opponent.id}`}>
+              Profile
+            </Link>
+
+            <Link className="btn secondary" href={`/community/${opponent.id}`}>
+              Message here
+            </Link>
+
+            {opponent.phone ? (
+              <a
+                className="btn secondary"
+                href={`https://wa.me/91${String(opponent.phone).replace(/[^0-9]/g, "").slice(-10)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                WhatsApp {opponent.phone}
+              </a>
+            ) : null}
+
+            {opponent.chesscom_username ? (
+              <a
+                className="site-link"
+                href={`https://www.chess.com/member/${opponent.chesscom_username}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span aria-hidden="true" className="site-mark">♟</span>
+                <span>
+                  <strong>Chess.com</strong>{" "}
+                  <span className="site-user">{opponent.chesscom_username}</span>
+                </span>
+              </a>
+            ) : null}
+
+            {opponent.lichess_username ? (
+              <a
+                className="site-link"
+                href={`https://lichess.org/@/${opponent.lichess_username}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span aria-hidden="true" className="site-mark">♞</span>
+                <span>
+                  <strong>Lichess</strong>{" "}
+                  <span className="site-user">@{opponent.lichess_username}</span>
+                </span>
+              </a>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
 
       {match.pgn ? (
         <>

@@ -18,45 +18,39 @@ export async function signIn(formData: FormData) {
 }
 
 export async function signUp(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
-  const password = String(formData.get("password") ?? "");
   const fullName = String(formData.get("full_name") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
+  const phone = String(formData.get("phone") ?? "").replace(/[^0-9]/g, "");
+  const chesscom = String(formData.get("chesscom_username") ?? "").trim();
 
-  if (!fullName) {
-    redirect(`/login?mode=signup&error=${encodeURIComponent("Enter your name.")}`);
-  }
+  const back = (msg: string) =>
+    `/login?mode=signup&error=${encodeURIComponent(msg)}`;
 
-  if (password.length < 8) {
-    redirect(
-      `/login?mode=signup&error=${encodeURIComponent("Use at least 8 characters.")}`
-    );
-  }
+  if (!fullName) redirect(back("Your name is required."));
+  if (!email) redirect(back("Your email is required."));
+  if (password.length < 8) redirect(back("Use at least 8 characters for the password."));
+  if (phone.length < 10) redirect(back("Enter a 10-digit mobile number."));
+  if (!chesscom) redirect(back("Your Chess.com username is required."));
 
   const supabase = createClient();
 
-  // The database enforces this too; this check exists so the message is readable.
   const { data: allowed } = await supabase.rpc("is_email_allowed", { p_email: email });
-
-  if (allowed === false) {
-    redirect(
-      `/login?mode=signup&error=${encodeURIComponent(
-        "Use your college email address. Only club members can create an account."
-      )}`
-    );
-  }
+  if (allowed === false) redirect(back("Use your Sai University email address."));
 
   const { error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } }
+    options: {
+      data: {
+        full_name: fullName,
+        phone,
+        chesscom_username: chesscom
+      }
+    }
   });
 
-  if (error) {
-    const message = /college email/i.test(error.message)
-      ? "Use your college email address. Only club members can create an account."
-      : error.message;
-    redirect(`/login?mode=signup&error=${encodeURIComponent(message)}`);
-  }
+  if (error) redirect(back(error.message));
 
   redirect("/profile/edit?welcome=1");
 }

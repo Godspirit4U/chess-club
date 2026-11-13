@@ -37,7 +37,7 @@ export default async function BlogPage() {
       >
         <h1 style={{ margin: 0 }}>Blog</h1>
         {isAdmin ? (
-          <Link className="btn" href="/admin/blog">
+          <Link className="btn" href="/blog/new">
             Write a post
           </Link>
         ) : null}
