@@ -128,6 +128,22 @@ export default async function EditProfilePage({ searchParams }: Props) {
               />
             </div>
 
+            <div className="field">
+              <label htmlFor="phone">Mobile number (WhatsApp)</label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel-national"
+                placeholder="10 digits"
+                defaultValue={profile.phone ?? ""}
+              />
+              <p className="muted small" style={{ margin: "4px 0 0" }}>
+                Shown to your opponent so they can reach you.
+              </p>
+            </div>
+
             <ChessAccounts
               defaultPlatform={profile.chess_platform ?? "none"}
               defaultLichess={profile.lichess_username ?? ""}
