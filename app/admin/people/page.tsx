@@ -22,7 +22,12 @@ export default async function PeoplePage({ searchParams }: Props) {
 
   return (
     <>
-      <h1>People</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, flexWrap: "wrap" }}>
+        <h1 style={{ margin: 0 }}>People</h1>
+        <a className="btn secondary" href="/admin/people/export">
+          Export members
+        </a>
+      </div>
 
 
       {searchParams.error ? (
