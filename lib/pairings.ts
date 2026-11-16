@@ -271,3 +271,54 @@ export function generateSwiss(standings: Standing[], previous: MatchRow[]): Draf
 
   return { boards, bye };
 }
+
+/**
+ * Round-robin schedule by the circle method.
+ * Returns `rounds` rounds, each a list of boards, so every player appears
+ * once per round and never meets the same opponent twice.
+ */
+export function generateRoundRobin(
+  playerIds: string[],
+  rounds: number
+): { board: number; white: string; black: string }[][] {
+  const players: (string | null)[] = [...playerIds];
+  if (players.length % 2 === 1) players.push(null);
+
+  const n = players.length;
+  if (n < 2) return [];
+
+  const maxRounds = n - 1;
+  const wanted = Math.max(1, Math.min(rounds, maxRounds));
+
+  const arr = [...players];
+  const out: { board: number; white: string; black: string }[][] = [];
+
+  for (let r = 0; r < wanted; r++) {
+    const boards: { board: number; white: string; black: string }[] = [];
+
+    for (let i = 0; i < n / 2; i++) {
+      const a = arr[i];
+      const b = arr[n - 1 - i];
+      if (!a || !b) continue;
+
+      // Alternate colours so nobody gets the same side every round.
+      const whiteFirst = (r + i) % 2 === 0;
+      boards.push({
+        board: boards.length + 1,
+        white: whiteFirst ? a : b,
+        black: whiteFirst ? b : a
+      });
+    }
+
+    out.push(boards);
+
+    // Rotate everyone except the first player.
+    const fixed = arr[0];
+    const rest = arr.slice(1);
+    rest.unshift(rest.pop() as string | null);
+    arr.length = 0;
+    arr.push(fixed, ...rest);
+  }
+
+  return out;
+}

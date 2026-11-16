@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
-import { computeStandings, generateSwiss, type MatchRow } from "@/lib/pairings";
+import { computeStandings, generateRoundRobin, generateSwiss, type MatchRow } from "@/lib/pairings";
 import { resolveBracket } from "@/lib/playoff";
 
 async function requireAdmin() {
@@ -501,5 +501,75 @@ export async function createPlayoff(formData: FormData) {
   }
 
   revalidatePath(`/tournaments/${slug}`);
+  redirect(`/tournaments/${slug}/console`);
+}
+
+/** Builds a round-robin schedule where each player plays a set number of games. */
+export async function createRoundRobin(formData: FormData) {
+  const me = await getCurrentProfile();
+  if (!me || me.role === "member") redirect("/");
+
+  const tournamentId = String(formData.get("tournament_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const gamesEach = Math.max(1, Math.min(11, Number(formData.get("games_each") ?? 3)));
+
+  const supabase = createClient();
+
+  const { data: players } = await supabase
+    .from("tournament_players")
+    .select("profile_id")
+    .eq("tournament_id", tournamentId)
+    .is("withdrawn_at", null);
+
+  const ids = (players ?? []).map((p: any) => p.profile_id);
+
+  if (ids.length < 2) {
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent("At least two players are needed.")}`);
+  }
+
+  const { data: existing } = await supabase
+    .from("rounds")
+    .select("number")
+    .eq("tournament_id", tournamentId)
+    .order("number", { ascending: false })
+    .limit(1);
+
+  const startAt = (existing?.[0]?.number ?? 0) + 1;
+
+  const schedule = generateRoundRobin(ids, gamesEach);
+
+  for (let i = 0; i < schedule.length; i++) {
+    const { data: round, error } = await supabase
+      .from("rounds")
+      .insert({
+        tournament_id: tournamentId,
+        number: startAt + i,
+        published_at: new Date().toISOString()
+      })
+      .select("id")
+      .single();
+
+    if (error || !round) {
+      redirect(`/tournaments/${slug}/console?error=${encodeURIComponent(error?.message ?? "Could not create the round.")}`);
+    }
+
+    const rows = schedule[i].map((b) => ({
+      tournament_id: tournamentId,
+      round_id: round!.id,
+      board: b.board,
+      white_id: b.white,
+      black_id: b.black,
+      result: "unplayed" as const
+    }));
+
+    if (rows.length > 0) {
+      await supabase.from("matches").insert(rows);
+    }
+  }
+
+  await supabase.from("tournaments").update({ status: "running" }).eq("id", tournamentId);
+
+  revalidatePath(`/tournaments/${slug}`);
+  revalidatePath(`/tournaments/${slug}/console`);
   redirect(`/tournaments/${slug}/console`);
 }

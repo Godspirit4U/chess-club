@@ -15,6 +15,7 @@ import {
   publishRound,
   regenerateRound,
   createPlayoff,
+  createRoundRobin,
   saveResult,
   startTournament,
   swapColours
@@ -275,6 +276,36 @@ export default async function ConsolePage({ params, searchParams }: Props) {
           </form>
         </section>
       ) : null}
+
+      <section style={{ marginTop: 28 }}>
+        <h2>Round robin schedule</h2>
+        <p className="muted small">
+          Builds the whole schedule at once. Every player meets a different opponent each
+          round, and the rounds are published straight away so they can play whenever they
+          are free.
+        </p>
+
+        <form action={createRoundRobin} className="card" style={{ display: "grid", gap: 10, maxWidth: 360 }}>
+          <input type="hidden" name="tournament_id" value={tournament.id} />
+          <input type="hidden" name="slug" value={tournament.slug} />
+
+          <div className="field" style={{ margin: 0 }}>
+            <label htmlFor="games_each">Games each player should play</label>
+            <input
+              id="games_each"
+              name="games_each"
+              type="number"
+              min={1}
+              max={11}
+              defaultValue={3}
+            />
+          </div>
+
+          <div>
+            <SubmitButton>Create schedule</SubmitButton>
+          </div>
+        </form>
+      </section>
 
       <section style={{ marginTop: 28 }}>
         <h2>Playoff</h2>
