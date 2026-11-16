@@ -6,6 +6,7 @@ import { computeStandings, type MatchRow } from "@/lib/pairings";
 import { registerForTournament, withdrawFromTournament } from "@/app/admin/tournaments/actions";
 import SubmitButton from "@/components/SubmitButton";
 import ShareTournament from "@/components/ShareTournament";
+import { chesscomRatings, ratingForTimeControl } from "@/lib/chesscom";
 
 export const dynamic = "force-dynamic";
 
@@ -50,7 +51,7 @@ export default async function TournamentPage({ params }: Props) {
   const { data: players } = supabase
     ? await supabase
         .from("tournament_players")
-        .select("profile_id,withdrawn_at,profiles(full_name)")
+        .select("profile_id,withdrawn_at,profiles(full_name,chesscom_username,chess_username,chess_platform)")
         .eq("tournament_id", tournament.id)
     : { data: [] as any[] };
 
@@ -84,6 +85,18 @@ export default async function TournamentPage({ params }: Props) {
   const registrationOpen = tournament.status === "open" && !deadlinePassed;
 
   const shareUrl = `https://saiu-chess-club.vercel.app/tournaments/${tournament.slug}`;
+
+  const ratingPairs = await Promise.all(
+    active.map(async (p: any) => {
+      const username =
+        p.profiles?.chesscom_username ??
+        (p.profiles?.chess_platform === "chesscom" ? p.profiles?.chess_username : null);
+      if (!username) return [p.profile_id, null] as const;
+      const stats = await chesscomRatings(username);
+      return [p.profile_id, ratingForTimeControl(stats, tournament.time_control)] as const;
+    })
+  );
+  const ratingByPlayer = new Map(ratingPairs);
 
   const shareSummary = [
     `${labels[tournament.format] ?? tournament.format} · ${tournament.rounds} rounds`,
@@ -145,6 +158,9 @@ export default async function TournamentPage({ params }: Props) {
             </Link>
             <Link className="btn secondary" href={`/tournaments/${tournament.slug}/edit`}>
               Edit
+            </Link>
+            <Link className="btn secondary" href={`/tournaments/${tournament.slug}/add-players`}>
+              Add players
             </Link>
           </p>
         ) : null}
@@ -228,6 +244,9 @@ export default async function TournamentPage({ params }: Props) {
             {active.map((p: any) => (
               <li key={p.profile_id}>
                 <Link href={`/members/${p.profile_id}`}>{p.profiles?.full_name ?? "Member"}</Link>
+                {ratingByPlayer.get(p.profile_id) ? (
+                  <span className="muted small"> · {ratingByPlayer.get(p.profile_id)}</span>
+                ) : null}
               </li>
             ))}
           </ul>

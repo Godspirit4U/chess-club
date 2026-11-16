@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import Avatar from "@/components/Avatar";
+import { chesscomRatings } from "@/lib/chesscom";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +68,7 @@ export default async function MemberPage({ params }: Props) {
   const chesscom = person.chesscom_username ?? (person.chess_platform === "chesscom" ? person.chess_username : null);
   const lichess = person.lichess_username ?? (person.chess_platform === "lichess" ? person.chess_username : null);
   const isMe = person.id === me.id;
+  const ratings = chesscom ? await chesscomRatings(chesscom) : null;
 
   return (
     <>
@@ -174,6 +176,26 @@ export default async function MemberPage({ params }: Props) {
             </p>
           ) : null}
         </div>
+
+        {ratings ? (
+          <div style={{ display: "flex", gap: 16, marginTop: 14, flexWrap: "wrap" }}>
+            {ratings.rapid ? (
+              <span className="small">
+                <strong>{ratings.rapid}</strong> <span className="muted">rapid</span>
+              </span>
+            ) : null}
+            {ratings.blitz ? (
+              <span className="small">
+                <strong>{ratings.blitz}</strong> <span className="muted">blitz</span>
+              </span>
+            ) : null}
+            {ratings.bullet ? (
+              <span className="small">
+                <strong>{ratings.bullet}</strong> <span className="muted">bullet</span>
+              </span>
+            ) : null}
+          </div>
+        ) : null}
 
         {!isMe && person.phone ? (
           <p style={{ marginTop: 14, marginBottom: 0 }}>

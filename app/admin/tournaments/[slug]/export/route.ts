@@ -33,25 +33,21 @@ export async function GET(
     .eq("tournament_id", tournament.id)
     .order("registered_at", { ascending: true });
 
-  const header = ["Name", "Email", "Mobile", "Chess.com", "Lichess", "Registered", "Status"];
+  const header = ["S.No", "Name", "Chess.com ID", "Mobile"];
 
   const lines = [header.map(cell).join(",")];
 
+  let index = 0;
   for (const row of rows ?? []) {
+    if ((row as any).withdrawn_at) continue;
     const p = (row as any).profiles ?? {};
+    index += 1;
     lines.push(
       [
+        cell(index),
         cell(p.full_name),
-        cell(p.email),
-        cell(p.phone ?? ""),
         cell(p.chesscom_username ?? p.chess_username ?? ""),
-        cell(p.lichess_username ?? ""),
-        cell(
-          row.registered_at
-            ? new Date(row.registered_at).toLocaleString("en-IN")
-            : ""
-        ),
-        cell(row.withdrawn_at ? "withdrawn" : "registered")
+        cell(p.phone ?? "")
       ].join(",")
     );
   }

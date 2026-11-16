@@ -357,3 +357,27 @@ export async function updateTournament(formData: FormData) {
   revalidatePath(`/tournaments/${slug}`);
   redirect(`/tournaments/${slug}`);
 }
+
+/** Registers chosen members directly, without them clicking anything. */
+export async function addPlayersToTournament(formData: FormData) {
+  const me = await getCurrentProfile();
+  if (!me || me.role === "member") redirect("/");
+
+  const tournamentId = String(formData.get("tournament_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const ids = formData.getAll("profile_ids").map(String).filter(Boolean);
+
+  if (ids.length === 0) {
+    redirect(`/tournaments/${slug}/add-players?error=${encodeURIComponent("Nobody was selected.")}`);
+  }
+
+  const supabase = createClient();
+
+  await supabase.from("tournament_players").upsert(
+    ids.map((id) => ({ tournament_id: tournamentId, profile_id: id })),
+    { onConflict: "tournament_id,profile_id", ignoreDuplicates: true }
+  );
+
+  revalidatePath(`/tournaments/${slug}`);
+  redirect(`/tournaments/${slug}?added=${ids.length}`);
+}
