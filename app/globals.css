@@ -812,3 +812,30 @@ h2::after {
 .theme-toggle:hover {
   background: var(--hover);
 }
+
+/* White / Black markers beside a player's name */
+.colour-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.colour-chip.light {
+  background: #ffffff;
+  color: #0f1f14;
+  border-color: #b9b3a1;
+}
+
+.colour-chip.dark {
+  background: #1d2620;
+  color: #ffffff;
+  border-color: #1d2620;
+}

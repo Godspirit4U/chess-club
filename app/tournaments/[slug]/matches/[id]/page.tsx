@@ -82,7 +82,10 @@ export default async function MatchPage({ params }: Props) {
       </p>
 
       <h1>
-        {white} vs {black}
+        <span className="colour-chip light" title="White" style={{ verticalAlign: "middle", marginRight: 8 }}>W</span>
+        {white} <span className="muted" style={{ fontSize: 16 }}>vs</span>{" "}
+        <span className="colour-chip dark" title="Black" style={{ verticalAlign: "middle", marginRight: 8, marginLeft: 8 }}>B</span>
+        {black}
       </h1>
       <p className="muted small">
         {round ? `Round ${round} · ` : ""}Board {match.board} ·{" "}
@@ -98,7 +101,8 @@ export default async function MatchPage({ params }: Props) {
       {opponent ? (
         <section className="card" style={{ marginTop: 16 }}>
           <h2 style={{ fontSize: 16, marginTop: 0 }}>
-            Playing {opponent.full_name}
+            Playing {opponent.full_name} — you have{" "}
+            <strong>{match.white_id === viewer?.id ? "White" : "Black"}</strong>
           </h2>
           <p className="muted small" style={{ marginTop: 0 }}>
             Arrange the game before the round starts.

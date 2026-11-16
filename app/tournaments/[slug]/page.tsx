@@ -354,7 +354,11 @@ export default async function TournamentPage({ params }: Props) {
                           </span>
 
                           {whiteId ? (
-                            <Link href={`/members/${whiteId}`} style={{ fontWeight: 600 }}>
+                            <Link
+                              href={`/members/${whiteId}`}
+                              style={{ fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}
+                            >
+                              <span className="colour-chip light" title="White">W</span>
                               {whiteName?.profiles?.full_name ?? "Member"}
                             </Link>
                           ) : (
@@ -364,7 +368,11 @@ export default async function TournamentPage({ params }: Props) {
                           <span className="muted">vs</span>
 
                           {blackId ? (
-                            <Link href={`/members/${blackId}`} style={{ fontWeight: 600 }}>
+                            <Link
+                              href={`/members/${blackId}`}
+                              style={{ fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}
+                            >
+                              <span className="colour-chip dark" title="Black">B</span>
                               {blackName?.profiles?.full_name ?? "Member"}
                             </Link>
                           ) : (
