@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import { computeStandings, generateSwiss, type MatchRow } from "@/lib/pairings";
+import { resolveBracket } from "@/lib/playoff";
 
 async function requireAdmin() {
   const profile = await getCurrentProfile();
@@ -250,6 +251,7 @@ export async function saveResult(formData: FormData) {
 
   const matchId = String(formData.get("match_id") ?? "");
   const slug = String(formData.get("slug") ?? "");
+  const tournamentId = String(formData.get("tournament_id") ?? "");
   const result = String(formData.get("result") ?? "unplayed");
   const pgn = String(formData.get("pgn") ?? "").trim();
 
@@ -267,6 +269,22 @@ export async function saveResult(formData: FormData) {
     .eq("id", matchId);
 
   revalidatePath(`/tournaments/${slug}/console`);
+  // Advance the playoff bracket when a result is recorded.
+  const { data: playoff } = await supabase
+    .from("matches")
+    .select("id,slot,white_id,black_id,result,pgn")
+    .eq("tournament_id", tournamentId)
+    .eq("stage", "playoff");
+
+  if (playoff && playoff.length > 0) {
+    for (const update of resolveBracket(playoff as any)) {
+      await supabase
+        .from("matches")
+        .update({ white_id: update.white_id, black_id: update.black_id })
+        .eq("id", update.id);
+    }
+  }
+
   revalidatePath(`/tournaments/${slug}`);
   redirect(`/tournaments/${slug}/console`);
 }
@@ -380,4 +398,108 @@ export async function addPlayersToTournament(formData: FormData) {
 
   revalidatePath(`/tournaments/${slug}`);
   redirect(`/tournaments/${slug}?added=${ids.length}`);
+}
+
+/** Builds the four-player playoff bracket from the current standings. */
+export async function createPlayoff(formData: FormData) {
+  const me = await getCurrentProfile();
+  if (!me || me.role === "member") redirect("/");
+
+  const tournamentId = String(formData.get("tournament_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+
+  const supabase = createClient();
+
+  const { data: tournament } = await supabase
+    .from("tournaments")
+    .select("id,slug,rounds,points_win,points_draw,points_loss")
+    .eq("id", tournamentId)
+    .single();
+
+  if (!tournament) redirect(`/tournaments/${slug}`);
+
+  const { data: players } = await supabase
+    .from("tournament_players")
+    .select("profile_id,withdrawn_at,profiles(full_name)")
+    .eq("tournament_id", tournamentId)
+    .is("withdrawn_at", null);
+
+  const { data: matches } = await supabase
+    .from("matches")
+    .select("id,round_id,board,white_id,black_id,result,rounds(number)")
+    .eq("tournament_id", tournamentId);
+
+  const standings = computeStandings(
+    (players ?? []).map((p: any) => ({
+      profileId: p.profile_id,
+      name: p.profiles?.full_name ?? "Member"
+    })),
+    (matches ?? []).map((m: any) => ({
+      white_id: m.white_id,
+      black_id: m.black_id,
+      result: m.result,
+      round: m.rounds?.number ?? 0
+    })) as MatchRow[],
+    {
+      win: Number(tournament.points_win),
+      draw: Number(tournament.points_draw),
+      loss: Number(tournament.points_loss)
+    }
+  );
+
+  if (standings.length < 4) {
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent("At least four players are needed.")}`);
+  }
+
+  const [first, second, third, fourth] = standings;
+
+  const { error } = await supabase.from("matches").insert([
+    {
+      tournament_id: tournamentId,
+      round_id: null,
+      board: 1,
+      stage: "playoff",
+      slot: "M1",
+      white_id: first.profileId,
+      black_id: second.profileId,
+      result: "unplayed"
+    },
+    {
+      tournament_id: tournamentId,
+      round_id: null,
+      board: 2,
+      stage: "playoff",
+      slot: "M2",
+      white_id: third.profileId,
+      black_id: fourth.profileId,
+      result: "unplayed"
+    },
+    {
+      tournament_id: tournamentId,
+      round_id: null,
+      board: 3,
+      stage: "playoff",
+      slot: "M3",
+      white_source: "loser:M1",
+      black_source: "winner:M2",
+      result: "unplayed"
+    },
+    {
+      tournament_id: tournamentId,
+      round_id: null,
+      board: 4,
+      stage: "playoff",
+      slot: "F",
+      white_source: "winner:M1",
+      black_source: "winner:M3",
+      result: "unplayed"
+    }
+  ]);
+
+  if (error) {
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath(`/tournaments/${slug}`);
+  redirect(`/tournaments/${slug}/console`);
 }

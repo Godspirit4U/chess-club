@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { computeStandings, generateSwiss, type MatchRow } from "@/lib/pairings";
 import SubmitButton from "@/components/SubmitButton";
 import ConfirmButton from "@/components/ConfirmButton";
+import { SLOT_TITLE } from "@/lib/playoff";
 import {
   completeTournament,
   deleteRound,
@@ -13,6 +14,7 @@ import {
   generateRound,
   publishRound,
   regenerateRound,
+  createPlayoff,
   saveResult,
   startTournament,
   swapColours
@@ -67,6 +69,16 @@ export default async function ConsolePage({ params, searchParams }: Props) {
   for (const p of players ?? []) {
     nameOf.set((p as any).profile_id, (p as any).profiles?.full_name ?? "Member");
   }
+
+  const { data: playoffMatches } = await supabase
+    .from("matches")
+    .select("id,slot,white_id,black_id,result,pgn,white_source,black_source")
+    .eq("tournament_id", tournament.id)
+    .eq("stage", "playoff")
+    .order("board", { ascending: true });
+
+  const playoff = playoffMatches ?? [];
+  const playoffBySlot = new Map(playoff.map((m: any) => [m.slot, m]));
 
   const draftRound = (rounds ?? []).find((r) => !r.published_at) ?? null;
   const draftMatches = draftRound
@@ -263,6 +275,78 @@ export default async function ConsolePage({ params, searchParams }: Props) {
           </form>
         </section>
       ) : null}
+
+      <section style={{ marginTop: 28 }}>
+        <h2>Playoff</h2>
+
+        {playoff.length === 0 ? (
+          <>
+            <p className="muted small">
+              Takes the top four from the table and builds the four matches. Winners move on
+              automatically as you enter results.
+            </p>
+            <form action={createPlayoff}>
+              <input type="hidden" name="tournament_id" value={tournament.id} />
+              <input type="hidden" name="slug" value={tournament.slug} />
+              <SubmitButton>Create playoff from top 4</SubmitButton>
+            </form>
+          </>
+        ) : (
+          <div className="stack">
+            {["M1", "M2", "M3", "F"].map((slot) => {
+              const m = playoffBySlot.get(slot) as any;
+              if (!m) return null;
+
+              const white = m.white_id
+                ? ((players ?? []).find((p: any) => p.profile_id === m.white_id)?.profiles as any)?.full_name ??
+                  "Member"
+                : m.white_source === "winner:M1"
+                  ? "Winner of Match 1"
+                  : m.white_source === "loser:M1"
+                    ? "Loser of Match 1"
+                    : m.white_source === "winner:M2"
+                      ? "Winner of Match 2"
+                      : m.white_source === "winner:M3"
+                        ? "Winner of Match 3"
+                        : "To be decided";
+
+              const black = m.black_id
+                ? ((players ?? []).find((p: any) => p.profile_id === m.black_id)?.profiles as any)?.full_name ??
+                  "Member"
+                : m.black_source === "winner:M2"
+                  ? "Winner of Match 2"
+                  : m.black_source === "loser:M1"
+                    ? "Loser of Match 1"
+                    : m.black_source === "winner:M3"
+                      ? "Winner of Match 3"
+                      : "To be decided";
+
+              return (
+                <form key={m.id} action={saveResult} className="card" style={{ display: "grid", gap: 8 }}>
+                  <input type="hidden" name="match_id" value={m.id} />
+                  <input type="hidden" name="tournament_id" value={tournament.id} />
+                  <input type="hidden" name="slug" value={tournament.slug} />
+
+                  <strong style={{ fontSize: 14 }}>{SLOT_TITLE[slot]}</strong>
+                  <p className="small" style={{ margin: 0 }}>
+                    {white} vs {black}
+                  </p>
+
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <select name="result" defaultValue={m.result} style={{ maxWidth: 220 }}>
+                      <option value="unplayed">Not played</option>
+                      <option value="white">White won</option>
+                      <option value="black">Black won</option>
+                      <option value="draw">Draw</option>
+                    </select>
+                    <SubmitButton className="btn secondary">Save</SubmitButton>
+                  </div>
+                </form>
+              );
+            })}
+          </div>
+        )}
+      </section>
 
       {(rounds ?? []).some((r) => r.published_at) ? (
         <section style={{ marginTop: 28 }}>
