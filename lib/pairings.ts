@@ -293,6 +293,14 @@ export function generateRoundRobin(
   const arr = [...players];
   const out: { board: number; white: string; black: string }[][] = [];
 
+  // Colour bookkeeping: whites minus blacks, and the last colour each had.
+  const balance = new Map<string, number>();
+  const lastColour = new Map<string, "w" | "b">();
+
+  for (const id of playerIds) {
+    balance.set(id, 0);
+  }
+
   for (let r = 0; r < wanted; r++) {
     const boards: { board: number; white: string; black: string }[] = [];
 
@@ -301,13 +309,32 @@ export function generateRoundRobin(
       const b = arr[n - 1 - i];
       if (!a || !b) continue;
 
-      // Alternate colours so nobody gets the same side every round.
-      const whiteFirst = (r + i) % 2 === 0;
-      boards.push({
-        board: boards.length + 1,
-        white: whiteFirst ? a : b,
-        black: whiteFirst ? b : a
-      });
+      const balA = balance.get(a) ?? 0;
+      const balB = balance.get(b) ?? 0;
+
+      let whiteFirst: boolean;
+
+      if (balA !== balB) {
+        // Whoever has had fewer whites takes white.
+        whiteFirst = balA < balB;
+      } else {
+        const lastA = lastColour.get(a);
+        const lastB = lastColour.get(b);
+
+        if (lastA === "w" && lastB !== "w") whiteFirst = false;
+        else if (lastB === "w" && lastA !== "w") whiteFirst = true;
+        else whiteFirst = (r + i) % 2 === 0;
+      }
+
+      const white = whiteFirst ? a : b;
+      const black = whiteFirst ? b : a;
+
+      boards.push({ board: boards.length + 1, white, black });
+
+      balance.set(white, (balance.get(white) ?? 0) + 1);
+      balance.set(black, (balance.get(black) ?? 0) - 1);
+      lastColour.set(white, "w");
+      lastColour.set(black, "b");
     }
 
     out.push(boards);
