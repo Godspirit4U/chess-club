@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const links = [
   { href: "/", label: "Home" },
@@ -86,15 +87,18 @@ export default function SiteHeader({
             )}
           </nav>
 
-          <button
-            type="button"
-            className="menu-toggle"
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <ThemeToggle />
+            <button
+              type="button"
+              className="menu-toggle"
             aria-expanded={open}
             aria-controls="mobile-nav"
             onClick={() => setOpen((v) => !v)}
-          >
-            {open ? "Close" : "Menu"}
-          </button>
+            >
+              {open ? "Close" : "Menu"}
+            </button>
+          </div>
         </div>
 
         {open && (

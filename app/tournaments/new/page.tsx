@@ -47,8 +47,8 @@ export default async function NewTournamentPage({ searchParams }: Props) {
           role="alert"
           style={{
             border: "1px solid #e3c9c9",
-            background: "#fbf1f1",
-            color: "#a32b2b",
+            background: "var(--tint-danger)",
+            color: "var(--danger)",
             borderRadius: 6,
             padding: "10px 12px",
             fontSize: 14
