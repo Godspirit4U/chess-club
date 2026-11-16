@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient, getCurrentProfile, isConfigured } from "@/lib/supabase/server";
 import { signOut } from "@/app/auth/actions";
+import RatingGrid from "@/components/RatingGrid";
+import { chesscomRatings } from "@/lib/chesscom";
 
 export const metadata: Metadata = { title: "Profile" };
 export const dynamic = "force-dynamic";
@@ -68,6 +70,11 @@ export default async function ProfilePage() {
       if (won) wins++;
     }
   }
+
+  const chesscomUser =
+    profile.chesscom_username ??
+    (profile.chess_platform === "chesscom" ? profile.chess_username : null);
+  const ratings = chesscomUser ? await chesscomRatings(chesscomUser) : null;
 
   return (
     <>
@@ -168,6 +175,13 @@ export default async function ProfilePage() {
           <Link href="/tournaments">See your tournaments</Link>
         </p>
       </div>
+
+      {ratings ? (
+        <div style={{ marginTop: 16 }}>
+          <h2 style={{ fontSize: 16, marginBottom: 0 }}>Chess.com ratings</h2>
+          <RatingGrid ratings={ratings} />
+        </div>
+      ) : null}
 
       <div className="card" style={{ marginTop: 16 }}>
         <h2 style={{ fontSize: 16 }}>Contact</h2>

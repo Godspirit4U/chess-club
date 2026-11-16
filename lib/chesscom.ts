@@ -1,10 +1,31 @@
 /** Chess.com publishes ratings publicly, no key needed. Cached for an hour. */
-export type Ratings = {
-  rapid?: number;
-  blitz?: number;
-  bullet?: number;
-  daily?: number;
+export type Rating = {
+  rating?: number;
+  best?: number;
+  win?: number;
+  loss?: number;
+  draw?: number;
 };
+
+export type Ratings = {
+  rapid?: Rating;
+  blitz?: Rating;
+  bullet?: Rating;
+  daily?: Rating;
+};
+
+type RawStats = Record<string, any>;
+
+function shape(entry: any): Rating | undefined {
+  if (!entry) return undefined;
+  return {
+    rating: entry?.last?.rating,
+    best: entry?.best?.rating,
+    win: entry?.record?.win,
+    loss: entry?.record?.loss,
+    draw: entry?.record?.draw
+  };
+}
 
 export async function chesscomRatings(username: string): Promise<Ratings | null> {
   if (!username) return null;
@@ -17,13 +38,13 @@ export async function chesscomRatings(username: string): Promise<Ratings | null>
 
     if (!res.ok) return null;
 
-    const data = await res.json();
+    const data = (await res.json()) as RawStats;
 
     return {
-      rapid: data?.chess_rapid?.last?.rating,
-      blitz: data?.chess_blitz?.last?.rating,
-      bullet: data?.chess_bullet?.last?.rating,
-      daily: data?.chess_daily?.last?.rating
+      rapid: shape(data.chess_rapid),
+      blitz: shape(data.chess_blitz),
+      bullet: shape(data.chess_bullet),
+      daily: shape(data.chess_daily)
     };
   } catch {
     return null;
@@ -35,9 +56,9 @@ export function ratingForTimeControl(ratings: Ratings | null, timeControl: strin
   if (!ratings) return null;
 
   const minutes = Number(String(timeControl ?? "").replace(/[^0-9.]/g, ""));
-  if (!minutes) return ratings.rapid ?? ratings.blitz ?? null;
+  if (!minutes) return ratings.rapid?.rating ?? ratings.blitz?.rating ?? null;
 
-  if (minutes <= 2) return ratings.bullet ?? ratings.blitz ?? null;
-  if (minutes <= 5) return ratings.blitz ?? ratings.rapid ?? null;
-  return ratings.rapid ?? ratings.blitz ?? null;
+  if (minutes <= 2) return ratings.bullet?.rating ?? ratings.blitz?.rating ?? null;
+  if (minutes <= 5) return ratings.blitz?.rating ?? ratings.rapid?.rating ?? null;
+  return ratings.rapid?.rating ?? ratings.blitz?.rating ?? null;
 }

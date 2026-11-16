@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient, getCurrentProfile } from "@/lib/supabase/server";
 import Avatar from "@/components/Avatar";
 import { chesscomRatings } from "@/lib/chesscom";
+import RatingGrid from "@/components/RatingGrid";
 
 export const dynamic = "force-dynamic";
 
@@ -177,25 +178,7 @@ export default async function MemberPage({ params }: Props) {
           ) : null}
         </div>
 
-        {ratings ? (
-          <div style={{ display: "flex", gap: 16, marginTop: 14, flexWrap: "wrap" }}>
-            {ratings.rapid ? (
-              <span className="small">
-                <strong>{ratings.rapid}</strong> <span className="muted">rapid</span>
-              </span>
-            ) : null}
-            {ratings.blitz ? (
-              <span className="small">
-                <strong>{ratings.blitz}</strong> <span className="muted">blitz</span>
-              </span>
-            ) : null}
-            {ratings.bullet ? (
-              <span className="small">
-                <strong>{ratings.bullet}</strong> <span className="muted">bullet</span>
-              </span>
-            ) : null}
-          </div>
-        ) : null}
+        <RatingGrid ratings={ratings} />
 
         {!isMe && person.phone ? (
           <p style={{ marginTop: 14, marginBottom: 0 }}>
