@@ -70,18 +70,7 @@ export default async function NewTournamentPage({ searchParams }: Props) {
         </div>
 
         <div className="grid two" style={{ gap: 16 }}>
-          <div className="field">
-            <label htmlFor="format">Format</label>
-            <select id="format" name="format" defaultValue={last?.format ?? "swiss"}>
-              {formats.map((f) => (
-                <option key={f.value} value={f.value}>
-                  {f.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="field">
+<div className="field">
             <label htmlFor="rounds">Rounds</label>
             <input
               id="rounds"

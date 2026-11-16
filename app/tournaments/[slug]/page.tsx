@@ -99,7 +99,7 @@ export default async function TournamentPage({ params }: Props) {
   const ratingByPlayer = new Map(ratingPairs);
 
   const shareSummary = [
-    `${labels[tournament.format] ?? tournament.format} · ${tournament.rounds} rounds`,
+    `${tournament.rounds} rounds`,
     tournament.time_control ? `Time control ${tournament.time_control}` : "",
     tournament.starts_at
       ? `Starts ${new Date(tournament.starts_at).toLocaleString("en-IN", {
@@ -168,8 +168,8 @@ export default async function TournamentPage({ params }: Props) {
 
       <h1>{tournament.name}</h1>
       <p className="muted">
-        {labels[tournament.format] ?? tournament.format} · {tournament.rounds} rounds ·{" "}
-        {tournament.time_control}
+        {tournament.rounds} rounds
+        {tournament.time_control ? ` · ${tournament.time_control} min` : ""}
         {tournament.starts_at
           ? ` · starts ${new Date(tournament.starts_at).toLocaleString("en-IN", {
               dateStyle: "medium",

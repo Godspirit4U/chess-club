@@ -30,7 +30,7 @@ function Card({ t }: { t: Row }) {
     <Link href={`/tournaments/${t.slug}`} className="card" style={{ display: "block" }}>
       <h3 style={{ marginBottom: 4 }}>{t.name}</h3>
       <p className="muted small" style={{ margin: 0 }}>
-        {labels[t.format] ?? t.format} · {t.rounds} rounds
+        {t.rounds} rounds
         {t.starts_at ? ` · ${new Date(t.starts_at).toLocaleDateString("en-IN", {
           day: "numeric",
           month: "short"

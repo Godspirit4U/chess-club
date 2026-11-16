@@ -61,18 +61,7 @@ export default async function EditTournamentPage({ params, searchParams }: Props
         </div>
 
         <div className="grid two" style={{ gap: 16 }}>
-          <div className="field">
-            <label htmlFor="format">Format</label>
-            <select id="format" name="format" defaultValue={t.format}>
-              <option value="swiss">Swiss</option>
-              <option value="round_robin">Round robin</option>
-              <option value="knockout">Knockout</option>
-              <option value="groups_knockout">Groups then knockout</option>
-              <option value="custom">Custom</option>
-            </select>
-          </div>
-
-          <div className="field">
+<div className="field">
             <label htmlFor="rounds">Rounds</label>
             <input id="rounds" name="rounds" type="number" min={1} max={15} defaultValue={t.rounds} />
           </div>
