@@ -90,7 +90,11 @@ export default function PeopleTable({
                     </form>
                   ) : (
                     <span className="muted small">
-                      {p.role === "super_admin" ? "Super admin" : "Admin"}
+                      {p.role === "super_admin"
+                        ? "Super admin"
+                        : p.role === "admin"
+                          ? "Admin"
+                          : "Member"}
                     </span>
                   )}
                 </td>
