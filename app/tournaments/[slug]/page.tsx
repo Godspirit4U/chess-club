@@ -316,7 +316,13 @@ export default async function TournamentPage({ params }: Props) {
               const rows = (allMatches ?? []).filter((m: any) => m.round_id === r.id);
               return (
                 <div key={r.id} className="card" style={{ marginBottom: 12 }}>
-                  <h3>Round {r.number}</h3>
+                  <h3 style={{ marginBottom: 2 }}>
+                    Round {r.number}
+                    <span className="muted small" style={{ fontWeight: 400, marginLeft: 8 }}>
+                      {rows.filter((m: any) => m.result !== "unplayed").length} of {rows.length}{" "}
+                      matches completed
+                    </span>
+                  </h3>
                   <ul style={{ margin: 0, paddingLeft: 18 }}>
                     {rows.map((m: any) => {
                       const whiteName = active.find((p: any) => p.profile_id === m.white_id);
@@ -381,10 +387,17 @@ export default async function TournamentPage({ params }: Props) {
 
                           {score ? <strong style={{ marginLeft: 4 }}>{score}</strong> : null}
 
+                          <span
+                            className={`status-chip ${m.result === "unplayed" ? "pending" : "done"}`}
+                            style={{ marginLeft: "auto" }}
+                          >
+                            {m.result === "unplayed" ? "Pending" : "Completed"}
+                          </span>
+
                           <Link
                             className="btn secondary"
                             href={`/tournaments/${tournament.slug}/matches/${m.id}`}
-                            style={{ marginLeft: "auto", minHeight: 30, fontSize: 13 }}
+                            style={{ minHeight: 30, fontSize: 13 }}
                           >
                             Open match
                           </Link>
