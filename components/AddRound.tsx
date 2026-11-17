@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import {
+  createCustomRound,
   createPlayoff,
   createRoundRobin,
   generateRound
 } from "@/lib/tournament-actions";
 import SubmitButton from "@/components/SubmitButton";
 
-type Mode = "swiss" | "roundrobin" | "playoff" | null;
+type Mode = "swiss" | "roundrobin" | "playoff" | "custom" | null;
 
 export default function AddRound({
   tournamentId,
@@ -71,6 +72,13 @@ export default function AddRound({
             >
               Playoff
             </button>
+            <button
+              type="button"
+              className={mode === "custom" ? "btn" : "btn secondary"}
+              onClick={() => setMode("custom")}
+            >
+              Custom
+            </button>
           </div>
 
           <div style={{ marginTop: 16 }}>
@@ -121,6 +129,32 @@ export default function AddRound({
 
                 <div>
                   <SubmitButton>Create schedule</SubmitButton>
+                </div>
+              </form>
+            ) : null}
+
+            {mode === "custom" ? (
+              <form action={createCustomRound} style={{ display: "grid", gap: 10, maxWidth: 520 }}>
+                <input type="hidden" name="tournament_id" value={tournamentId} />
+                <input type="hidden" name="slug" value={slug} />
+
+                <div className="field" style={{ margin: 0 }}>
+                  <label htmlFor="pairings">Pairings, one board per line</label>
+                  <textarea
+                    id="pairings"
+                    name="pairings"
+                    rows={10}
+                    placeholder={"Sai Eswar vs Sai Vikas\nSaanvi subash vs Surya A Varadarajan"}
+                    required
+                  />
+                  <p className="muted small" style={{ margin: "4px 0 0" }}>
+                    Write "Name vs Name". First name is white. It is created as a draft so you
+                    can check it before publishing.
+                  </p>
+                </div>
+
+                <div>
+                  <SubmitButton>Create draft round</SubmitButton>
                 </div>
               </form>
             ) : null}

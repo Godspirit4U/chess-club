@@ -573,3 +573,122 @@ export async function createRoundRobin(formData: FormData) {
   revalidatePath(`/tournaments/${slug}/console`);
   redirect(`/tournaments/${slug}/console`);
 }
+
+/** Creates a draft round from pairings typed or pasted by the admin. */
+export async function createCustomRound(formData: FormData) {
+  const me = await getCurrentProfile();
+  if (!me || me.role === "member") redirect("/");
+
+  const tournamentId = String(formData.get("tournament_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const text = String(formData.get("pairings") ?? "");
+
+  const supabase = createClient();
+
+  const { data: players } = await supabase
+    .from("tournament_players")
+    .select("profile_id,withdrawn_at,profiles(full_name)")
+    .eq("tournament_id", tournamentId)
+    .is("withdrawn_at", null);
+
+  const roster = (players ?? []).map((p: any) => ({
+    id: p.profile_id as string,
+    name: (p.profiles?.full_name ?? (p.profiles as any)?.[0]?.full_name ?? "Member") as string
+  }));
+
+  const normalise = (value: string) =>
+    value.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+  function findPlayer(raw: string) {
+    const target = normalise(raw);
+    if (!target) return null;
+
+    let best: { id: string; name: string } | null = null;
+
+    for (const player of roster) {
+      const candidate = normalise(player.name);
+      if (candidate === target) return player;
+      if (!best && (candidate.includes(target) || target.includes(candidate))) best = player;
+    }
+
+    // Fall back to a word-by-word match, e.g. "Deva" for "PETLURI ... DEVAMITHRA".
+    if (!best) {
+      for (const player of roster) {
+        const words = player.name.toLowerCase().split(/\s+/).map(normalise);
+        if (words.some((w) => w && w === target)) return player;
+      }
+    }
+
+    return best;
+  }
+
+  const lines = text
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .filter((l) => !/^round\s*-?\s*\d+/i.test(l));
+
+  const boards: { board: number; white: string; black: string }[] = [];
+  const problems: string[] = [];
+
+  for (const line of lines) {
+    const parts = line.split(/\s+(?:vs\.?|v)\s+/i);
+    if (parts.length !== 2) {
+      problems.push(`Could not read: ${line}`);
+      continue;
+    }
+
+    const white = findPlayer(parts[0]);
+    const black = findPlayer(parts[1]);
+
+    if (!white || !black) {
+      problems.push(
+        `Unknown player in: ${line}${!white ? ` (${parts[0].trim()})` : ""}${
+          !black ? ` (${parts[1].trim()})` : ""
+        }`
+      );
+      continue;
+    }
+
+    boards.push({ board: boards.length + 1, white: white.id, black: black.id });
+  }
+
+  if (problems.length > 0 || boards.length === 0) {
+    const message =
+      problems.length > 0 ? problems.slice(0, 3).join(" · ") : "No pairings found in the text.";
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent(message)}`);
+  }
+
+  const { data: existing } = await supabase
+    .from("rounds")
+    .select("number")
+    .eq("tournament_id", tournamentId)
+    .order("number", { ascending: false })
+    .limit(1);
+
+  const nextNumber = (existing?.[0]?.number ?? 0) + 1;
+
+  const { data: round, error } = await supabase
+    .from("rounds")
+    .insert({ tournament_id: tournamentId, number: nextNumber, published_at: null })
+    .select("id")
+    .single();
+
+  if (error || !round) {
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent(error?.message ?? "Could not create the round.")}`);
+  }
+
+  await supabase.from("matches").insert(
+    boards.map((b) => ({
+      tournament_id: tournamentId,
+      round_id: round!.id,
+      board: b.board,
+      white_id: b.white,
+      black_id: b.black,
+      result: "unplayed" as const
+    }))
+  );
+
+  revalidatePath(`/tournaments/${slug}/console`);
+  redirect(`/tournaments/${slug}/console`);
+}
