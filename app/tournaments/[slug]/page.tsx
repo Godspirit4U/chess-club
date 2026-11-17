@@ -270,7 +270,7 @@ export default async function TournamentPage({ params }: Props) {
       {(allMatches ?? []).length > 0 ? (
         <>
           <section style={{ marginTop: 28 }}>
-            <h2>Points table</h2>
+            <h2>{tournament.status === "running" ? "Live leaderboard" : "Leaderboard"}</h2>
             <table>
               <thead>
                 <tr>
