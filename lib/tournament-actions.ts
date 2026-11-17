@@ -544,7 +544,7 @@ export async function createRoundRobin(formData: FormData) {
       .insert({
         tournament_id: tournamentId,
         number: startAt + i,
-        published_at: new Date().toISOString()
+        published_at: null
       })
       .select("id")
       .single();
