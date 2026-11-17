@@ -8,6 +8,7 @@ import SubmitButton from "@/components/SubmitButton";
 import ConfirmButton from "@/components/ConfirmButton";
 import { SLOT_TITLE } from "@/lib/playoff";
 import AddRound from "@/components/AddRound";
+import PgnInput from "@/components/PgnInput";
 import {
   completeTournament,
   deleteRound,
@@ -298,7 +299,11 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                         <input type="hidden" name="slug" value={tournament.slug} />
 
                         <div className="small">
-                          Board {m.board}: {m.white_id ? nameOf.get(m.white_id) : "—"} vs{" "}
+                          Board {m.board}:{" "}
+                          <span className="colour-chip light" style={{ marginRight: 5 }}>W</span>
+                          {m.white_id ? nameOf.get(m.white_id) : "—"}{" "}
+                          <span className="muted">vs</span>{" "}
+                          <span className="colour-chip dark" style={{ margin: "0 5px 0 4px" }}>B</span>
                           {isBye ? "bye" : m.black_id ? nameOf.get(m.black_id) : "—"}{" "}
                           <span className="muted">· now: {m.result}</span>
                         </div>
@@ -330,12 +335,7 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                                 Black won
                               </SubmitButton>
                             </div>
-                            <input
-                              name="pgn"
-                              placeholder="PGN, optional"
-                              defaultValue={m.pgn ?? ""}
-                              style={{ fontSize: 13 }}
-                            />
+                            <PgnInput defaultValue={m.pgn ?? ""} />
                           </>
                         )}
                       </form>

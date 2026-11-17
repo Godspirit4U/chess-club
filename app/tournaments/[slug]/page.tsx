@@ -386,7 +386,7 @@ export default async function TournamentPage({ params }: Props) {
                             href={`/tournaments/${tournament.slug}/matches/${m.id}`}
                             style={{ marginLeft: "auto", minHeight: 30, fontSize: 13 }}
                           >
-                            Match
+                            Open match
                           </Link>
                         </li>
                       );
