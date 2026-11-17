@@ -208,14 +208,22 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                     <SubmitButton>Publish round {dr.number}</SubmitButton>
                   </form>
 
+                  <form action={regenerateRound}>
+                    <input type="hidden" name="tournament_id" value={tournament.id} />
+                    <input type="hidden" name="round_id" value={dr.id} />
+                    <input type="hidden" name="slug" value={tournament.slug} />
+                    <input type="hidden" name="pairing_format" value="swiss" />
+                    <SubmitButton className="btn secondary">Regenerate</SubmitButton>
+                  </form>
+
                   <form action={deleteRound}>
                     <input type="hidden" name="round_id" value={dr.id} />
                     <input type="hidden" name="slug" value={tournament.slug} />
                     <ConfirmButton
-                      message={`Delete the draft pairings for round ${dr.number}?`}
+                      message={`Delete the draft pairings for round ${dr.number}? Nothing has been played yet, so this is safe.`}
                       style={{ minHeight: 34, color: "var(--danger)" }}
                     >
-                      Delete
+                      Delete draft
                     </ConfirmButton>
                   </form>
                 </div>
