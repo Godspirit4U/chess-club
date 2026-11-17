@@ -82,10 +82,7 @@ export default async function MatchPage({ params }: Props) {
       </p>
 
       <h1>
-        <span className="colour-chip light" title="White" style={{ verticalAlign: "middle", marginRight: 8 }}>W</span>
-        {white} <span className="muted" style={{ fontSize: 16 }}>vs</span>{" "}
-        <span className="colour-chip dark" title="Black" style={{ verticalAlign: "middle", marginRight: 8, marginLeft: 8 }}>B</span>
-        {black}
+        {white} vs {black}
       </h1>
       <p className="muted small">
         {round ? `Round ${round} · ` : ""}Board {match.board} ·{" "}
@@ -164,7 +161,7 @@ export default async function MatchPage({ params }: Props) {
       {match.pgn ? (
         <>
           <div style={{ marginTop: 20 }}>
-            <ChessBoard pgn={match.pgn} />
+            <ChessBoard pgn={match.pgn} topLabel={black} bottomLabel={white} />
           </div>
           <p style={{ marginTop: 12 }}>
             <a

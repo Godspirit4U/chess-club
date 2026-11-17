@@ -839,3 +839,17 @@ h2::after {
   color: #ffffff;
   border-color: #1d2620;
 }
+
+/* Player name strips above and below the board */
+.board-player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 2px;
+}
+
+.board-player:first-of-type {
+  margin-bottom: 6px;
+}

@@ -27,7 +27,15 @@ function positionsFromPgn(pgn: string): { fen: string; san: string | null }[] {
   return out;
 }
 
-export default function ChessBoard({ pgn }: { pgn: string }) {
+export default function ChessBoard({
+  pgn,
+  topLabel,
+  bottomLabel
+}: {
+  pgn: string;
+  topLabel?: string;
+  bottomLabel?: string;
+}) {
   const positions = useMemo(() => positionsFromPgn(pgn), [pgn]);
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -75,6 +83,13 @@ export default function ChessBoard({ pgn }: { pgn: string }) {
 
   return (
     <div>
+      {topLabel ? (
+        <div className="board-player" style={{ maxWidth: 380 }}>
+          <span className="colour-chip dark">B</span>
+          <span>{topLabel}</span>
+        </div>
+      ) : null}
+
       <div style={{ maxWidth: 400 }}>
         <Chessboard
           position={positions[at].fen}
@@ -85,6 +100,13 @@ export default function ChessBoard({ pgn }: { pgn: string }) {
           customLightSquareStyle={{ backgroundColor: "#f6f1e3" }}
         />
       </div>
+
+      {bottomLabel ? (
+        <div className="board-player" style={{ maxWidth: 380 }}>
+          <span className="colour-chip light">W</span>
+          <span>{bottomLabel}</span>
+        </div>
+      ) : null}
 
       <div style={{ display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap", alignItems: "center" }}>
         <button

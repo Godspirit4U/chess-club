@@ -186,10 +186,12 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                         <tr key={m.id}>
                           <td>{m.board}</td>
                           <td>
+                            <span className="colour-chip light" style={{ marginRight: 6 }}>W</span>
                             {((whiteName?.profiles as any)?.full_name ??
                               (whiteName?.profiles as any)?.[0]?.full_name) ?? "—"}
                           </td>
                           <td>
+                            <span className="colour-chip dark" style={{ marginRight: 6 }}>B</span>
                             {((blackName?.profiles as any)?.full_name ??
                               (blackName?.profiles as any)?.[0]?.full_name) ?? "bye"}
                           </td>
