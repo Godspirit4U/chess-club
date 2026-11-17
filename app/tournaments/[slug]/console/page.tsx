@@ -113,11 +113,25 @@ export default async function ConsolePage({ params, searchParams }: Props) {
 
   return (
     <>
-      <p className="small">
-        <Link href="/admin">Admin</Link> · <Link href={`/tournaments/${tournament.slug}`}>Public page</Link>
-      </p>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: 12,
+          flexWrap: "wrap"
+        }}
+      >
+        <p className="small" style={{ margin: 0 }}>
+          Console
+        </p>
 
-      <h1>{tournament.name}</h1>
+        <Link className="btn secondary" href={`/tournaments/${tournament.slug}`}>
+          Exit console
+        </Link>
+      </div>
+
+      <h1 style={{ marginTop: 8 }}>{tournament.name}</h1>
       <p className="muted small">
         {tournament.status} · {(players ?? []).length} players · {(rounds ?? []).length} of{" "}
         {tournament.rounds} rounds created
