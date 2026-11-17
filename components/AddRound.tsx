@@ -15,12 +15,14 @@ export default function AddRound({
   tournamentId,
   slug,
   canAddSwiss,
-  nextRoundNumber
+  nextRoundNumber,
+  playerNames = []
 }: {
   tournamentId: string;
   slug: string;
   canAddSwiss: boolean;
   nextRoundNumber: number;
+  playerNames?: string[];
 }) {
   const [mode, setMode] = useState<Mode>(null);
 
@@ -144,13 +146,26 @@ export default function AddRound({
                     id="pairings"
                     name="pairings"
                     rows={10}
-                    placeholder={"Sai Eswar vs Sai Vikas\nSaanvi subash vs Surya A Varadarajan"}
+                    placeholder={"Player 1 vs Player 2\nPlayer 3 vs Player 4"}
                     required
                   />
                   <p className="muted small" style={{ margin: "4px 0 0" }}>
                     Write "Name vs Name". First name is white. It is created as a draft so you
                     can check it before publishing.
                   </p>
+
+                  {playerNames.length > 0 ? (
+                    <details style={{ marginTop: 8 }}>
+                      <summary className="small" style={{ cursor: "pointer" }}>
+                        Player names ({playerNames.length})
+                      </summary>
+                      <ul className="small" style={{ margin: "6px 0 0", paddingLeft: 18 }}>
+                        {playerNames.map((name) => (
+                          <li key={name}>{name}</li>
+                        ))}
+                      </ul>
+                    </details>
+                  ) : null}
                 </div>
 
                 <div>

@@ -254,6 +254,10 @@ export default async function ConsolePage({ params, searchParams }: Props) {
         slug={tournament.slug}
         canAddSwiss={tournament.status === "running" && draftRounds.length === 0}
         nextRoundNumber={(rounds?.length ?? 0) + 1}
+        playerNames={(players ?? []).map(
+          (p: any) =>
+            ((p.profiles as any)?.full_name ?? (p.profiles as any)?.[0]?.full_name ?? "Member") as string
+        )}
       />
 
       {(rounds ?? []).some((r) => r.published_at) ? (
