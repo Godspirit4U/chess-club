@@ -183,7 +183,7 @@ export default async function ConsolePage({ params, searchParams }: Props) {
               <div key={dr.id} className="card" style={{ marginTop: 12 }}>
                 <h3 style={{ marginTop: 0 }}>Round {dr.number}</h3>
 
-                <table style={{ marginTop: 8 }}>
+                <table className="draft-table" style={{ marginTop: 8 }}>
                   <thead>
                     <tr>
                       <th>Board</th>
@@ -213,7 +213,7 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                             {((blackName?.profiles as any)?.full_name ??
                               (blackName?.profiles as any)?.[0]?.full_name) ?? "bye"}
                           </td>
-                          <td style={{ textAlign: "right" }}>
+                          <td className="draft-actions">
                             {m.white_id && m.black_id ? (
                               <form action={swapMatchColours}>
                                 <input type="hidden" name="match_id" value={m.id} />

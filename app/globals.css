@@ -888,3 +888,46 @@ h2::after {
   color: var(--muted);
   border-style: dashed;
 }
+
+/* Draft pairings table: stacks cleanly on a phone */
+.draft-table td.draft-actions {
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .draft-table thead {
+    display: none;
+  }
+
+  .draft-table,
+  .draft-table tbody,
+  .draft-table tr,
+  .draft-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .draft-table tr {
+    border-top: 1px solid var(--border);
+    padding: 10px 0;
+  }
+
+  .draft-table tr:first-child {
+    border-top: none;
+  }
+
+  .draft-table td {
+    padding: 2px 0;
+    border: none;
+  }
+
+  .draft-table td.draft-actions {
+    text-align: left;
+    padding-top: 8px;
+  }
+
+  .draft-table td.draft-actions form,
+  .draft-table td.draft-actions button {
+    width: 100%;
+  }
+}
