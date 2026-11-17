@@ -853,3 +853,38 @@ h2::after {
 .board-player:first-of-type {
   margin-bottom: 6px;
 }
+
+/* Small status pills in the console */
+.status-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+.status-chip.pending {
+  background: var(--hover);
+  color: var(--muted);
+}
+
+.status-chip.done {
+  background: var(--tint);
+  color: var(--accent-dark);
+  border-color: transparent;
+}
+
+.status-chip.pgn {
+  background: var(--tint);
+  color: var(--accent-dark);
+  border-color: transparent;
+}
+
+.status-chip.nopgn {
+  background: transparent;
+  color: var(--muted);
+  border-style: dashed;
+}

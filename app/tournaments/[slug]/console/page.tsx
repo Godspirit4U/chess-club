@@ -261,6 +261,16 @@ export default async function ConsolePage({ params, searchParams }: Props) {
               const rows = (matches ?? []).filter((m) => m.round_id === r.id);
               return (
                 <div key={r.id} className="card" style={{ marginBottom: 16 }}>
+                  {(() => {
+                    const all = (matches ?? []).filter((m: any) => m.round_id === r.id);
+                    const done = all.filter((m: any) => m.result !== "unplayed").length;
+                    const withPgn = all.filter((m: any) => m.pgn).length;
+                    return (
+                      <p className="small muted" style={{ margin: "0 0 8px" }}>
+                        {done} of {all.length} results entered · {withPgn} with PGN
+                      </p>
+                    );
+                  })()}
                   <div
                     style={{
                       display: "flex",
@@ -305,7 +315,24 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                           <span className="muted">vs</span>{" "}
                           <span className="colour-chip dark" style={{ margin: "0 5px 0 4px" }}>B</span>
                           {isBye ? "bye" : m.black_id ? nameOf.get(m.black_id) : "—"}{" "}
-                          <span className="muted">· now: {m.result}</span>
+                          {m.result === "unplayed" ? (
+                            <span className="status-chip pending">result pending</span>
+                          ) : (
+                            <span className="status-chip done">
+                              {m.result === "draw"
+                                ? "½–½"
+                                : m.result === "white" || m.result === "forfeit_black"
+                                  ? "1–0"
+                                  : m.result === "bye"
+                                    ? "bye"
+                                    : "0–1"}
+                            </span>
+                          )}{" "}
+                          {m.pgn ? (
+                            <span className="status-chip pgn">PGN saved</span>
+                          ) : (
+                            <span className="status-chip nopgn">no PGN</span>
+                          )}
                         </div>
 
                         {isBye ? (
