@@ -25,6 +25,7 @@ export default function ResultRow({
   isBye: boolean;
 }) {
   const [editing, setEditing] = useState(result === "unplayed");
+  const [chosen, setChosen] = useState(result === "unplayed" ? "" : result);
 
   const won =
     result === "white" || result === "forfeit_black"
@@ -118,32 +119,47 @@ export default function ResultRow({
         </div>
       ) : (
         <>
+          <input type="hidden" name="result" value={chosen} />
+
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            <SubmitButton name="result" value="white">
+            <button
+              type="button"
+              className={chosen === "white" ? "btn" : "btn secondary"}
+              onClick={() => setChosen("white")}
+            >
               White won
-            </SubmitButton>
-            <SubmitButton className="btn secondary" name="result" value="draw">
+            </button>
+            <button
+              type="button"
+              className={chosen === "draw" ? "btn" : "btn secondary"}
+              onClick={() => setChosen("draw")}
+            >
               Draw
-            </SubmitButton>
-            <SubmitButton name="result" value="black">
+            </button>
+            <button
+              type="button"
+              className={chosen === "black" ? "btn" : "btn secondary"}
+              onClick={() => setChosen("black")}
+            >
               Black won
-            </SubmitButton>
+            </button>
           </div>
 
           <PgnInput defaultValue={pgn ?? ""} />
 
-          {result !== "unplayed" ? (
-            <div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <SubmitButton>Save</SubmitButton>
+
+            {result !== "unplayed" ? (
               <button
                 type="button"
                 className="btn secondary"
-                style={{ minHeight: 30, fontSize: 12 }}
                 onClick={() => setEditing(false)}
               >
                 Cancel
               </button>
-            </div>
-          ) : null}
+            ) : null}
+          </div>
         </>
       )}
     </form>
