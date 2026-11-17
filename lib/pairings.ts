@@ -179,39 +179,28 @@ export function generateSwiss(standings: Standing[], previous: MatchRow[]): Draf
     }
   }
 
-  const half = pool.length / 2;
-  const top = pool.slice(0, half);
-  const bottom = pool.slice(half);
+  // Split into score groups, keeping the order inside each group.
+  const groups: Standing[][] = [];
+  for (const player of pool) {
+    const last = groups[groups.length - 1];
+    if (last && last[0].points === player.points) last.push(player);
+    else groups.push([player]);
+  }
 
-  const used = new Set<string>();
   const boards: Board[] = [];
+  const used = new Set<string>();
 
-  for (const player of top) {
-    if (used.has(player.profileId)) continue;
-
-    let opponentIndex = bottom.findIndex(
-      (c) => !used.has(c.profileId) && !havePlayed(player.profileId, c.profileId, previous)
-    );
-
-    // No legal opponent in the bottom half: take the nearest available player.
-    if (opponentIndex === -1) {
-      opponentIndex = bottom.findIndex((c) => !used.has(c.profileId));
-    }
-
-    if (opponentIndex === -1) continue;
-
-    const opponent = bottom[opponentIndex];
+  /** Pairs two players, applying the FIDE colour rules. */
+  function makeBoard(player: Standing, opponent: Standing) {
+    if (used.has(player.profileId) || used.has(opponent.profileId)) return;
     used.add(player.profileId);
     used.add(opponent.profileId);
 
     const warnings: string[] = [];
-
     if (havePlayed(player.profileId, opponent.profileId, previous)) {
       warnings.push("These two have already played");
     }
 
-    // FIDE C.04.1: a player should get the colour they have played less, and
-    // when balanced, the one alternating from their last game.
     const prefA = colourPreference(player);
     const prefB = colourPreference(opponent);
 
@@ -224,30 +213,22 @@ export function generateSwiss(standings: Standing[], previous: MatchRow[]): Draf
     } else if (!prefA && prefB) {
       whiteIsA = prefB !== "w";
     } else if (prefA && prefB && prefA === prefB) {
-      // Both want the same colour: the larger imbalance wins, else the higher scorer.
       const imbalanceA = Math.abs(player.whites - player.blacks);
       const imbalanceB = Math.abs(opponent.whites - opponent.blacks);
-      if (imbalanceA === imbalanceB) {
-        whiteIsA = prefA === "w";
-      } else {
-        whiteIsA = imbalanceA > imbalanceB ? prefA === "w" : prefB !== "w";
-      }
+      if (imbalanceA === imbalanceB) whiteIsA = prefA === "w";
+      else whiteIsA = imbalanceA > imbalanceB ? prefA === "w" : prefB !== "w";
     } else {
-      // Neither has a preference: the higher-ranked player takes white.
       whiteIsA = true;
     }
 
     let white = whiteIsA ? player : opponent;
     let black = whiteIsA ? opponent : player;
 
-    // Hard rules: never more than two apart, never three of the same colour.
     const whiteOk = !colourViolates(white, "w");
     const blackOk = !colourViolates(black, "b");
 
     if (!(whiteOk && blackOk)) {
-      const swappedOk =
-        !colourViolates(opponent, "w") && !colourViolates(player, "b");
-
+      const swappedOk = !colourViolates(opponent, "w") && !colourViolates(player, "b");
       if (swappedOk) {
         white = opponent;
         black = player;
@@ -267,6 +248,57 @@ export function generateSwiss(standings: Standing[], previous: MatchRow[]): Draf
       black: black.profileId,
       warnings
     });
+  }
+
+  /** Pairs inside one score group: first half against second half. */
+  function pairGroup(group: Standing[]) {
+    const half = Math.ceil(group.length / 2);
+    const top = group.slice(0, half);
+    const bottom = group.slice(half);
+
+    for (const player of top) {
+      if (used.has(player.profileId)) continue;
+
+      let index = bottom.findIndex(
+        (c) => !used.has(c.profileId) && !havePlayed(player.profileId, c.profileId, previous)
+      );
+
+      // Everyone legal is taken or already played: accept a repeat.
+      if (index === -1) index = bottom.findIndex((c) => !used.has(c.profileId));
+      if (index === -1) continue;
+
+      makeBoard(player, bottom[index]);
+    }
+
+    // Anything left in this group (odd numbers) pairs among itself.
+    const leftover = group.filter((p) => !used.has(p.profileId));
+    for (let i = 0; i + 1 < leftover.length; i += 2) {
+      makeBoard(leftover[i], leftover[i + 1]);
+    }
+  }
+
+  // Pair each score group, floating one player down when a group is odd.
+  let carried: Standing | null = null;
+
+  for (let gi = 0; gi < groups.length; gi++) {
+    let group = groups[gi];
+
+    if (carried) {
+      group = [carried, ...group];
+      carried = null;
+    }
+
+    if (group.length % 2 === 1 && gi < groups.length - 1) {
+      carried = group.pop() as Standing;
+    }
+
+    pairGroup(group);
+  }
+
+  // A floater left at the bottom pairs with whoever is still free.
+  if (carried && !used.has(carried.profileId)) {
+    const free = pool.find((p) => !used.has(p.profileId) && p.profileId !== carried!.profileId);
+    if (free) makeBoard(carried, free);
   }
 
   return { boards, bye };
