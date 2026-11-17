@@ -9,6 +9,7 @@ import ConfirmButton from "@/components/ConfirmButton";
 import { SLOT_TITLE } from "@/lib/playoff";
 import AddRound from "@/components/AddRound";
 import PgnInput from "@/components/PgnInput";
+import ResultRow from "@/components/ResultRow";
 import {
   completeTournament,
   deleteRound,
@@ -295,77 +296,17 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                   {rows.map((m) => {
                     const isBye = !m.black_id;
                     return (
-                      <form
+                      <ResultRow
                         key={m.id}
-                        action={saveResult}
-                        style={{
-                          display: "grid",
-                          gap: 8,
-                          padding: "10px 0",
-                          borderTop: "1px solid var(--border)"
-                        }}
-                      >
-                        <input type="hidden" name="match_id" value={m.id} />
-                        <input type="hidden" name="slug" value={tournament.slug} />
-
-                        <div className="small">
-                          Board {m.board}:{" "}
-                          <span className="colour-chip light" style={{ marginRight: 5 }}>W</span>
-                          {m.white_id ? nameOf.get(m.white_id) : "—"}{" "}
-                          <span className="muted">vs</span>{" "}
-                          <span className="colour-chip dark" style={{ margin: "0 5px 0 4px" }}>B</span>
-                          {isBye ? "bye" : m.black_id ? nameOf.get(m.black_id) : "—"}{" "}
-                          {m.result === "unplayed" ? (
-                            <span className="status-chip pending">result pending</span>
-                          ) : (
-                            <span className="status-chip done">
-                              {m.result === "draw"
-                                ? "½–½"
-                                : m.result === "white" || m.result === "forfeit_black"
-                                  ? "1–0"
-                                  : m.result === "bye"
-                                    ? "bye"
-                                    : "0–1"}
-                            </span>
-                          )}{" "}
-                          {m.pgn ? (
-                            <span className="status-chip pgn">PGN saved</span>
-                          ) : (
-                            <span className="status-chip nopgn">no PGN</span>
-                          )}
-                        </div>
-
-                        {isBye ? (
-                          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                            <SubmitButton
-                              className="btn secondary"
-                              name="result"
-                              value="bye"
-                            >
-                              Count as bye
-                            </SubmitButton>
-                          </div>
-                        ) : (
-                          <>
-                            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                              <SubmitButton name="result" value="white">
-                                White won
-                              </SubmitButton>
-                              <SubmitButton
-                                className="btn secondary"
-                                name="result"
-                                value="draw"
-                              >
-                                Draw
-                              </SubmitButton>
-                              <SubmitButton name="result" value="black">
-                                Black won
-                              </SubmitButton>
-                            </div>
-                            <PgnInput defaultValue={m.pgn ?? ""} />
-                          </>
-                        )}
-                      </form>
+                        matchId={m.id}
+                        slug={tournament.slug}
+                        board={m.board}
+                        whiteName={m.white_id ? nameOf.get(m.white_id) ?? "Member" : "—"}
+                        blackName={m.black_id ? nameOf.get(m.black_id) ?? "Member" : "bye"}
+                        result={m.result}
+                        pgn={m.pgn ?? null}
+                        isBye={isBye}
+                      />
                     );
                   })}
                 </div>
