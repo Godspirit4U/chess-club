@@ -19,6 +19,7 @@ import {
   regenerateRound,
   createPlayoff,
   createRoundRobin,
+  swapMatchColours,
   saveResult,
   startTournament,
   swapColours
@@ -188,6 +189,7 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                       <th>Board</th>
                       <th>White</th>
                       <th>Black</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -210,6 +212,21 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                             <span className="colour-chip dark" style={{ marginRight: 6 }}>B</span>
                             {((blackName?.profiles as any)?.full_name ??
                               (blackName?.profiles as any)?.[0]?.full_name) ?? "bye"}
+                          </td>
+                          <td style={{ textAlign: "right" }}>
+                            {m.white_id && m.black_id ? (
+                              <form action={swapMatchColours}>
+                                <input type="hidden" name="match_id" value={m.id} />
+                                <input type="hidden" name="slug" value={tournament.slug} />
+                                <button
+                                  type="submit"
+                                  className="btn secondary"
+                                  style={{ minHeight: 28, fontSize: 12 }}
+                                >
+                                  Swap colours
+                                </button>
+                              </form>
+                            ) : null}
                           </td>
                         </tr>
                       );

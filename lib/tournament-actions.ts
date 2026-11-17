@@ -755,3 +755,31 @@ export async function createCustomRound(formData: FormData) {
   revalidatePath(`/tournaments/${slug}/console`);
   redirect(`/tournaments/${slug}/console`);
 }
+
+/** Swaps white and black on a single board, for drafts you are checking. */
+export async function swapMatchColours(formData: FormData) {
+  await requireAdmin();
+
+  const matchId = String(formData.get("match_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+
+  const supabase = createClient();
+
+  const { data: match } = await supabase
+    .from("matches")
+    .select("id,white_id,black_id,result")
+    .eq("id", matchId)
+    .single();
+
+  if (!match || !match.white_id || !match.black_id) {
+    redirect(`/tournaments/${slug}/console`);
+  }
+
+  await supabase
+    .from("matches")
+    .update({ white_id: match.black_id, black_id: match.white_id })
+    .eq("id", matchId);
+
+  revalidatePath(`/tournaments/${slug}/console`);
+  redirect(`/tournaments/${slug}/console`);
+}
