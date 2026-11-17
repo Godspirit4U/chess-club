@@ -596,30 +596,91 @@ export async function createCustomRound(formData: FormData) {
     name: (p.profiles?.full_name ?? (p.profiles as any)?.[0]?.full_name ?? "Member") as string
   }));
 
-  const normalise = (value: string) =>
-    value.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const normalise = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, "");
 
-  function findPlayer(raw: string) {
-    const target = normalise(raw);
-    if (!target) return null;
+  /** Levenshtein distance, for names that are close but not identical. */
+  function distance(a: string, b: string) {
+    const rows = a.length + 1;
+    const cols = b.length + 1;
+    const grid: number[][] = Array.from({ length: rows }, (_, i) =>
+      Array.from({ length: cols }, (_, j) => (i === 0 ? j : j === 0 ? i : 0))
+    );
 
-    let best: { id: string; name: string } | null = null;
-
-    for (const player of roster) {
-      const candidate = normalise(player.name);
-      if (candidate === target) return player;
-      if (!best && (candidate.includes(target) || target.includes(candidate))) best = player;
+    for (let i = 1; i < rows; i++) {
+      for (let j = 1; j < cols; j++) {
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        grid[i][j] = Math.min(
+          grid[i - 1][j] + 1,
+          grid[i][j - 1] + 1,
+          grid[i - 1][j - 1] + cost
+        );
+      }
     }
+    return grid[rows - 1][cols - 1];
+  }
 
-    // Fall back to a word-by-word match, e.g. "Deva" for "PETLURI ... DEVAMITHRA".
-    if (!best) {
-      for (const player of roster) {
-        const words = player.name.toLowerCase().split(/\s+/).map(normalise);
-        if (words.some((w) => w && w === target)) return player;
+  function wordMatch(word: string, candidate: string) {
+    if (word === candidate) return true;
+    if (candidate.startsWith(word) && word.length >= 4) return true;
+    if (word.startsWith(candidate) && candidate.length >= 4) return true;
+    if (candidate.includes(word) && word.length >= 4) return true;
+    // "Prabu" against "Prabhulikith": one letter off at the start.
+    if (
+      word.length >= 4 &&
+      candidate.length >= word.length &&
+      distance(word, candidate.slice(0, word.length)) <= 1
+    ) {
+      return true;
+    }
+    if (word.length >= 6 && candidate.length >= 6 && distance(word, candidate) <= 1) {
+      return true;
+    }
+    return false;
+  }
+
+  function similarity(target: string, name: string) {
+    const t = normalise(target);
+    const n = normalise(name);
+    if (!t || !n) return 0;
+    if (t === n) return 1;
+
+    const substringScore =
+      n.includes(t) || t.includes(n)
+        ? 0.9 * (Math.min(t.length, n.length) / Math.max(t.length, n.length)) + 0.1
+        : 0;
+
+    const targetWords = target.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+    const nameWords = name.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+    if (targetWords.length === 0 || nameWords.length === 0) return substringScore;
+
+    let matched = 0;
+    for (const word of targetWords) {
+      if (word.length === 1) {
+        if (nameWords.some((c) => c.startsWith(word))) matched += 1;
+      } else if (nameWords.some((c) => wordMatch(word, c))) {
+        matched += 1;
       }
     }
 
-    return best;
+    return Math.max(substringScore, matched / targetWords.length);
+  }
+
+  function findPlayer(raw: string) {
+    const cleaned = raw.toLowerCase().trim();
+    if (!cleaned) return null;
+
+    let best: { id: string; name: string } | null = null;
+    let bestScore = 0;
+
+    for (const player of roster) {
+      const score = similarity(cleaned, player.name.toLowerCase());
+      if (score > bestScore) {
+        bestScore = score;
+        best = player;
+      }
+    }
+
+    return bestScore >= 0.75 ? best : null;
   }
 
   const lines = text
@@ -655,7 +716,9 @@ export async function createCustomRound(formData: FormData) {
 
   if (problems.length > 0 || boards.length === 0) {
     const message =
-      problems.length > 0 ? problems.slice(0, 3).join(" · ") : "No pairings found in the text.";
+      problems.length > 0
+        ? `${problems.slice(0, 2).join(" · ")}. Check the spelling against the player list.`
+        : "No pairings found in the text.";
     redirect(`/tournaments/${slug}/console?error=${encodeURIComponent(message)}`);
   }
 
