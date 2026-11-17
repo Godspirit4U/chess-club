@@ -249,6 +249,13 @@ export default async function ConsolePage({ params, searchParams }: Props) {
         </section>
       ) : null}
 
+      <AddRound
+        tournamentId={tournament.id}
+        slug={tournament.slug}
+        canAddSwiss={tournament.status === "running" && draftRounds.length === 0}
+        nextRoundNumber={(rounds?.length ?? 0) + 1}
+      />
+
       {(rounds ?? []).some((r) => r.published_at) ? (
         <section style={{ marginTop: 28 }}>
           <h2>Enter results</h2>
