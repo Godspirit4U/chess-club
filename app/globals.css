@@ -26,24 +26,24 @@
 }
 
 
-/* Dark theme: same roles, inverted values */
+/* Dark theme: neutral slate, not green-tinted */
 html[data-theme="dark"] {
-  --paper: #0e1411;
-  --surface: #161e19;
-  --hover: #1d2721;
-  --border: #2b3730;
+  --paper: #0d1117;
+  --surface: #161b22;
+  --hover: #1f242c;
+  --border: #30363d;
 
-  --ink: #e9f0ea;
-  --muted: #9aab9f;
-  --disabled: #63736a;
+  --ink: #e6edf3;
+  --muted: #8b949e;
+  --disabled: #6e7681;
 
-  --accent: #34b483;
-  --accent-dark: #45c795;
-  --tint: #1b2c23;
+  --accent: #2ea043;
+  --accent-dark: #3fb950;
+  --tint: #12261a;
 
-  --amber: #e2954a;
-  --danger: #e57b7b;
-  --tint-danger: #2a1c1c;
+  --amber: #d29922;
+  --danger: #f85149;
+  --tint-danger: #2d1618;
 }
 
 html[data-theme="dark"] .hero-image::after {
@@ -1002,4 +1002,43 @@ h2::after {
   font-weight: 700;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
+}
+
+/* Card highlight: a thin gradient hairline, tinted for each theme */
+.card {
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, #4f8cff 0%, #2ea043 45%, #b06ab3 100%);
+  opacity: 0.45;
+}
+
+html[data-theme="dark"] .card::before {
+  opacity: 0.7;
+}
+
+/* The Grand Final card carries a stronger gradient edge */
+.playoff-card.final {
+  position: relative;
+}
+
+.playoff-card.final::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  padding: 1px;
+  background: linear-gradient(135deg, #4f8cff, #2ea043, #b06ab3);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
