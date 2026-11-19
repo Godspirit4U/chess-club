@@ -37,9 +37,9 @@ html[data-theme="dark"] {
   --muted: #8b949e;
   --disabled: #6e7681;
 
-  --accent: #2ea043;
-  --accent-dark: #3fb950;
-  --tint: #12261a;
+  --accent: #1f6feb;
+  --accent-dark: #58a6ff;
+  --tint: #12233d;
 
   --amber: #d29922;
   --danger: #f85149;
@@ -282,10 +282,15 @@ input:focus, textarea:focus, select:focus {
   min-height: 40px;
   padding: 0 14px;
   background: transparent;
+  color: var(--ink);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   font: inherit;
   cursor: pointer;
+}
+
+.menu-toggle:hover {
+  background: var(--hover);
 }
 
 .mobile-nav {
@@ -1016,7 +1021,7 @@ h2::after {
   inset: 0 0 auto 0;
   height: 3px;
   background: linear-gradient(90deg, #4f8cff 0%, #2ea043 45%, #b06ab3 100%);
-  opacity: 0.45;
+  opacity: 0.28;
 }
 
 html[data-theme="dark"] .card::before {
@@ -1041,4 +1046,44 @@ html[data-theme="dark"] .card::before {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
+}
+
+/* Member names: bigger, with a soft pill so they stand out */
+.person-name,
+.playoff-side a,
+.playoff-side span:not(.colour-chip):not(.muted) {
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.pairing-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--hover);
+  border: 1px solid var(--border);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+a.pairing-name:hover {
+  background: var(--tint);
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+/* Light mode: a touch more presence */
+html:not([data-theme="dark"]) .card {
+  box-shadow: 0 1px 2px rgba(20, 32, 26, 0.06), 0 6px 18px -12px rgba(20, 32, 26, 0.25);
+}
+
+html:not([data-theme="dark"]) h1 {
+  letter-spacing: -0.015em;
+}
+
+html:not([data-theme="dark"]) .page-hero {
+  background: linear-gradient(135deg, #0f7d52 0%, #0b6342 60%, #14503a 100%);
 }
