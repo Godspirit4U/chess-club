@@ -202,6 +202,7 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                     <input type="hidden" name="slug" value={tournament.slug} />
                     <input
                       name="name"
+                      list="round-name-options"
                       defaultValue={dr.name ?? ""}
                       placeholder={`Round ${dr.number}`}
                       style={{ width: 150, minHeight: 30, fontSize: 13 }}
@@ -305,11 +306,23 @@ export default async function ConsolePage({ params, searchParams }: Props) {
         </section>
       ) : null}
 
+      <datalist id="round-name-options">
+        <option value="Round 1" />
+        <option value="Round 2" />
+        <option value="Round 3" />
+        <option value="Quarterfinals" />
+        <option value="Semi-final 1" />
+        <option value="Semi-final 2" />
+        <option value="Eliminator" />
+        <option value="Grand Final" />
+      </datalist>
+
       <AddRound
         tournamentId={tournament.id}
         slug={tournament.slug}
         canAddSwiss={tournament.status === "running" && draftRounds.length === 0}
         nextRoundNumber={(rounds?.length ?? 0) + 1}
+        rounds={(rounds ?? []).map((r: any) => ({ id: r.id, number: r.number, name: r.name ?? null }))}
         playerNames={(players ?? []).map(
           (p: any) =>
             ((p.profiles as any)?.full_name ?? (p.profiles as any)?.[0]?.full_name ?? "Member") as string
@@ -355,9 +368,10 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                       <input type="hidden" name="slug" value={tournament.slug} />
                       <input
                         name="name"
+                        list="round-name-options"
                         defaultValue={(r as any).name ?? ""}
                         placeholder={`Round ${r.number}`}
-                        style={{ width: 140, minHeight: 30, fontSize: 13 }}
+                        style={{ width: 150, minHeight: 30, fontSize: 13 }}
                       />
                       <button
                         type="submit"

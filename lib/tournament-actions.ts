@@ -451,7 +451,48 @@ export async function createPlayoff(formData: FormData) {
     redirect(`/tournaments/${slug}/console?error=${encodeURIComponent("At least four players are needed.")}`);
   }
 
-  const [first, second, third, fourth] = standings;
+  const { data: existingPlayoff } = await supabase
+    .from("matches")
+    .select("id")
+    .eq("tournament_id", tournamentId)
+    .eq("stage", "playoff")
+    .limit(1);
+
+  if (existingPlayoff && existingPlayoff.length > 0) {
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent("A playoff already exists for this tournament.")}`);
+  }
+
+  const source = String(formData.get("source") ?? "table");
+  const sourceRoundId = String(formData.get("source_round") ?? "");
+
+  let seeded = standings;
+
+  if (source === "round" && sourceRoundId) {
+    const { data: roundMatches } = await supabase
+      .from("matches")
+      .select("white_id,black_id,result")
+      .eq("round_id", sourceRoundId);
+
+    const winners = new Set<string>();
+    for (const m of roundMatches ?? []) {
+      if (m.result === "white" || m.result === "forfeit_black") winners.add(m.white_id as string);
+      else if (m.result === "black" || m.result === "forfeit_white") winners.add(m.black_id as string);
+    }
+
+    const ranked = standings.filter((s) => winners.has(s.profileId));
+
+    if (ranked.length < 4) {
+      redirect(
+        `/tournaments/${slug}/console?error=${encodeURIComponent(
+          `That round has ${ranked.length} winners with a result. Four are needed.`
+        )}`
+      );
+    }
+
+    seeded = ranked;
+  }
+
+  const [first, second, third, fourth] = seeded;
 
   const { error } = await supabase.from("matches").insert([
     {

@@ -16,13 +16,15 @@ export default function AddRound({
   slug,
   canAddSwiss,
   nextRoundNumber,
-  playerNames = []
+  playerNames = [],
+  rounds = []
 }: {
   tournamentId: string;
   slug: string;
   canAddSwiss: boolean;
   nextRoundNumber: number;
   playerNames?: string[];
+  rounds?: { id: string; number: number; name: string | null }[];
 }) {
   const [mode, setMode] = useState<Mode>(null);
 
@@ -179,9 +181,29 @@ export default function AddRound({
                 <input type="hidden" name="tournament_id" value={tournamentId} />
                 <input type="hidden" name="slug" value={slug} />
 
+                <div className="field" style={{ margin: 0 }}>
+                  <label htmlFor="source">Who goes into the playoff?</label>
+                  <select id="source" name="source" defaultValue="table">
+                    <option value="table">Top four of the table</option>
+                    <option value="round">Winners of a round, ranked by points</option>
+                  </select>
+                </div>
+
+                <div className="field" style={{ margin: 0 }}>
+                  <label htmlFor="source_round">If winners of a round, which round</label>
+                  <select id="source_round" name="source_round" defaultValue="">
+                    <option value="">Not used for the table option</option>
+                    {rounds.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.name || `Round ${r.number}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <p className="muted small" style={{ margin: 0 }}>
-                  Takes the top four from the table and builds Match 1, Match 2, Match 3 and the
-                  Final. Winners move on as you enter results.
+                  Builds Semi-final 1, the Eliminator, Semi-final 2 and the Grand Final. Winners
+                  move on as you enter results.
                 </p>
 
                 <div>
