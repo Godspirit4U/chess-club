@@ -58,7 +58,7 @@ export default async function TournamentPage({ params }: Props) {
   const { data: rounds } = supabase
     ? await supabase
         .from("rounds")
-        .select("id,number,published_at")
+        .select("id,number,published_at,name")
         .eq("tournament_id", tournament.id)
         .not("published_at", "is", null)
         .order("number", { ascending: true })
@@ -317,7 +317,7 @@ export default async function TournamentPage({ params }: Props) {
               return (
                 <div key={r.id} className="card" style={{ marginBottom: 12 }}>
                   <h3 style={{ marginBottom: 2 }}>
-                    Round {r.number}
+                    {(r as any).name || `Round ${r.number}`}
                     <span className="muted small" style={{ fontWeight: 400, marginLeft: 8 }}>
                       {rows.filter((m: any) => m.result !== "unplayed").length} of {rows.length}{" "}
                       matches completed

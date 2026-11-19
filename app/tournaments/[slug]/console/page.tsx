@@ -19,6 +19,8 @@ import {
   regenerateRound,
   createPlayoff,
   createRoundRobin,
+  renameRound,
+  shuffleCustomRound,
   swapMatchColours,
   saveResult,
   startTournament,
@@ -56,7 +58,7 @@ export default async function ConsolePage({ params, searchParams }: Props) {
 
   const { data: rounds } = await supabase
     .from("rounds")
-    .select("id,number,published_at")
+    .select("id,number,published_at,name")
     .eq("tournament_id", tournament.id)
     .order("number", { ascending: true });
 
@@ -181,7 +183,37 @@ export default async function ConsolePage({ params, searchParams }: Props) {
             const rows = (matches ?? []).filter((m: any) => m.round_id === dr.id);
             return (
               <div key={dr.id} className="card" style={{ marginTop: 12 }}>
-                <h3 style={{ marginTop: 0 }}>Round {dr.number}</h3>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    flexWrap: "wrap"
+                  }}
+                >
+                  <h3 style={{ marginTop: 0, marginBottom: 0 }}>
+                    {dr.name || `Round ${dr.number}`}
+                  </h3>
+
+                  <form action={renameRound} style={{ display: "flex", gap: 6 }}>
+                    <input type="hidden" name="round_id" value={dr.id} />
+                    <input type="hidden" name="slug" value={tournament.slug} />
+                    <input
+                      name="name"
+                      defaultValue={dr.name ?? ""}
+                      placeholder={`Round ${dr.number}`}
+                      style={{ width: 150, minHeight: 30, fontSize: 13 }}
+                    />
+                    <button
+                      type="submit"
+                      className="btn secondary"
+                      style={{ minHeight: 30, fontSize: 12 }}
+                    >
+                      Name it
+                    </button>
+                  </form>
+                </div>
 
                 <table className="draft-table" style={{ marginTop: 8 }}>
                   <thead>
@@ -241,12 +273,11 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                     <SubmitButton>Publish round {dr.number}</SubmitButton>
                   </form>
 
-                  <form action={regenerateRound}>
+                  <form action={shuffleCustomRound}>
                     <input type="hidden" name="tournament_id" value={tournament.id} />
                     <input type="hidden" name="round_id" value={dr.id} />
                     <input type="hidden" name="slug" value={tournament.slug} />
-                    <input type="hidden" name="pairing_format" value="swiss" />
-                    <SubmitButton className="btn secondary">Regenerate</SubmitButton>
+                    <SubmitButton className="btn secondary">Shuffle</SubmitButton>
                   </form>
 
                   <form action={deleteRound}>
@@ -309,7 +340,7 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                       flexWrap: "wrap"
                     }}
                   >
-                    <h3 style={{ margin: 0 }}>Round {r.number}</h3>
+                    <h3 style={{ margin: 0 }}>{r.name || `Round ${r.number}`}</h3>
                     <form action={deleteRound}>
                       <input type="hidden" name="round_id" value={r.id} />
                       <input type="hidden" name="slug" value={tournament.slug} />

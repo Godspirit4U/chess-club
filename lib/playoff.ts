@@ -1,20 +1,32 @@
 /**
- * Four-player Page playoff, the format the club uses.
+ * Four-player Page playoff, with the club's naming.
  *
- *   M1: 1st vs 2nd        winner -> Final (white), loser -> M3 (black)
- *   M2: 3rd vs 4th        winner -> M3 (white)
- *   M3: loser(M1) vs winner(M2)   winner -> Final (black)
- *   F : winner(M1) vs winner(M3)
+ *   Semi-final 1 : 1st vs 2nd          winner -> Grand Final (white)
+ *                                     loser  -> Semi-final 2 (white)
+ *   Eliminator   : 3rd vs 4th          winner -> Semi-final 2 (black)
+ *   Semi-final 2 : loser of Semi-final 1 vs winner of the Eliminator
+ *                                      winner -> Grand Final (black)
+ *   Grand Final  : winner of Semi-final 1 vs winner of Semi-final 2
  */
-export const PLAYOFF_SLOTS = ["M1", "M2", "M3", "F"] as const;
+export const PLAYOFF_SLOTS = ["SF1", "ELIM", "SF2", "GF"] as const;
 export type PlayoffSlot = (typeof PLAYOFF_SLOTS)[number];
 
 export const SLOT_TITLE: Record<string, string> = {
-  M1: "Match 1 · 1st vs 2nd",
-  M2: "Match 2 · 3rd vs 4th",
-  M3: "Match 3 · loser of Match 1 vs winner of Match 2",
-  F: "Final · winner of Match 1 vs winner of Match 3"
+  SF1: "Semi-final 1 · 1st vs 2nd",
+  ELIM: "Eliminator · 3rd vs 4th",
+  SF2: "Semi-final 2 · loser of Semi-final 1 vs winner of the Eliminator",
+  GF: "Grand Final · winner of Semi-final 1 vs winner of Semi-final 2"
 };
+
+export const SLOT_SHORT: Record<string, string> = {
+  SF1: "Semi-final 1",
+  ELIM: "Eliminator",
+  SF2: "Semi-final 2",
+  GF: "Grand Final"
+};
+
+/** Legacy slot names, so older brackets still resolve. */
+const LEGACY: Record<string, string> = { M1: "SF1", M2: "ELIM", M3: "SF2", F: "GF" };
 
 export type PlayoffMatch = {
   id: string;
@@ -41,28 +53,31 @@ export function loserOf(m: PlayoffMatch | undefined): string | null {
 
 /** Works out which players belong in the unfilled slots. */
 export function resolveBracket(matches: PlayoffMatch[]) {
-  const bySlot = new Map(matches.map((m) => [m.slot, m]));
+  const bySlot = new Map<string, PlayoffMatch>();
+  for (const m of matches) {
+    bySlot.set(LEGACY[m.slot] ?? m.slot, m);
+  }
 
-  const m1 = bySlot.get("M1");
-  const m2 = bySlot.get("M2");
-  const m3 = bySlot.get("M3");
+  const sf1 = bySlot.get("SF1");
+  const elim = bySlot.get("ELIM");
+  const sf2 = bySlot.get("SF2");
 
   const updates: { id: string; white_id: string | null; black_id: string | null }[] = [];
 
-  if (m3) {
-    const white = winnerOf(m2);
-    const black = loserOf(m1);
-    if (m3.white_id !== white || m3.black_id !== black) {
-      updates.push({ id: m3.id, white_id: white, black_id: black });
+  if (sf2) {
+    const white = loserOf(sf1);
+    const black = winnerOf(elim);
+    if (sf2.white_id !== white || sf2.black_id !== black) {
+      updates.push({ id: sf2.id, white_id: white, black_id: black });
     }
   }
 
-  const final = bySlot.get("F");
-  if (final) {
-    const white = winnerOf(m1);
-    const black = winnerOf(m3);
-    if (final.white_id !== white || final.black_id !== black) {
-      updates.push({ id: final.id, white_id: white, black_id: black });
+  const gf = bySlot.get("GF");
+  if (gf) {
+    const white = winnerOf(sf1);
+    const black = winnerOf(sf2);
+    if (gf.white_id !== white || gf.black_id !== black) {
+      updates.push({ id: gf.id, white_id: white, black_id: black });
     }
   }
 

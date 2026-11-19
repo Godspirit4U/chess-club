@@ -459,7 +459,7 @@ export async function createPlayoff(formData: FormData) {
       round_id: null,
       board: 1,
       stage: "playoff",
-      slot: "M1",
+      slot: "SF1",
       white_id: first.profileId,
       black_id: second.profileId,
       result: "unplayed"
@@ -469,7 +469,7 @@ export async function createPlayoff(formData: FormData) {
       round_id: null,
       board: 2,
       stage: "playoff",
-      slot: "M2",
+      slot: "ELIM",
       white_id: third.profileId,
       black_id: fourth.profileId,
       result: "unplayed"
@@ -479,9 +479,9 @@ export async function createPlayoff(formData: FormData) {
       round_id: null,
       board: 3,
       stage: "playoff",
-      slot: "M3",
-      white_source: "loser:M1",
-      black_source: "winner:M2",
+      slot: "SF2",
+      white_source: "loser:SF1",
+      black_source: "winner:ELIM",
       result: "unplayed"
     },
     {
@@ -489,9 +489,9 @@ export async function createPlayoff(formData: FormData) {
       round_id: null,
       board: 4,
       stage: "playoff",
-      slot: "F",
-      white_source: "winner:M1",
-      black_source: "winner:M3",
+      slot: "GF",
+      white_source: "winner:SF1",
+      black_source: "winner:SF2",
       result: "unplayed"
     }
   ]);
@@ -748,6 +748,7 @@ export async function createCustomRound(formData: FormData) {
       board: b.board,
       white_id: b.white,
       black_id: b.black,
+      stage: "custom",
       result: "unplayed" as const
     }))
   );
@@ -779,6 +780,82 @@ export async function swapMatchColours(formData: FormData) {
     .from("matches")
     .update({ white_id: match.black_id, black_id: match.white_id })
     .eq("id", matchId);
+
+  revalidatePath(`/tournaments/${slug}/console`);
+  redirect(`/tournaments/${slug}/console`);
+}
+
+/** Renames a round, e.g. "Quarterfinals" instead of "Round 5". */
+export async function renameRound(formData: FormData) {
+  await requireAdmin();
+
+  const roundId = String(formData.get("round_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const name = String(formData.get("name") ?? "").trim();
+
+  const supabase = createClient();
+  await supabase
+    .from("rounds")
+    .update({ name: name || null })
+    .eq("id", roundId);
+
+  revalidatePath(`/tournaments/${slug}/console`);
+  revalidatePath(`/tournaments/${slug}`);
+  redirect(`/tournaments/${slug}/console`);
+}
+
+/** Re-pairs a custom draft at random, keeping the same players. */
+export async function shuffleCustomRound(formData: FormData) {
+  await requireAdmin();
+
+  const roundId = String(formData.get("round_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const tournamentId = String(formData.get("tournament_id") ?? "");
+
+  const supabase = createClient();
+
+  const { data: round } = await supabase
+    .from("rounds")
+    .select("id,published_at")
+    .eq("id", roundId)
+    .single();
+
+  if (!round || round.published_at) {
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent("Only a draft can be shuffled.")}`);
+  }
+
+  const { data: matches } = await supabase
+    .from("matches")
+    .select("id,white_id,black_id")
+    .eq("round_id", roundId);
+
+  const ids: string[] = [];
+  for (const m of matches ?? []) {
+    if (m.white_id) ids.push(m.white_id);
+    if (m.black_id) ids.push(m.black_id);
+  }
+
+  if (ids.length < 2) {
+    redirect(`/tournaments/${slug}/console`);
+  }
+
+  for (let i = ids.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [ids[i], ids[j]] = [ids[j], ids[i]];
+  }
+
+  const rows = (matches ?? []).map((m, index) => ({
+    id: m.id,
+    white_id: ids[index * 2] ?? null,
+    black_id: ids[index * 2 + 1] ?? null
+  }));
+
+  for (const row of rows) {
+    await supabase
+      .from("matches")
+      .update({ white_id: row.white_id, black_id: row.black_id })
+      .eq("id", row.id);
+  }
 
   revalidatePath(`/tournaments/${slug}/console`);
   redirect(`/tournaments/${slug}/console`);
