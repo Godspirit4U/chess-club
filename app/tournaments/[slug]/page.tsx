@@ -322,9 +322,114 @@ export default async function TournamentPage({ params }: Props) {
             </table>
           </section>
 
+          {playoff.length > 0 ? (
+            <section style={{ marginTop: 28 }}>
+              <h2>Playoff</h2>
+
+              <div className="playoff-grid">
+                {["SF1", "ELIM", "SF2", "GF"].map((slot) => {
+                  const m = playoffBySlot.get(slot) as any;
+                  if (!m) return null;
+
+                  const title =
+                    slot === "SF1"
+                      ? "Semi-final 1"
+                      : slot === "ELIM"
+                        ? "Eliminator"
+                        : slot === "SF2"
+                          ? "Semi-final 2"
+                          : "Grand Final";
+
+                  const person = (id: string | null) => {
+                    if (!id) return null;
+                    const found = (active ?? []).find((p: any) => p.profile_id === id);
+                    return {
+                      id,
+                      name:
+                        ((found?.profiles as any)?.full_name ??
+                          (found?.profiles as any)?.[0]?.full_name ??
+                          "Member") as string
+                    };
+                  };
+
+                  const label = (source: string | null, fallback: string) => {
+                    if (!source) return fallback;
+                    const [kind, ref] = source.split(":");
+                    const refName =
+                      ref === "SF1"
+                        ? "Semi-final 1"
+                        : ref === "ELIM"
+                          ? "the Eliminator"
+                          : ref === "SF2"
+                            ? "Semi-final 2"
+                            : "the previous match";
+                    return `${kind === "winner" ? "Winner" : "Loser"} of ${refName}`;
+                  };
+
+                  const white = person(m.white_id);
+                  const black = person(m.black_id);
+                  const whiteLabel = white ? white.name : label(m.white_source, "To be decided");
+                  const blackLabel = black ? black.name : label(m.black_source, "To be decided");
+
+                  const score =
+                    m.result === "white" || m.result === "forfeit_black"
+                      ? "1–0"
+                      : m.result === "black" || m.result === "forfeit_white"
+                        ? "0–1"
+                        : m.result === "draw"
+                          ? "½–½"
+                          : "";
+
+                  const done = m.result !== "unplayed";
+
+                  return (
+                    <div key={m.id} className={`playoff-card ${slot === "GF" ? "final" : ""}`}>
+                      <div className="playoff-head">
+                        <span>{title}</span>
+                        <span className={`status-chip ${done ? "done" : "pending"}`}>
+                          {done ? "Completed" : "Pending"}
+                        </span>
+                      </div>
+
+                      <div className="playoff-body">
+                        <div className="playoff-side">
+                          <span className="colour-chip light">W</span>
+                          {white ? (
+                            <Link href={`/members/${white.id}`}>{white.name}</Link>
+                          ) : (
+                            <span className="muted">{whiteLabel}</span>
+                          )}
+                        </div>
+
+                        <div className="playoff-side">
+                          <span className="colour-chip dark">B</span>
+                          {black ? (
+                            <Link href={`/members/${black.id}`}>{black.name}</Link>
+                          ) : (
+                            <span className="muted">{blackLabel}</span>
+                          )}
+                        </div>
+
+                        {score ? <div className="playoff-score">{score}</div> : null}
+
+                        <Link
+                          className="btn secondary"
+                          href={`/tournaments/${tournament.slug}/matches/${m.id}`}
+                          style={{ minHeight: 30, fontSize: 13, marginTop: 4 }}
+                        >
+                          Match details
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+          ) : null}
+
           <section style={{ marginTop: 28 }}>
             <h2>Pairings</h2>
-            {(rounds ?? []).map((r: any) => {
+            {[...(rounds ?? [])].sort((a: any, b: any) => b.number - a.number).map((r: any) => {
               const rows = (allMatches ?? []).filter((m: any) => m.round_id === r.id);
               return (
                 <div key={r.id} className="card" style={{ marginBottom: 12 }}>
@@ -432,65 +537,6 @@ export default async function TournamentPage({ params }: Props) {
             })}
           </section>
 
-          {playoff.length > 0 ? (
-        <section style={{ marginTop: 28 }}>
-          <h2>Playoff</h2>
-          <div className="stack">
-            {["SF1", "ELIM", "SF2", "GF"].map((slot) => {
-              const m = playoffBySlot.get(slot) as any;
-              if (!m) return null;
-
-              const title =
-                slot === "SF1"
-                  ? "Semi-final 1"
-                  : slot === "ELIM"
-                    ? "Eliminator"
-                    : slot === "SF2"
-                      ? "Semi-final 2"
-                      : "Grand Final";
-
-              const nameOf = (id: string | null) => {
-                if (!id) return null;
-                const found = (active ?? []).find((p: any) => p.profile_id === id);
-                return (
-                  ((found?.profiles as any)?.full_name ??
-                    (found?.profiles as any)?.[0]?.full_name ??
-                    "Member") as string
-                );
-              };
-
-              const label = (source: string | null, fallback: string) => {
-                if (!source) return fallback;
-                const [kind, ref] = source.split(":");
-                const refName =
-                  ref === "SF1" ? "Semi-final 1" : ref === "ELIM" ? "the Eliminator" : ref === "SF2" ? "Semi-final 2" : "the previous match";
-                return `${kind === "winner" ? "Winner" : "Loser"} of ${refName}`;
-              };
-
-              const white = nameOf(m.white_id) ?? label(m.white_source, "To be decided");
-              const black = nameOf(m.black_id) ?? label(m.black_source, "To be decided");
-
-              const score =
-                m.result === "white" || m.result === "forfeit_black"
-                  ? "1-0"
-                  : m.result === "black" || m.result === "forfeit_white"
-                    ? "0-1"
-                    : m.result === "draw"
-                      ? "½-½"
-                      : "";
-
-              return (
-                <div key={m.id} className="card">
-                  <p className="small" style={{ margin: "0 0 4px", fontWeight: 600 }}>{title}</p>
-                  <p className="small" style={{ margin: 0 }}>
-                    {white} vs {black} {score ? <strong>{score}</strong> : null}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      ) : null}
         </>
       ) : null}
     </>
