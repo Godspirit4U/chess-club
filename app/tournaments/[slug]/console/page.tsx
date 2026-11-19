@@ -349,6 +349,25 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                     }}
                   >
                     <h3 style={{ margin: 0 }}>{r.name || `Round ${r.number}`}</h3>
+
+                    <form action={renameRound} style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      <input type="hidden" name="round_id" value={r.id} />
+                      <input type="hidden" name="slug" value={tournament.slug} />
+                      <input
+                        name="name"
+                        defaultValue={(r as any).name ?? ""}
+                        placeholder={`Round ${r.number}`}
+                        style={{ width: 140, minHeight: 30, fontSize: 13 }}
+                      />
+                      <button
+                        type="submit"
+                        className="btn secondary"
+                        style={{ minHeight: 30, fontSize: 12 }}
+                      >
+                        Rename
+                      </button>
+                    </form>
+
                     <form action={deleteRound}>
                       <input type="hidden" name="round_id" value={r.id} />
                       <input type="hidden" name="slug" value={tournament.slug} />
