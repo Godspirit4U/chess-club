@@ -434,7 +434,7 @@ export default async function TournamentPage({ params }: Props) {
             {[...(rounds ?? [])].sort((a: any, b: any) => b.number - a.number).map((r: any) => {
               const rows = (allMatches ?? []).filter((m: any) => m.round_id === r.id);
               return (
-                <div key={r.id} className="card" style={{ marginBottom: 12 }}>
+                <div key={r.id} className="card round-card" style={{ marginBottom: 14 }}>
                   <h3 style={{ marginBottom: 2 }}>
                     {(r as any).name || `Round ${r.number}`}
                     <span className="muted small" style={{ fontWeight: 400, marginLeft: 8 }}>
@@ -460,66 +460,49 @@ export default async function TournamentPage({ params }: Props) {
                       const blackId = m.black_id;
 
                       return (
-                        <li
-                          key={m.id}
-                          className="small"
-                          style={{
-                            display: "flex",
-                            gap: 10,
-                            alignItems: "center",
-                            flexWrap: "wrap",
-                            padding: "6px 0",
-                            borderTop: "1px solid var(--border)",
-                            listStyle: "none",
-                            marginLeft: -18
-                          }}
-                        >
-                          <span style={{ width: 34, color: "var(--muted)" }}>
-                            {m.board}
-                          </span>
-
-                          {whiteId ? (
-                            <Link
-                              href={`/members/${whiteId}`}
-                              style={{ fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}
-                            >
+                        <li key={m.id} className="pairing-row">
+                          <div className="pairing-players">
+                            <div className="pairing-player">
+                              <span className="pairing-board">{m.board}</span>
                               <span className="colour-chip light" title="White">W</span>
-                              {whiteName?.profiles?.full_name ?? "Member"}
-                            </Link>
-                          ) : (
-                            <span>—</span>
-                          )}
+                              {whiteId ? (
+                                <Link href={`/members/${whiteId}`}>
+                                  {whiteName?.profiles?.full_name ?? "Member"}
+                                </Link>
+                              ) : (
+                                <span className="muted">—</span>
+                              )}
+                            </div>
 
-                          <span className="muted">vs</span>
-
-                          {blackId ? (
-                            <Link
-                              href={`/members/${blackId}`}
-                              style={{ fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}
-                            >
+                            <div className="pairing-player">
+                              <span className="pairing-board" aria-hidden="true" />
                               <span className="colour-chip dark" title="Black">B</span>
-                              {blackName?.profiles?.full_name ?? "Member"}
+                              {blackId ? (
+                                <Link href={`/members/${blackId}`}>
+                                  {blackName?.profiles?.full_name ?? "Member"}
+                                </Link>
+                              ) : (
+                                <span className="muted">bye</span>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="pairing-meta">
+                            {score ? <strong className="pairing-score">{score}</strong> : null}
+
+                            <span
+                              className={`status-chip ${m.result === "unplayed" ? "pending" : "done"}`}
+                            >
+                              {m.result === "unplayed" ? "Pending" : "Completed"}
+                            </span>
+
+                            <Link
+                              className="btn secondary pairing-open"
+                              href={`/tournaments/${tournament.slug}/matches/${m.id}`}
+                            >
+                              Open match
                             </Link>
-                          ) : (
-                            <span className="muted">bye</span>
-                          )}
-
-                          {score ? <strong style={{ marginLeft: 4 }}>{score}</strong> : null}
-
-                          <span
-                            className={`status-chip ${m.result === "unplayed" ? "pending" : "done"}`}
-                            style={{ marginLeft: "auto" }}
-                          >
-                            {m.result === "unplayed" ? "Pending" : "Completed"}
-                          </span>
-
-                          <Link
-                            className="btn secondary"
-                            href={`/tournaments/${tournament.slug}/matches/${m.id}`}
-                            style={{ minHeight: 30, fontSize: 13 }}
-                          >
-                            Open match
-                          </Link>
+                          </div>
                         </li>
                       );
                     })}

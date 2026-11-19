@@ -1112,3 +1112,92 @@ html:not([data-theme="dark"]) .page-hero {
   min-width: 170px;
   white-space: normal;
 }
+
+/* Pairing rows: names stacked on the left, controls on the right */
+.pairing-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  list-style: none;
+  margin-left: -18px;
+}
+
+.pairing-players {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pairing-player {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.pairing-player a {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pairing-board {
+  width: 22px;
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  text-align: right;
+}
+
+.pairing-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pairing-score {
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pairing-open {
+  min-height: 30px;
+  font-size: 13px;
+}
+
+/* Round cards stand apart from each other */
+.round-card {
+  border-left: 3px solid var(--accent);
+}
+
+@media (max-width: 640px) {
+  .pairing-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .pairing-meta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-left: 30px;
+  }
+
+  .pairing-open {
+    margin-left: auto;
+  }
+
+  .pairing-player a {
+    white-space: normal;
+  }
+}
