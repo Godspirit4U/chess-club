@@ -18,6 +18,7 @@ import {
   publishRound,
   regenerateRound,
   createPlayoff,
+  deletePlayoff,
   createRoundRobin,
   renameRound,
   balanceCustomColours,
@@ -331,7 +332,29 @@ export default async function ConsolePage({ params, searchParams }: Props) {
 
       {playoff.length > 0 ? (
         <section style={{ marginTop: 28 }}>
-          <h2>Playoff</h2>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 12,
+              flexWrap: "wrap"
+            }}
+          >
+            <h2 style={{ margin: 0 }}>Playoff</h2>
+
+            <form action={deletePlayoff}>
+              <input type="hidden" name="tournament_id" value={tournament.id} />
+              <input type="hidden" name="slug" value={tournament.slug} />
+              <ConfirmButton
+                message="Delete the whole playoff, including any results entered?"
+                style={{ minHeight: 32, fontSize: 13, color: "var(--danger)" }}
+              >
+                Delete playoff
+              </ConfirmButton>
+            </form>
+          </div>
+
           <p className="muted small">
             Names fill in automatically as you enter each result.
           </p>

@@ -992,3 +992,22 @@ export async function balanceCustomColours(formData: FormData) {
   revalidatePath(`/tournaments/${slug}/console`);
   redirect(`/tournaments/${slug}/console`);
 }
+
+/** Removes the whole playoff bracket so it can be rebuilt. */
+export async function deletePlayoff(formData: FormData) {
+  await requireAdmin();
+
+  const tournamentId = String(formData.get("tournament_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+
+  const supabase = createClient();
+  await supabase
+    .from("matches")
+    .delete()
+    .eq("tournament_id", tournamentId)
+    .eq("stage", "playoff");
+
+  revalidatePath(`/tournaments/${slug}/console`);
+  revalidatePath(`/tournaments/${slug}`);
+  redirect(`/tournaments/${slug}/console`);
+}
