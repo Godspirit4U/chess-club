@@ -265,66 +265,6 @@ export default async function TournamentPage({ params }: Props) {
         )}
       </section>
 
-      {playoff.length > 0 ? (
-        <section style={{ marginTop: 28 }}>
-          <h2>Playoff</h2>
-          <div className="stack">
-            {["SF1", "ELIM", "SF2", "GF"].map((slot) => {
-              const m = playoffBySlot.get(slot) as any;
-              if (!m) return null;
-
-              const title =
-                slot === "SF1"
-                  ? "Semi-final 1"
-                  : slot === "ELIM"
-                    ? "Eliminator"
-                    : slot === "SF2"
-                      ? "Semi-final 2"
-                      : "Grand Final";
-
-              const nameOf = (id: string | null) => {
-                if (!id) return null;
-                const found = (active ?? []).find((p: any) => p.profile_id === id);
-                return (
-                  ((found?.profiles as any)?.full_name ??
-                    (found?.profiles as any)?.[0]?.full_name ??
-                    "Member") as string
-                );
-              };
-
-              const label = (source: string | null, fallback: string) => {
-                if (!source) return fallback;
-                const [kind, ref] = source.split(":");
-                const refName =
-                  ref === "SF1" ? "Semi-final 1" : ref === "ELIM" ? "the Eliminator" : ref === "SF2" ? "Semi-final 2" : "the previous match";
-                return `${kind === "winner" ? "Winner" : "Loser"} of ${refName}`;
-              };
-
-              const white = nameOf(m.white_id) ?? label(m.white_source, "To be decided");
-              const black = nameOf(m.black_id) ?? label(m.black_source, "To be decided");
-
-              const score =
-                m.result === "white" || m.result === "forfeit_black"
-                  ? "1-0"
-                  : m.result === "black" || m.result === "forfeit_white"
-                    ? "0-1"
-                    : m.result === "draw"
-                      ? "½-½"
-                      : "";
-
-              return (
-                <div key={m.id} className="card">
-                  <p className="small" style={{ margin: "0 0 4px", fontWeight: 600 }}>{title}</p>
-                  <p className="small" style={{ margin: 0 }}>
-                    {white} vs {black} {score ? <strong>{score}</strong> : null}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      ) : null}
-
       {tournament.rules ? (
         <section style={{ marginTop: 28 }}>
           <h2>Rules</h2>
@@ -491,6 +431,66 @@ export default async function TournamentPage({ params }: Props) {
               );
             })}
           </section>
+
+          {playoff.length > 0 ? (
+        <section style={{ marginTop: 28 }}>
+          <h2>Playoff</h2>
+          <div className="stack">
+            {["SF1", "ELIM", "SF2", "GF"].map((slot) => {
+              const m = playoffBySlot.get(slot) as any;
+              if (!m) return null;
+
+              const title =
+                slot === "SF1"
+                  ? "Semi-final 1"
+                  : slot === "ELIM"
+                    ? "Eliminator"
+                    : slot === "SF2"
+                      ? "Semi-final 2"
+                      : "Grand Final";
+
+              const nameOf = (id: string | null) => {
+                if (!id) return null;
+                const found = (active ?? []).find((p: any) => p.profile_id === id);
+                return (
+                  ((found?.profiles as any)?.full_name ??
+                    (found?.profiles as any)?.[0]?.full_name ??
+                    "Member") as string
+                );
+              };
+
+              const label = (source: string | null, fallback: string) => {
+                if (!source) return fallback;
+                const [kind, ref] = source.split(":");
+                const refName =
+                  ref === "SF1" ? "Semi-final 1" : ref === "ELIM" ? "the Eliminator" : ref === "SF2" ? "Semi-final 2" : "the previous match";
+                return `${kind === "winner" ? "Winner" : "Loser"} of ${refName}`;
+              };
+
+              const white = nameOf(m.white_id) ?? label(m.white_source, "To be decided");
+              const black = nameOf(m.black_id) ?? label(m.black_source, "To be decided");
+
+              const score =
+                m.result === "white" || m.result === "forfeit_black"
+                  ? "1-0"
+                  : m.result === "black" || m.result === "forfeit_white"
+                    ? "0-1"
+                    : m.result === "draw"
+                      ? "½-½"
+                      : "";
+
+              return (
+                <div key={m.id} className="card">
+                  <p className="small" style={{ margin: "0 0 4px", fontWeight: 600 }}>{title}</p>
+                  <p className="small" style={{ margin: 0 }}>
+                    {white} vs {black} {score ? <strong>{score}</strong> : null}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
         </>
       ) : null}
     </>
