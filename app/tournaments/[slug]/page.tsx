@@ -283,7 +283,8 @@ export default async function TournamentPage({ params }: Props) {
         <>
           <section style={{ marginTop: 28 }}>
             <h2>{tournament.status === "running" ? "Live leaderboard" : "Leaderboard"}</h2>
-            <table>
+            <div className="table-scroll">
+            <table className="leaderboard">
               <thead>
                 <tr>
                   <th>#</th>
@@ -320,6 +321,7 @@ export default async function TournamentPage({ params }: Props) {
                 ))}
               </tbody>
             </table>
+            </div>
           </section>
 
           {playoff.length > 0 ? (
@@ -477,7 +479,10 @@ export default async function TournamentPage({ params }: Props) {
                           </span>
 
                           {whiteId ? (
-                            <Link className="pairing-name" href={`/members/${whiteId}`}>
+                            <Link
+                              href={`/members/${whiteId}`}
+                              style={{ fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}
+                            >
                               <span className="colour-chip light" title="White">W</span>
                               {whiteName?.profiles?.full_name ?? "Member"}
                             </Link>
@@ -488,7 +493,10 @@ export default async function TournamentPage({ params }: Props) {
                           <span className="muted">vs</span>
 
                           {blackId ? (
-                            <Link className="pairing-name" href={`/members/${blackId}`}>
+                            <Link
+                              href={`/members/${blackId}`}
+                              style={{ fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 6 }}
+                            >
                               <span className="colour-chip dark" title="Black">B</span>
                               {blackName?.profiles?.full_name ?? "Member"}
                             </Link>
