@@ -329,6 +329,67 @@ export default async function ConsolePage({ params, searchParams }: Props) {
         )}
       />
 
+      {playoff.length > 0 ? (
+        <section style={{ marginTop: 28 }}>
+          <h2>Playoff</h2>
+          <p className="muted small">
+            Names fill in automatically as you enter each result.
+          </p>
+
+          <div className="stack">
+            {["SF1", "ELIM", "SF2", "GF"].map((slot) => {
+              const m = playoffBySlot.get(slot) as any;
+              if (!m) return null;
+
+              const nameOfId = (id: string | null) => {
+                if (!id) return null;
+                const found = (players ?? []).find((p: any) => p.profile_id === id);
+                return (
+                  ((found?.profiles as any)?.full_name ??
+                    (found?.profiles as any)?.[0]?.full_name ??
+                    "Member") as string
+                );
+              };
+
+              const placeholder = (source: string | null, fallback: string) => {
+                if (!source) return fallback;
+                const [kind, ref] = source.split(":");
+                const label =
+                  ref === "SF1"
+                    ? "Semi-final 1"
+                    : ref === "ELIM" || ref === "M2"
+                      ? "the Eliminator"
+                      : ref === "SF2" || ref === "M3"
+                        ? "Semi-final 2"
+                        : "the previous match";
+                return `${kind === "winner" ? "Winner" : "Loser"} of ${label}`;
+              };
+
+              const white = nameOfId(m.white_id) ?? placeholder(m.white_source, "To be decided");
+              const black = nameOfId(m.black_id) ?? placeholder(m.black_source, "To be decided");
+
+              return (
+                <div key={m.id}>
+                  <p className="small" style={{ margin: "0 0 4px", fontWeight: 600 }}>
+                    {SLOT_TITLE[slot] ?? slot}
+                  </p>
+                  <ResultRow
+                    matchId={m.id}
+                    slug={tournament.slug}
+                    board={m.board}
+                    whiteName={white}
+                    blackName={black}
+                    result={m.result}
+                    pgn={m.pgn ?? null}
+                    isBye={false}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
       {(rounds ?? []).some((r) => r.published_at) ? (
         <section style={{ marginTop: 28 }}>
           <h2>Enter results</h2>
