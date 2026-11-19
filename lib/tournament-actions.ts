@@ -860,3 +860,94 @@ export async function shuffleCustomRound(formData: FormData) {
   revalidatePath(`/tournaments/${slug}/console`);
   redirect(`/tournaments/${slug}/console`);
 }
+
+/**
+ * Reassigns white/black across a draft so each player's colour count stays as
+ * even as possible, taking their earlier rounds into account.
+ */
+export async function balanceCustomColours(formData: FormData) {
+  await requireAdmin();
+
+  const roundId = String(formData.get("round_id") ?? "");
+  const slug = String(formData.get("slug") ?? "");
+  const tournamentId = String(formData.get("tournament_id") ?? "");
+
+  const supabase = createClient();
+
+  const { data: round } = await supabase
+    .from("rounds")
+    .select("id,published_at")
+    .eq("id", roundId)
+    .single();
+
+  if (!round || round.published_at) {
+    redirect(`/tournaments/${slug}/console?error=${encodeURIComponent("Only a draft can be rebalanced.")}`);
+  }
+
+  // Colour history from every other round.
+  const { data: history } = await supabase
+    .from("matches")
+    .select("white_id,black_id,round_id")
+    .eq("tournament_id", tournamentId);
+
+  const balance = new Map<string, number>();
+  const last = new Map<string, "w" | "b">();
+
+  for (const m of history ?? []) {
+    if (m.round_id === roundId) continue;
+    if (m.white_id) {
+      balance.set(m.white_id, (balance.get(m.white_id) ?? 0) + 1);
+      last.set(m.white_id, "w");
+    }
+    if (m.black_id) {
+      balance.set(m.black_id, (balance.get(m.black_id) ?? 0) - 1);
+      last.set(m.black_id, "b");
+    }
+  }
+
+  const { data: matches } = await supabase
+    .from("matches")
+    .select("id,board,white_id,black_id")
+    .eq("round_id", roundId)
+    .order("board", { ascending: true });
+
+  for (const m of matches ?? []) {
+    if (!m.white_id || !m.black_id) continue;
+
+    const a = m.white_id;
+    const b = m.black_id;
+    const balA = balance.get(a) ?? 0;
+    const balB = balance.get(b) ?? 0;
+
+    let white = a;
+    let black = b;
+
+    if (balA > balB) {
+      // A has had more whites, so B should take white.
+      white = b;
+      black = a;
+    } else if (balA === balB) {
+      const lastA = last.get(a);
+      const lastB = last.get(b);
+      if (lastA === "w" && lastB !== "w") {
+        white = b;
+        black = a;
+      }
+    }
+
+    if (white !== m.white_id) {
+      await supabase
+        .from("matches")
+        .update({ white_id: white, black_id: black })
+        .eq("id", m.id);
+    }
+
+    balance.set(white, (balance.get(white) ?? 0) + 1);
+    balance.set(black, (balance.get(black) ?? 0) - 1);
+    last.set(white, "w");
+    last.set(black, "b");
+  }
+
+  revalidatePath(`/tournaments/${slug}/console`);
+  redirect(`/tournaments/${slug}/console`);
+}

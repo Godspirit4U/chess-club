@@ -20,6 +20,7 @@ import {
   createPlayoff,
   createRoundRobin,
   renameRound,
+  balanceCustomColours,
   shuffleCustomRound,
   swapMatchColours,
   saveResult,
@@ -271,6 +272,13 @@ export default async function ConsolePage({ params, searchParams }: Props) {
                     <input type="hidden" name="round_id" value={dr.id} />
                     <input type="hidden" name="slug" value={tournament.slug} />
                     <SubmitButton>Publish round {dr.number}</SubmitButton>
+                  </form>
+
+                  <form action={balanceCustomColours}>
+                    <input type="hidden" name="tournament_id" value={tournament.id} />
+                    <input type="hidden" name="round_id" value={dr.id} />
+                    <input type="hidden" name="slug" value={tournament.slug} />
+                    <SubmitButton className="btn secondary">Balance colours</SubmitButton>
                   </form>
 
                   <form action={shuffleCustomRound}>
