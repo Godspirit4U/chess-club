@@ -251,7 +251,6 @@ export async function saveResult(formData: FormData) {
 
   const matchId = String(formData.get("match_id") ?? "");
   const slug = String(formData.get("slug") ?? "");
-  const tournamentId = String(formData.get("tournament_id") ?? "");
   const result = String(formData.get("result") ?? "unplayed");
   const pgn = String(formData.get("pgn") ?? "").trim();
 
@@ -259,6 +258,15 @@ export async function saveResult(formData: FormData) {
   if (!allowed.includes(result)) redirect(`/tournaments/${slug}/console`);
 
   const supabase = createClient();
+
+  const { data: matchRow } = await supabase
+    .from("matches")
+    .select("id,tournament_id,stage")
+    .eq("id", matchId)
+    .single();
+
+  const tournamentId = matchRow?.tournament_id ?? String(formData.get("tournament_id") ?? "");
+
   await supabase
     .from("matches")
     .update({
