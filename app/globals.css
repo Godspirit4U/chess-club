@@ -1,27 +1,27 @@
 :root {
   /* Surfaces */
-  --paper: #f4f1e7;      /* page */
+  --paper: #f7f6f4;      /* soft paper */
   --surface: #ffffff;    /* cards, tables, inputs */
-  --hover: #f1eee3;      /* row or card under the cursor */
-  --border: #d7cfb8;     /* hairlines */
+  --hover: #f1efec;      /* row or card under the cursor */
+  --border: #e6e3dd;     /* hairlines */
 
   /* Text */
-  --ink: #0f1f14;        /* body and headings */
-  --muted: #5a6659;      /* captions, dates */
-  --disabled: #8c9288;   /* fields that cannot be edited */
+  --ink: #14110f;        /* body and headings */
+  --muted: #6b6f76;      /* captions, dates */
+  --disabled: #9aa0a6;   /* fields that cannot be edited */
 
   /* Action */
-  --accent: #0f7d52;     /* every link and primary button */
-  --accent-dark: #0b6342;
-  --tint: #dff3e7;       /* badges, selected row */
+  --accent: #6d28d9;     /* every link and primary button */
+  --accent-dark: #5b21b6;
+  --tint: #f1ebfe;       /* badges, selected row */
 
   /* Status */
-  --amber: #c2560f;      /* live, in progress, warnings */
-  --tint-danger: #fbf1f1; /* error banner background */
-  --danger: #a32b2b;     /* delete, errors */
+  --amber: #b45309;      /* live, in progress, warnings */
+  --danger: #b42318;     /* delete, errors */
+  --tint-danger: #fdf1f0; /* error banner background */
 
   /* Layout */
-  --radius: 6px;
+  --radius: 10px;
   --maxw: 1080px;
 }
 
@@ -1019,9 +1019,14 @@ h2::after {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
-  height: 3px;
+  height: 2px;
+  background: linear-gradient(90deg, #a78bfa 0%, #6d28d9 50%, #c4b5fd 100%);
+  opacity: 0.5;
+}
+
+html[data-theme="dark"] .card::before {
   background: linear-gradient(90deg, #4f8cff 0%, #2ea043 45%, #b06ab3 100%);
-  opacity: 0.28;
+  opacity: 0.7;
 }
 
 html[data-theme="dark"] .card::before {
@@ -1077,7 +1082,7 @@ a.pairing-name:hover {
 
 /* Light mode: a touch more presence */
 html:not([data-theme="dark"]) .card {
-  box-shadow: 0 1px 2px rgba(20, 32, 26, 0.06), 0 6px 18px -12px rgba(20, 32, 26, 0.25);
+  box-shadow: 0 1px 2px rgba(17, 17, 17, 0.04), 0 8px 20px -16px rgba(17, 17, 17, 0.35);
 }
 
 html:not([data-theme="dark"]) h1 {
@@ -1085,7 +1090,7 @@ html:not([data-theme="dark"]) h1 {
 }
 
 html:not([data-theme="dark"]) .page-hero {
-  background: linear-gradient(135deg, #0f7d52 0%, #0b6342 60%, #14503a 100%);
+  background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 55%, #4c1d95 100%);
 }
 
 /* Only the table scrolls sideways, never the page */
